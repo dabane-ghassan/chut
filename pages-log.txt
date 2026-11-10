@@ -1,0 +1,17 @@
+deploy job: failure
+commit: ad6cba9e68909dd3445545a1d1c635beebe34fe5
+== Pages settings (GET /repos/dabane-ghassan/chut/pages)
+{"url":"https://api.github.com/repos/dabane-ghassan/chut/pages","status":null,"cname":null,"custom_404":false,"html_url":"https://dabane-ghassan.github.io/chut/","build_type":"workflow","source":{"branch":"main","path":"/"},"public":true,"protected_domain_state":null,"pending_domain_unverified_at":null,"https_enforced":true}
+== Latest Pages builds
+[]
+== Failed steps of this run
+deploy: failure Run cp community/numbers.csv site/community.csv
+report: null 
+
+== Annotations (error messages)
+warning: Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+failure: Process completed with exit code 1.
+notice: "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748"
+
+== Live site
+https://dabane-ghassan.github.io/chut/ -> HTTP 200
