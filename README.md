@@ -35,9 +35,9 @@ sans compte, sans internet. Tout est expliqué en français sur le [site](https:
 
 - **Blocks before the ring** with Android's own call-screening API, whether chut is open, closed,
   force-stopped or the phone just restarted. Blocked calls stay in your call history.
-- **Your lists**: an unlimited block list that already holds 62 known telemarketing numbers, whole
-  ranges (`0162*`), and an allow list. Import your phone's "Blocked numbers" export, a file, or pick
-  from your call log; export everything as CSV.
+- **Your lists, if you want them**: chut ships no list of numbers. Block a number when it bothers you,
+  or import your phone's "Blocked numbers" export, a file, or pick from your call log. Whole ranges
+  (`0162*`) and an allow list work too. Numbers are never displayed unless you turn on *Show numbers*.
 - **ARCEP telemarketing ranges**: since 2023, French telemarketers must call from 01 62, 01 63, 02 70,
   02 71, 03 77, 03 78, 04 24, 04 25, 05 68, 05 69, 09 48 or 09 49.
 - **A model learned from your blocks** (below), with its accuracy shown in the app.
@@ -65,8 +65,9 @@ Android asks chut about each incoming call. chut answers on the phone in a fract
      after every list change, every Block / Not spam tap, and weekly;
    - *behaviour*: one blocked number does not make its neighbours suspicious (0.35); two in the same
      block of 1,000 numbers do (0.41), three more so (0.58); the rest of the 10,000-block stays low (0.23);
-   - *accuracy*, by 5-fold cross-validation on the 62 shipped numbers: **94 %** of hidden spam numbers
-     recognised, **0.6 %** false alarms on random numbers. The app shows these figures for your own list.
+   - *accuracy*, by 5-fold cross-validation on a synthetic history of spam blocks (in the tests):
+     **66 %** of hidden spam numbers recognised, **0.1 %** false alarms on random numbers. The app
+     shows the same measure for your own list.
 4. **Combine** the points as a noisy OR, `score = 1 − Π(1 − pᵢ)`, and **decide** with your sensitivity:
    *relaxed* silences from 60 and blocks from 90, *balanced* 40 / 70, *strict* 25 / 50.
    A silenced number that calls back within 5 minutes rings: a person insists, a robot moves on.

@@ -1,7 +1,7 @@
 <p><b>chut</b> vérifie chaque appel inconnu <b>avant que votre téléphone sonne</b> et fait taire le démarchage. Gratuit, open source, sans compte, sans pub, sans pisteur et sans accès à internet. Toutes les fonctions et toutes les statistiques, pour tout le monde.</p>
 <p><b>Comment il filtre</b></p>
 <ul>
-<li>Votre liste noire, illimitée, avec 62 numéros de démarchage déjà fournis et des tranches entières (0162*)</li>
+<li>Votre liste noire, si vous le voulez : bloquez un numéro, ou importez la liste de votre téléphone ; des tranches entières (0162*) aussi</li>
 <li>Les 12 tranches que l'ARCEP réserve au démarchage (01 62, 09 48…)</li>
 <li>Un modèle appris sur le téléphone à partir de vos blocages : il reconnaît les numéros qui ressemblent à ceux que vous bloquez (mêmes blocs de numéros, mêmes heures). Sa précision est mesurée par validation croisée et affichée dans l'appli.</li>
 <li>Votre liste blanche et vos contacts sonnent toujours</li>

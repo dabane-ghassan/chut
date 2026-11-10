@@ -44,8 +44,8 @@ public final class PhoneNumbers {
             "64", "65", "66", "81", "82", "84", "86", "90", "91", "92", "93", "94", "95", "98"));
 
     /**
-     * Normalises any written form to E.164: "04 24 03 60 62", "0033424036062" and
-     * "33424036062" all become "+33424036062". A trailing '*' (prefix rule) is kept.
+     * Normalises any written form to E.164: "01 23 45 67 89", "0033123456789" and
+     * "33123456789" all become "+33123456789". A trailing '*' (prefix rule) is kept.
      * Numbers without a country code are taken as French. Short codes (≤ 6 digits) stay as they are.
      */
     public static String normalize(String raw) {
@@ -76,7 +76,7 @@ public final class PhoneNumbers {
         return n != null && n.endsWith("*");
     }
 
-    /** "+33424036062" → "0424036062"; other numbers are returned as they are. */
+    /** "+33123456789" → "0123456789"; other numbers are returned as they are. */
     public static String national(String e164) {
         if (e164 != null && e164.startsWith("+33")) return "0" + e164.substring(3);
         return e164 == null ? "" : e164;
@@ -168,7 +168,7 @@ public final class PhoneNumbers {
     }
 
     /**
-     * The block of 1 000 numbers a number belongs to ("+33377259" for +33377259405).
+     * The block of 1 000 numbers a number belongs to ("+33512340" for +33512340457).
      * Spam platforms rent numbers in such blocks and rotate through them.
      */
     public static String block1000(String e164) {
@@ -176,7 +176,7 @@ public final class PhoneNumbers {
         return e164.substring(0, 9);
     }
 
-    /** Readable form: "+33 4 24 03 60 62", "+225 07 12 34 56", prefix rules end in " …". */
+    /** Readable form: "+33 1 23 45 67 89", "+225 07 12 34 56", prefix rules end in " …". */
     public static String pretty(String n) {
         if (n == null || n.isEmpty()) return "";
         boolean prefix = isPrefixRule(n);

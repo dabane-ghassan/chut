@@ -100,7 +100,7 @@ public class MainActivity extends Activity {
         setContentView(root);
         edgeToEdge(root);
 
-        // Opens the database (adding the preset list on first launch) and trains the model if needed.
+        // Opens the database and trains the model if needed.
         new Thread(() -> {
             Learning.model(this);
             runOnUiThread(this::refresh);

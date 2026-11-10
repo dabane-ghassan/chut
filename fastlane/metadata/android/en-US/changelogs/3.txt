@@ -1,3 +1,4 @@
 • Simpler: one screen, the number of calls stopped and a field to block a number.
+• chut no longer ships any list of numbers: your list is optional (block a number, or import your phone's list).
 • No phone number shown by default; your lists and history are optional (More settings › Show numbers).
 • Lighter statistics and settings.

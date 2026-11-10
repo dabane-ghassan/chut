@@ -8,16 +8,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.dabaneghassan.chut.R;
 import io.github.dabaneghassan.chut.engine.Engine;
 import io.github.dabaneghassan.chut.engine.Learner;
 import io.github.dabaneghassan.chut.engine.PhoneNumbers;
@@ -28,7 +23,8 @@ public final class Store extends SQLiteOpenHelper implements Engine.Lists {
 
     public static final int BLOCKED = 0;
     public static final int ALLOWED = 1;
-    public static final String SOURCE_PRESET = "preset";
+    /** Source of the numbers 1.1 shipped with; removed when upgrading. */
+    static final String SOURCE_PRESET = "preset";
 
     private static final long HISTORY_DAYS = 400;
     private static volatile Store instance;
@@ -44,7 +40,7 @@ public final class Store extends SQLiteOpenHelper implements Engine.Lists {
     }
 
     private Store(Context context) {
-        super(context, "chut.db", null, 2);
+        super(context, "chut.db", null, 3);
         this.context = context;
     }
 
@@ -55,35 +51,16 @@ public final class Store extends SQLiteOpenHelper implements Engine.Lists {
                 + "action INTEGER NOT NULL, category TEXT, reasons TEXT, score INTEGER)");
         db.execSQL("CREATE INDEX calls_time ON calls(time)");
         db.execSQL("CREATE INDEX calls_number ON calls(number)");
-        seedPreset(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < 2) {
             db.execSQL("DROP TABLE IF EXISTS community");   // the community list is gone in 1.1
-            seedPreset(db);
         }
-    }
-
-    /** The spam numbers chut ships with go on the block list, the first time the database opens. */
-    private void seedPreset(SQLiteDatabase db) {
-        long now = System.currentTimeMillis();
-        try (InputStream in = context.getResources().openRawResource(R.raw.preset_blocklist);
-             BufferedReader r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
-            ContentValues v = new ContentValues();
-            String line;
-            while ((line = r.readLine()) != null) {
-                String n = PhoneNumbers.normalize(line);
-                if (!isValid(n)) continue;
-                v.clear();
-                v.put("number", n);
-                v.put("list", BLOCKED);
-                v.put("source", SOURCE_PRESET);
-                v.put("added", now);
-                db.insertWithOnConflict("numbers", null, v, SQLiteDatabase.CONFLICT_IGNORE);
-            }
-        } catch (Exception ignored) {
+        if (oldVersion < 3) {
+            // 1.1 shipped a list of numbers; lists are now only what each person adds.
+            db.delete("numbers", "source=?", new String[]{SOURCE_PRESET});
         }
     }
 

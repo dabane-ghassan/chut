@@ -10,7 +10,7 @@ import java.util.List;
  * The call filter. It runs on the phone, in a fraction of a millisecond, with no network.
  *
  * <p>Hard rules come first: your allow list and your contacts always ring, your block list
- * (with the numbers chut ships with) never does. Then two signals give a spam score: the
+ * (if you keep one) never does. Then two signals give a spam score: the
  * ranges ARCEP reserves for telemarketing, and the {@link Learner model} trained on what you
  * blocked. They combine as a "noisy OR", 1 − Π(1 − wᵢ), so the score never passes 100.
  * Depending on your sensitivity, the score lets the call ring, silences it (it rings without
@@ -136,7 +136,7 @@ public final class Engine {
             this.reasons = Collections.unmodifiableList(reasons);
         }
 
-        /** Compact form stored in the history: "ARCEP_RANGE:0162;LEARNED:87:037725". */
+        /** Compact form stored in the history: "ARCEP_RANGE:0162;LEARNED:87:0512340". */
         public String reasonCodes() {
             StringBuilder sb = new StringBuilder();
             for (Reason r : reasons) {

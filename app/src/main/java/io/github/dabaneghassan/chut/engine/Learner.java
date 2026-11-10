@@ -15,7 +15,7 @@ import java.util.Set;
  *
  * <p><b>What it learns.</b> Spam platforms rent numbers in blocks and rotate through them, at set
  * hours. The model sees each number as a set of features: every prefix from 2 to 9 digits
- * ("0377", "03772", … "037725940"), the type of line, and the time of the call when it is known.
+ * ("0512", "05123", … "051234045"), the type of line, and the time of the call when it is known.
  * A logistic regression gives each feature a weight; a number's spam probability is
  * σ(Σ weights of its features). A new number from a block you keep blocking gets a high
  * probability, even though you never saw it.
@@ -45,7 +45,7 @@ public final class Learner {
     /** From this probability, the model's opinion counts in the spam score. */
     public static final double THRESHOLD = 0.4;
 
-    // Tuned on the preset list and synthetic blocks (see LearnerTest): with these values one
+    // Tuned on synthetic spam blocks (see LearnerTest): with these values one
     // blocked number does not taint its neighbours, two in the same block of 1,000 numbers make
     // the others suspicious, and wide areas (10,000 numbers and more) stay clean.
     private static final int EPOCHS = 30;
@@ -103,7 +103,7 @@ public final class Learner {
         }
 
         /**
-         * The block that makes this number look like spam, in national form ("0377259"): the
+         * The block that makes this number look like spam, in national form ("0512340"): the
          * longest prefix whose weight is at least half of the strongest prefix's. Null when no
          * prefix points towards spam.
          */

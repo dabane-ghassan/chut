@@ -1,3 +1,4 @@
 • Plus simple : un seul écran, le nombre d’appels stoppés et un champ pour bloquer un numéro.
-• Aucun numéro affiché par défaut ; vos listes et l’historique deviennent une option (Plus de réglages › Afficher les numéros).
+• chut ne fournit plus aucune liste de numéros : votre liste est facultative (bloquez un numéro, ou importez celle de votre téléphone).
+• Aucun numéro affiché par défaut ; vos listes et l’historique sont une option (Plus de réglages › Afficher les numéros).
 • Statistiques et réglages allégés.

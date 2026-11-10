@@ -52,13 +52,14 @@ public class DeviceTest {
     }
 
     @Test
-    public void presetListIsOnTheBlockListFromTheStart() {
-        assertTrue(store.size(Store.BLOCKED) >= 62);
-        assertEquals("+33424036062", store.blockedBy("+33424036062"));
-        assertEquals("+33412112496", store.blockedBy("+33412112496"));
-        boolean preset = false;
-        for (Store.Entry e : store.entries(Store.BLOCKED)) if (e.number.equals("+33948204800")) preset = Store.SOURCE_PRESET.equals(e.source);
-        assertTrue(preset);
+    public void startsWithNoListAndImportsYours() {
+        // chut ships no numbers: lists are only what each person adds.
+        for (Store.Entry e : store.entries(Store.BLOCKED)) assertFalse(e.source, "preset".equals(e.source));
+        // A list exported from a phone ("Blocked numbers"), imported if the user wants to.
+        int added = store.addAll(Store.BLOCKED, "+33500000001,+33500000002,+33500000003", "file");
+        assertEquals(3, added);
+        assertEquals("+33500000002", store.blockedBy("+33500000002"));
+        for (String n : new String[]{"+33500000001", "+33500000002", "+33500000003"}) store.remove(n);
     }
 
     @Test
@@ -97,7 +98,8 @@ public class DeviceTest {
 
     @Test
     public void learnsFromBlocksAndKeepsTheModelOnDisk() throws Exception {
-        String[] spam = {"+33512340001", "+33512340457", "+33512340930"};
+        // Three numbers in one block of 1,000, and two elsewhere: the model starts at five.
+        String[] spam = {"+33512340001", "+33512340457", "+33512340930", "+33299000111", "+33388000222"};
         for (String n : spam) store.add(Store.BLOCKED, n, "test");
         Learner.Model m = Learning.retrainNow(context);
         assertTrue(m.ready());
@@ -126,8 +128,10 @@ public class DeviceTest {
     public void listsDecideBeforeAnythingElse() {
         Engine.Config cfg = new Prefs(context).engineConfig();
         long now = System.currentTimeMillis();
+        store.add(Store.BLOCKED, "06 55 44 33 22", "test");
         assertEquals(Engine.Action.BLOCK,
-                Engine.evaluate(new Engine.Call("04 24 03 60 62", false, 10, now), cfg, store, null).action);
+                Engine.evaluate(new Engine.Call("06 55 44 33 22", false, 10, now), cfg, store, null).action);
+        store.remove("+33655443322");
         assertEquals(Engine.Action.BLOCK,
                 Engine.evaluate(new Engine.Call("01 62 99 99 99", false, 10, now), cfg, store, null).action);
         store.add(Store.ALLOWED, "+33162999999", "test");
@@ -172,7 +176,7 @@ public class DeviceTest {
         Notifier.afterScreening(Lang.wrap(context), "+33612345678", v);
         assertTrue(hasNotification(nm, "06 12 34 56 78"));
 
-        Stats week = Stats.compute(List.of(new Stats.Event(System.currentTimeMillis(), "+33162434166",
+        Stats week = Stats.compute(List.of(new Stats.Event(System.currentTimeMillis(), "+33162000010",
                 Engine.Action.BLOCK, Engine.Category.TELEMARKETING, "ARCEP_RANGE:0162", 70)),
                 System.currentTimeMillis(), ZoneId.systemDefault(), 7, 1);
         Notifier.weeklyReport(Lang.wrap(context), week);

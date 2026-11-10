@@ -55,11 +55,11 @@ public class EngineTest {
 
     @Test
     public void normalizesEveryFrenchForm() {
-        assertEquals("+33424036062", PhoneNumbers.normalize("04 24 03 60 62"));
-        assertEquals("+33424036062", PhoneNumbers.normalize("0033424036062"));
-        assertEquals("+33424036062", PhoneNumbers.normalize("33424036062"));
-        assertEquals("+33424036062", PhoneNumbers.normalize("+33 (0)4 24 03 60 62"));
-        assertEquals("+33424036062", PhoneNumbers.normalize("tel:+33424036062"));
+        assertEquals("+33424000032", PhoneNumbers.normalize("04 24 00 00 32"));
+        assertEquals("+33424000032", PhoneNumbers.normalize("0033424000032"));
+        assertEquals("+33424000032", PhoneNumbers.normalize("33424000032"));
+        assertEquals("+33424000032", PhoneNumbers.normalize("+33 (0)4 24 00 00 32"));
+        assertEquals("+33424000032", PhoneNumbers.normalize("tel:+33424000032"));
         assertEquals("+33162*", PhoneNumbers.normalize("0162*"));
         assertEquals("3179", PhoneNumbers.normalize("3179"));
         assertEquals("", PhoneNumbers.normalize(null));
@@ -68,7 +68,7 @@ public class EngineTest {
 
     @Test
     public void prettyPrints() {
-        assertEquals("04 24 03 60 62", PhoneNumbers.pretty("+33424036062"));
+        assertEquals("04 24 00 00 32", PhoneNumbers.pretty("+33424000032"));
         assertEquals("01 62 …", PhoneNumbers.pretty("+33162*"));
         assertEquals("+225 07 12 34 56 78", PhoneNumbers.pretty("+2250712345678"));
         assertEquals("+44 20 79 46 09 58", PhoneNumbers.pretty("+442079460958"));
@@ -76,10 +76,10 @@ public class EngineTest {
 
     @Test
     public void classifiesNumbers() {
-        assertEquals(PhoneNumbers.Kind.TELEMARKETING, PhoneNumbers.kind("+33162434166"));
+        assertEquals(PhoneNumbers.Kind.TELEMARKETING, PhoneNumbers.kind("+33162000010"));
         assertEquals(PhoneNumbers.Kind.TELEMARKETING, PhoneNumbers.kind("+33949000000"));
-        assertEquals(PhoneNumbers.Kind.LANDLINE, PhoneNumbers.kind("+33187686895"));
-        assertEquals(PhoneNumbers.Kind.VOIP, PhoneNumbers.kind("+33978808220"));
+        assertEquals(PhoneNumbers.Kind.LANDLINE, PhoneNumbers.kind("+33187000012"));
+        assertEquals(PhoneNumbers.Kind.VOIP, PhoneNumbers.kind("+33978000062"));
         assertEquals(PhoneNumbers.Kind.MOBILE, PhoneNumbers.kind("+33612345678"));
         assertEquals(PhoneNumbers.Kind.PREMIUM, PhoneNumbers.kind("+33899123456"));
         assertEquals(PhoneNumbers.Kind.TOLL_FREE, PhoneNumbers.kind("+33800123456"));
@@ -90,8 +90,8 @@ public class EngineTest {
         assertEquals("44", PhoneNumbers.countryCode("+442079460958"));
         assertEquals("1", PhoneNumbers.countryCode("+12025550123"));
         assertEquals("225", PhoneNumbers.countryCode("+2250712345678"));
-        assertEquals(PhoneNumbers.Region.SOUTH_EAST, PhoneNumbers.region("+33424036062"));
-        assertEquals(PhoneNumbers.Region.IDF, PhoneNumbers.region("+33162434166"));
+        assertEquals(PhoneNumbers.Region.SOUTH_EAST, PhoneNumbers.region("+33424000032"));
+        assertEquals(PhoneNumbers.Region.IDF, PhoneNumbers.region("+33162000010"));
     }
 
     @Test
@@ -105,23 +105,23 @@ public class EngineTest {
     @Test
     public void arcepRangeIsBlockedWhenBalancedAndSilencedWhenRelaxed() {
         Engine.Config cfg = new Engine.Config();
-        Engine.Verdict v = eval("01 62 43 41 66", cfg, new FakeLists());
+        Engine.Verdict v = eval("01 62 00 00 10", cfg, new FakeLists());
         assertEquals(Engine.Action.BLOCK, v.action);
         assertEquals(Engine.Category.TELEMARKETING, v.category);
         assertEquals("ARCEP_RANGE:0162", v.reasonCodes());
 
         cfg.sensitivity = 0;
-        assertEquals(Engine.Action.SILENCE, eval("0162434166", cfg, new FakeLists()).action);
+        assertEquals(Engine.Action.SILENCE, eval("0162000010", cfg, new FakeLists()).action);
 
         cfg.arcepRanges = false;
-        assertEquals(Engine.Action.ALLOW, eval("0162434166", cfg, new FakeLists()).action);
+        assertEquals(Engine.Action.ALLOW, eval("0162000010", cfg, new FakeLists()).action);
     }
 
     @Test
     public void hardRulesWin() {
         FakeLists l = new FakeLists();
-        l.allowed.add("+33162434166");
-        assertEquals(Engine.Action.ALLOW, eval("0162434166", new Engine.Config(), l).action);
+        l.allowed.add("+33162000010");
+        assertEquals(Engine.Action.ALLOW, eval("0162000010", new Engine.Config(), l).action);
 
         l = new FakeLists();
         l.blocked.add("+33612345678");
@@ -130,23 +130,23 @@ public class EngineTest {
         assertEquals(Engine.Category.PERSONAL, v.category);
 
         l.blocked.add("+33187*");
-        assertEquals(Engine.Action.BLOCK, eval("0187686895", new Engine.Config(), l).action);
+        assertEquals(Engine.Action.BLOCK, eval("0187000012", new Engine.Config(), l).action);
         assertNull(l.blockedBy("+33100000000"));
     }
 
     @Test
     public void contactsAlwaysRing() {
-        Engine.Verdict v = Engine.evaluate(new Engine.Call("0162434166", true, 12, NOON), new Engine.Config(), new FakeLists(), null);
+        Engine.Verdict v = Engine.evaluate(new Engine.Call("0162000010", true, 12, NOON), new Engine.Config(), new FakeLists(), null);
         assertEquals(Engine.Action.ALLOW, v.action);
         assertTrue(v.has(Engine.Signal.CONTACT));
     }
 
     @Test
     public void learnedModelFlagsNeighboursOfBlockedNumbers() {
-        // Three numbers you blocked in 03 77 25 9x xx, plus a few others.
+        // Three numbers you blocked in 05 12 34 0x xx, plus a few others.
         FakeLists l = new FakeLists();
         List<Learner.Sample> history = new ArrayList<>();
-        for (String n : new String[]{"+33377259405", "+33377259522", "+33377259230", "+33568305160", "+33568305236", "+33424288384"}) {
+        for (String n : new String[]{"+33512340001", "+33512340457", "+33512340930", "+33299000111", "+33388000222", "+33456000333"}) {
             l.blocked.add(n);
             history.add(new Learner.Sample(n, -1, true, 1));
         }
@@ -154,17 +154,17 @@ public class EngineTest {
         Engine.Config cfg = new Engine.Config();
         cfg.arcepRanges = false;   // the model alone
 
-        Engine.Verdict v = eval("03 77 25 91 11", cfg, l, model);
+        Engine.Verdict v = eval("05 12 34 02 22", cfg, l, model);
         assertTrue(v.reasonCodes(), v.has(Engine.Signal.LEARNED));
         assertTrue(v.action != Engine.Action.ALLOW);
         assertEquals(Engine.Category.LEARNED, v.category);
-        assertTrue(v.reasonCodes().contains(":0377259"));
+        assertTrue(v.reasonCodes(), v.reasonCodes().contains(":0512340"));
 
         // A number unlike anything you blocked is left alone.
         assertEquals(Engine.Action.ALLOW, eval("06 98 76 54 32", cfg, l, model).action);
         // Learning off: nothing.
         cfg.learn = false;
-        assertEquals(Engine.Action.ALLOW, eval("03 77 25 91 11", cfg, l, model).action);
+        assertEquals(Engine.Action.ALLOW, eval("05 12 34 02 22", cfg, l, model).action);
     }
 
     @Test
@@ -204,14 +204,14 @@ public class EngineTest {
         FakeLists l = new FakeLists();
         Engine.Config cfg = new Engine.Config();
         cfg.sensitivity = 0;
-        assertEquals(Engine.Action.SILENCE, eval("0162434166", cfg, l).action);
-        l.lastCall.put("+33162434166", NOON - 2 * 60 * 1000L);
-        Engine.Verdict v = eval("0162434166", cfg, l);
+        assertEquals(Engine.Action.SILENCE, eval("0162000010", cfg, l).action);
+        l.lastCall.put("+33162000010", NOON - 2 * 60 * 1000L);
+        Engine.Verdict v = eval("0162000010", cfg, l);
         assertEquals(Engine.Action.ALLOW, v.action);
         assertTrue(v.has(Engine.Signal.CALLED_BACK));
         // but never a blocked one
         cfg.sensitivity = 1;
-        assertEquals(Engine.Action.BLOCK, eval("0162434166", cfg, l).action);
+        assertEquals(Engine.Action.BLOCK, eval("0162000010", cfg, l).action);
     }
 
     @Test

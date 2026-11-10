@@ -76,7 +76,7 @@ public final class Labels {
                         ? c.getString(R.string.sig_arcep, detail.substring(0, 2) + " " + detail.substring(2))
                         : c.getString(R.string.sig_arcep_short);
             case LEARNED: {
-                // detail: "87" or "87:0377259"
+                // detail: "87" or "87:0512340"
                 String pct = detail == null ? "?" : detail.split(":")[0];
                 String prefix = detail != null && detail.contains(":") ? detail.substring(detail.indexOf(':') + 1) : null;
                 return prefix == null || prefix.isEmpty()
@@ -90,7 +90,7 @@ public final class Labels {
         }
     }
 
-    /** "0377259" → "03 77 25 9". */
+    /** "0512340" → "05 12 34 0". */
     public static String prettyPrefix(String national) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < national.length(); i++) {

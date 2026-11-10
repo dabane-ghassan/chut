@@ -1,7 +1,7 @@
 <p><b>chut</b> (French for "shh!") checks every unknown call <b>before your phone rings</b> and silences telemarketing. Free, open source, with no account, no ads, no trackers and no internet access. Every feature and every statistic, for everyone.</p>
 <p><b>How it filters</b></p>
 <ul>
-<li>Your block list, unlimited, with 62 known telemarketing numbers already on it and whole ranges (0162*)</li>
+<li>Your block list, if you want one: block a number, or import your phone's list; whole ranges (0162*) too</li>
 <li>The 12 number ranges ARCEP reserves for telemarketing in France (01 62, 09 48…)</li>
 <li>A model learned on the phone from what you block: it recognises numbers that look like the ones you block (same number blocks, same hours). Its accuracy is measured by cross-validation and shown in the app.</li>
 <li>Your allow list and your contacts always ring</li>

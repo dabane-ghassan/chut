@@ -156,7 +156,7 @@
     <string name="privacy_note">No account, no ads, no trackers, no internet access. Your lists, history and model never leave this phone.</string>
     <string name="about_line">Free software by Ghassan Dabane</string>
     <string name="how_it_works">How chut decides</string>
-    <string name="how_it_works_text">Android asks chut about every incoming call, before it rings, even when the app is closed. chut answers on the phone, in a fraction of a millisecond, without the internet.\n\n1. Your lists first. Your allow list and your contacts always ring. Your block list, with the numbers chut ships with, never does.\n\n2. ARCEP ranges: since 2023, telemarketers must call from 12 known ranges (01 62, 09 48…). They count for 70 points.\n\n3. The learned model. chut trains a logistic regression on the phone from what you block: blocks of numbers (4 to 9 digits) and call hours. It compares your blocked numbers with 3,000 random French numbers and with the ones you let ring. One block doesn\'t make its neighbours suspicious; several in the same block of 1,000 numbers do. Its probability becomes points, up to 95.\n\n4. Points combine into a score from 0 to 100, and your sensitivity decides: ring, ring silently with a notification, or block.\n\nEvery decision keeps its reasons: tap a call to see why. Block or Not spam retrains the model at once.</string>
+    <string name="how_it_works_text">Android asks chut about every incoming call, before it rings, even when the app is closed. chut answers on the phone, in a fraction of a millisecond, without the internet.\n\n1. Your lists first. Your allow list and your contacts always ring. Your block list, if you keep one, never does. It is optional: block a number when it bothers you, or import your phone\'s list.\n\n2. ARCEP ranges: since 2023, telemarketers must call from 12 known ranges (01 62, 09 48…). They count for 70 points.\n\n3. The learned model. chut trains a logistic regression on the phone from what you block: blocks of numbers (4 to 9 digits) and call hours. It compares your blocked numbers with 3,000 random French numbers and with the ones you let ring. One block doesn\'t make its neighbours suspicious; several in the same block of 1,000 numbers do. Its probability becomes points, up to 95.\n\n4. Points combine into a score from 0 to 100, and your sensitivity decides: ring, ring silently with a notification, or block.\n\nEvery decision keeps its reasons: tap a call to see why. Block or Not spam retrains the model at once.</string>
     <string name="website">Website</string>
     <string name="source_code">Source code</string>
 
@@ -182,6 +182,5 @@
     <string name="set_show_numbers_sub">Your lists and latest calls, number by number. Off: chut filters without ever showing a number.</string>
     <string name="list_blocked">Blocked</string>
     <string name="list_allowed">Allowed</string>
-    <string name="preset_count">+ %1$d telemarketing numbers shipped with chut</string>
     <string name="model_summary">Recognises %1$s of never-seen spam numbers, with %2$s false alarms.</string>
 </resources>

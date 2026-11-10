@@ -136,8 +136,9 @@ for p in POST_NOTIFICATIONS READ_CONTACTS READ_CALL_LOG; do sh pm grant "$PKG" "
 
 section "Calls while chut has never been opened"
 check "app process is not running" not_running
-expect_call "preset spam number is blocked (04 24 03 60 62)" "+33424036062" 2 "USER_LIST" 0
-t="$(calllog_type +33424036062)"
+check "chut ships no list of numbers" eq "$(sql "SELECT COUNT(*) FROM numbers")" 0
+expect_call "a telemarketing range is blocked (02 70 11 12 22)" "+33270111222" 2 "ARCEP_RANGE" 0
+t="$(calllog_type +33270111222)"
 check "it is in the phone's call log as rejected/blocked (type $t)" is_rejected "$t"
 [ -n "$t" ] || { say "  call log:"; calllog | head -5 | sed 's/^/    /' | tee -a "$REPORT" >/dev/null; }
 check "background jobs were scheduled without opening the app" jobs_scheduled
@@ -155,10 +156,11 @@ PID="$(sh pidof $PKG)"
 [ -n "$PID" ] && sh kill -9 $PID
 sleep 2
 check "process killed" not_running
-expect_call "preset spam number is blocked (09 48 20 48 00)" "+33948204800" 2 "USER_LIST" 0
+expect_call "a telemarketing range is blocked (09 48 11 12 22)" "+33948111222" 2 "ARCEP_RANGE" 0
 
 section "Learning from blocks (notification Block button)"
-for n in +33512340001 +33512340457 +33512340930; do broadcast BLOCK "$n"; done
+# Three numbers in one block of 1,000 and two elsewhere: the model starts at five blocks.
+for n in +33512340001 +33512340457 +33512340930 +33299000111 +33388000222; do broadcast BLOCK "$n"; done
 check "the three numbers are on the block list" eq "$(sql "SELECT COUNT(*) FROM numbers WHERE number LIKE '+3351234%' AND list=0")" 3
 check "the model was saved" eq "$(sh ls /data/data/$PKG/files/model.bin)" "/data/data/$PKG/files/model.bin"
 expect_call "an unseen number in that block is silenced by the model (05 12 34 02 22)" "+33512340222" 1 "LEARNED" 1
@@ -232,7 +234,6 @@ check "home now lists the latest calls" $UI has "DERNIERS APPELS INCONNUS" 8
 check "with their numbers" number_on_screen
 $UI tap "Mes listes" 8 >/dev/null
 check "my lists show only my own numbers" $UI has "04 78 12 34 56" 6
-check "the shipped numbers are counted, not listed" $UI has "fournis avec chut" 6
 shot lists-fr
 sh input keyevent 4
 $UI tap "Réglages" 6 >/dev/null
@@ -261,7 +262,7 @@ sleep 15
 boot_wait
 check "chut still holds the call-screening role" holds_role
 check "jobs survived the reboot" jobs_scheduled
-expect_call "preset spam number is blocked after reboot (03 77 32 53 77)" "+33377325377" 2 "USER_LIST" 0
+expect_call "a number you blocked is blocked after reboot (02 99 00 01 11)" "+33299000111" 2 "USER_LIST" 0
 expect_call "the model still silences its block after reboot (05 12 34 07 77)" "+33512340777" 1 "LEARNED" 1
 open_app
 check "French after reboot" $UI has "Protection active" 0

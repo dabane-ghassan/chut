@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.github.dabaneghassan.chut.MainActivity;
@@ -21,8 +20,7 @@ import io.github.dabaneghassan.chut.data.Store;
 import io.github.dabaneghassan.chut.engine.PhoneNumbers;
 
 /**
- * Your own block and allow lists. Opt-in: the page only exists when "Show numbers" is on, and
- * the numbers chut ships with are counted, not listed.
+ * Your own block and allow lists. Opt-in: the page only exists when "Show numbers" is on.
  */
 public final class ListsScreen {
 
@@ -43,12 +41,7 @@ public final class ListsScreen {
 
         if (a.listsTab > 1) a.listsTab = 0;
         int list = a.listsTab == 1 ? Store.ALLOWED : Store.BLOCKED;
-        List<Store.Entry> mine = new ArrayList<>();
-        int preset = 0;
-        for (Store.Entry e : store.entries(list)) {
-            if (Store.SOURCE_PRESET.equals(e.source)) preset++;
-            else mine.add(e);
-        }
+        List<Store.Entry> mine = store.entries(list);
         col.addView(Ui.segmented(a, new String[]{a.getString(R.string.list_blocked), a.getString(R.string.list_allowed)},
                 a.listsTab, i -> {
                     a.listsTab = i;
@@ -90,7 +83,6 @@ public final class ListsScreen {
         tip.setPadding(0, Ui.dp(a, 8), 0, Ui.dp(a, 16));
         col.addView(tip);
 
-        if (preset > 0) col.addView(Ui.muted(a, a.getString(R.string.preset_count, preset)));
         if (mine.isEmpty()) {
             TextView empty = Ui.muted(a, a.getString(list == Store.BLOCKED ? R.string.blocked_empty : R.string.allowed_empty));
             empty.setPadding(0, Ui.dp(a, 8), 0, 0);
