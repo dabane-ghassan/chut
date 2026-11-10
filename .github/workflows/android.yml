@@ -37,17 +37,17 @@ jobs:
       HAS_KEY: ${{ secrets.CHUT_KEYSTORE_BASE64 != '' && secrets.CHUT_KEYSTORE_PASSWORD != '' }}
     steps:
       - uses: actions/checkout@v4
+        id: checkout
 
       - uses: actions/setup-java@v4
+        id: java
         with:
           distribution: temurin
           java-version: "17"
 
-      - uses: android-actions/setup-android@v3
-
-      - uses: gradle/actions/setup-gradle@v4
-
+      # GitHub's Ubuntu runners ship the Android SDK; the Gradle wrapper fetches Gradle.
       - name: Test and build
+        id: build
         shell: bash
         run: |
           set -o pipefail
@@ -81,7 +81,16 @@ jobs:
         if: failure()
         shell: bash
         run: |
-          [ -f build-log.txt ] || echo "No log was written; see the Actions page." > build-log.txt
+          {
+            echo "== step outcomes"
+            echo '${{ toJSON(steps) }}'
+            echo "== environment"
+            echo "ANDROID_HOME=$ANDROID_HOME"; ls "$ANDROID_HOME/platforms" "$ANDROID_HOME/build-tools" 2>&1 | head -20
+            java -version 2>&1
+            echo "== build"
+            cat build-log.txt 2>/dev/null || echo "(the build step did not start)"
+          } > full-log.txt
+          mv full-log.txt build-log.txt
           mkdir -p /tmp/ci-log && cp build-log.txt /tmp/ci-log/
           cd /tmp/ci-log
           git init -q -b ci-log
