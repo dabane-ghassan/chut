@@ -1,0 +1,5 @@
+• French throughout, with a language switch (French / English) in the settings.
+• New on-device learned model: it recognises numbers that look like the ones you block (number blocks, hours), measured by cross-validation.
+• 62 known telemarketing numbers ship on the block list.
+• No internet access any more: the community list is removed.
+• Tested on Android 14 with real calls: app never opened, force-stopped, killed, after a reboot.

@@ -1,3 +1,0 @@
-# Numbers that must never be on the community list (wrongly reported, legitimate services).
-# One E.164 number or prefix ending in * per line, with an optional comment after a comma.
-number,why

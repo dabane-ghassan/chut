@@ -6,12 +6,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.telecom.Call;
 import android.telecom.CallScreeningService;
-import android.telecom.Connection;
 import android.telecom.TelecomManager;
 
 import java.time.LocalTime;
 
-import io.github.dabaneghassan.chut.data.Community;
+import io.github.dabaneghassan.chut.data.Lang;
+import io.github.dabaneghassan.chut.data.Learning;
 import io.github.dabaneghassan.chut.data.Phone;
 import io.github.dabaneghassan.chut.data.Prefs;
 import io.github.dabaneghassan.chut.data.Store;
@@ -19,8 +19,9 @@ import io.github.dabaneghassan.chut.engine.Engine;
 
 /**
  * Android binds this service for an incoming call, before the phone rings, once chut is the
- * "Caller ID & spam" app. There is no service running the rest of the time: chut uses no
- * battery between calls.
+ * "Caller ID & spam" app. It works whether or not chut is open: Android starts it for the call,
+ * even after the app was closed, force-stopped or the phone restarted. Nothing runs between
+ * calls, so chut uses no battery.
  */
 public class ScreeningService extends CallScreeningService {
 
@@ -34,19 +35,16 @@ public class ScreeningService extends CallScreeningService {
             if (details.getCallDirection() == Call.Details.DIRECTION_INCOMING) {
                 Uri handle = details.getHandle();
                 number = handle == null ? "" : handle.getSchemeSpecificPart();
-                int verification = Engine.VERIFICATION_UNKNOWN;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    if (details.getHandlePresentation() == TelecomManager.PRESENTATION_RESTRICTED) number = "";
-                    // France's caller-ID authentication (MAN, like STIR/SHAKEN) reports here.
-                    int status = details.getCallerNumberVerificationStatus();
-                    if (status == Connection.VERIFICATION_STATUS_FAILED) verification = Engine.VERIFICATION_FAILED;
-                    else if (status == Connection.VERIFICATION_STATUS_PASSED) verification = Engine.VERIFICATION_PASSED;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                        && details.getHandlePresentation() == TelecomManager.PRESENTATION_RESTRICTED) {
+                    number = "";
                 }
-                Community.loadBundledIfNeeded(this);
                 Store store = Store.get(this);
                 boolean contact = Phone.isContact(this, number);
-                verdict = Engine.evaluate(new Engine.Call(number, verification, contact, LocalTime.now().getHour(), now),
-                        new Prefs(this).engineConfig(), store);
+                Prefs prefs = new Prefs(this);
+                Engine.Config cfg = prefs.engineConfig();
+                verdict = Engine.evaluate(new Engine.Call(number, contact, LocalTime.now().getHour(), now),
+                        cfg, store, cfg.learn ? Learning.savedModel(this) : null);
                 if (verdict.action == Engine.Action.BLOCK) {
                     response.setDisallowCall(true)
                             .setRejectCall(true)
@@ -63,11 +61,12 @@ public class ScreeningService extends CallScreeningService {
 
         if (verdict != null && !verdict.has(Engine.Signal.CONTACT)) {
             final Engine.Verdict v = verdict;
-            final String n = new Engine.Call(number, 0, false, 0, now).number;
+            final String n = new Engine.Call(number, false, 0, now).number;
             new Thread(() -> {
                 try {
+                    BackgroundJobs.schedule(this);   // even if the app was never opened
                     Store.get(this).log(n, v, now);
-                    Notifier.afterScreening(this, n, v);
+                    Notifier.afterScreening(Lang.wrap(this), n, v);
                 } catch (Throwable ignored) {
                 }
             }).start();

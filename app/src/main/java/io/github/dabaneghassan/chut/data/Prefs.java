@@ -12,28 +12,31 @@ public final class Prefs {
 
     public static final String SENSITIVITY = "sensitivity";
     public static final String ARCEP = "arcep";
-    public static final String COMMUNITY = "community";
-    public static final String SPOOF = "spoof";
     public static final String LEARN = "learn";
     public static final String HIDDEN = "hidden";
     public static final String FOREIGN = "foreign";
     public static final String CONTACTS = "contacts";
     public static final String CALLBACKS = "callbacks";
-    public static final String QUIET = "quiet";
-    public static final String QUIET_START = "quiet_start";
-    public static final String QUIET_END = "quiet_end";
     public static final String SENIOR = "senior";
     public static final String NOTIFY_SILENCED = "notify_silenced";
     public static final String NOTIFY_BLOCKED = "notify_blocked";
     public static final String WEEKLY = "weekly";
-    public static final String SYNC = "sync";
-    public static final String LAST_SYNC = "last_sync";
-    public static final String BUNDLED_VERSION = "bundled_version";
+    public static final String LANGUAGE = "language";
 
     private final SharedPreferences p;
 
     public Prefs(Context context) {
-        p = context.getApplicationContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
+        Context app = context.getApplicationContext();
+        p = (app != null ? app : context).getSharedPreferences("settings", Context.MODE_PRIVATE);
+    }
+
+    /** "fr" (the default) or "en". */
+    public String language() {
+        return "en".equals(p.getString(LANGUAGE, "fr")) ? "en" : "fr";
+    }
+
+    public void setLanguage(String lang) {
+        p.edit().putString(LANGUAGE, "en".equals(lang) ? "en" : "fr").commit();
     }
 
     public boolean flag(String key) {
@@ -41,7 +44,7 @@ public final class Prefs {
     }
 
     public void setFlag(String key, boolean on) {
-        p.edit().putBoolean(key, on).apply();
+        p.edit().putBoolean(key, on).commit();   // on disk at once: survives the app being killed
     }
 
     public int number(String key, int def) {
@@ -49,7 +52,7 @@ public final class Prefs {
     }
 
     public void setNumber(String key, int value) {
-        p.edit().putInt(key, value).apply();
+        p.edit().putInt(key, value).commit();
     }
 
     public long time(String key) {
@@ -63,8 +66,6 @@ public final class Prefs {
     private static boolean defaultFlag(String key) {
         switch (key) {
             case ARCEP:
-            case COMMUNITY:
-            case SPOOF:
             case LEARN:
             case CONTACTS:
             case CALLBACKS:
@@ -72,7 +73,7 @@ public final class Prefs {
             case WEEKLY:
                 return true;
             default:
-                return false;   // hidden, foreign, quiet, senior, notify_blocked, sync
+                return false;   // hidden, foreign, senior, notify_blocked
         }
     }
 
@@ -80,16 +81,11 @@ public final class Prefs {
         Engine.Config c = new Engine.Config();
         c.sensitivity = number(SENSITIVITY, 1);
         c.arcepRanges = flag(ARCEP);
-        c.community = flag(COMMUNITY);
-        c.spoofCheck = flag(SPOOF);
         c.learn = flag(LEARN);
         c.blockHidden = flag(HIDDEN);
         c.blockForeign = flag(FOREIGN);
         c.contactsAlwaysRing = flag(CONTACTS);
         c.letCallbacksThrough = flag(CALLBACKS);
-        c.quietHours = flag(QUIET);
-        c.quietStart = number(QUIET_START, 22);
-        c.quietEnd = number(QUIET_END, 8);
         c.seniorMode = flag(SENIOR);
         return c;
     }

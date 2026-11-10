@@ -8,22 +8,31 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import io.github.dabaneghassan.chut.R;
 import io.github.dabaneghassan.chut.engine.Engine;
+import io.github.dabaneghassan.chut.engine.Learner;
 import io.github.dabaneghassan.chut.engine.PhoneNumbers;
 import io.github.dabaneghassan.chut.engine.Stats;
 
-/** The phone's local database: your lists, the community list and the call history. Nothing leaves it. */
+/** The phone's local database: your lists and the call history. Nothing leaves it. */
 public final class Store extends SQLiteOpenHelper implements Engine.Lists {
 
     public static final int BLOCKED = 0;
     public static final int ALLOWED = 1;
+    public static final String SOURCE_PRESET = "preset";
 
     private static final long HISTORY_DAYS = 400;
     private static volatile Store instance;
+    private final Context context;
 
     public static Store get(Context context) {
         if (instance == null) {
@@ -35,22 +44,47 @@ public final class Store extends SQLiteOpenHelper implements Engine.Lists {
     }
 
     private Store(Context context) {
-        super(context, "chut.db", null, 1);
+        super(context, "chut.db", null, 2);
+        this.context = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE numbers (number TEXT PRIMARY KEY, list INTEGER NOT NULL, source TEXT, added INTEGER NOT NULL)");
-        db.execSQL("CREATE TABLE community (number TEXT PRIMARY KEY, category TEXT, reports INTEGER)");
         db.execSQL("CREATE TABLE calls (id INTEGER PRIMARY KEY AUTOINCREMENT, time INTEGER NOT NULL, number TEXT NOT NULL, "
                 + "action INTEGER NOT NULL, category TEXT, reasons TEXT, score INTEGER)");
         db.execSQL("CREATE INDEX calls_time ON calls(time)");
         db.execSQL("CREATE INDEX calls_number ON calls(number)");
+        seedPreset(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // First schema version.
+        if (oldVersion < 2) {
+            db.execSQL("DROP TABLE IF EXISTS community");   // the community list is gone in 1.1
+            seedPreset(db);
+        }
+    }
+
+    /** The spam numbers chut ships with go on the block list, the first time the database opens. */
+    private void seedPreset(SQLiteDatabase db) {
+        long now = System.currentTimeMillis();
+        try (InputStream in = context.getResources().openRawResource(R.raw.preset_blocklist);
+             BufferedReader r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
+            ContentValues v = new ContentValues();
+            String line;
+            while ((line = r.readLine()) != null) {
+                String n = PhoneNumbers.normalize(line);
+                if (!isValid(n)) continue;
+                v.clear();
+                v.put("number", n);
+                v.put("list", BLOCKED);
+                v.put("source", SOURCE_PRESET);
+                v.put("added", now);
+                db.insertWithOnConflict("numbers", null, v, SQLiteDatabase.CONFLICT_IGNORE);
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     /** One entry of a personal list. */
@@ -78,28 +112,6 @@ public final class Store extends SQLiteOpenHelper implements Engine.Lists {
     public String blockedBy(String number) {
         if (count("SELECT COUNT(*) FROM numbers WHERE list=0 AND number=?", number) > 0) return number;
         return matchPrefix(BLOCKED, number);
-    }
-
-    @Override
-    public String communityCategory(String number) {
-        try (Cursor c = getReadableDatabase().rawQuery("SELECT category FROM community WHERE number=?", new String[]{number})) {
-            if (c.moveToFirst()) return c.isNull(0) ? "telemarketing" : c.getString(0);
-        }
-        try (Cursor c = getReadableDatabase().rawQuery("SELECT number, category FROM community WHERE number LIKE '%*'", null)) {
-            while (c.moveToNext()) {
-                String p = c.getString(0);
-                if (number.startsWith(p.substring(0, p.length() - 1))) return c.isNull(1) ? "telemarketing" : c.getString(1);
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public int blockedNeighbours(String block1000, String number) {
-        return count("SELECT COUNT(*) FROM ("
-                        + "SELECT number FROM numbers WHERE list=0 AND length(number)=12 AND substr(number,1,9)=? AND number<>? "
-                        + "UNION SELECT number FROM community WHERE length(number)=12 AND substr(number,1,9)=? AND number<>?)",
-                block1000, number, block1000, number);
     }
 
     @Override
@@ -131,6 +143,12 @@ public final class Store extends SQLiteOpenHelper implements Engine.Lists {
 
     /** Adds (or moves) a number to a list. Returns false for an invalid number or one already there. */
     public boolean add(int list, String raw, String source) {
+        boolean added = insert(list, raw, source);
+        if (added) Learning.retrainSoon(context);
+        return added;
+    }
+
+    private boolean insert(int list, String raw, String source) {
         String n = PhoneNumbers.normalize(raw);
         if (!isValid(n)) return false;
         if (count("SELECT COUNT(*) FROM numbers WHERE number=? AND list=?", n, String.valueOf(list)) > 0) return false;
@@ -159,22 +177,23 @@ public final class Store extends SQLiteOpenHelper implements Engine.Lists {
                 if (line.isEmpty() || line.startsWith("#")) continue;
                 String[] cols = line.split(",");
                 if (cols.length >= 2 && (cols[1].trim().equals("blocked") || cols[1].trim().equals("allowed"))) {
-                    if (add(cols[1].trim().equals("blocked") ? BLOCKED : ALLOWED, cols[0], source)) added++;
+                    if (insert(cols[1].trim().equals("blocked") ? BLOCKED : ALLOWED, cols[0], source)) added++;
                     continue;
                 }
                 for (String part : line.split("[,;\\t]+")) {
-                    if (add(list, part, source)) added++;
+                    if (insert(list, part, source)) added++;
                 }
             }
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
+        if (added > 0) Learning.retrainSoon(context);
         return added;
     }
 
     public void remove(String number) {
-        getWritableDatabase().delete("numbers", "number=?", new String[]{number});
+        if (getWritableDatabase().delete("numbers", "number=?", new String[]{number}) > 0) Learning.retrainSoon(context);
     }
 
     /** BLOCKED, ALLOWED or -1. */
@@ -198,35 +217,35 @@ public final class Store extends SQLiteOpenHelper implements Engine.Lists {
         return count("SELECT COUNT(*) FROM numbers WHERE list=?", String.valueOf(list));
     }
 
-    // ---- Community list ----------------------------------------------------------------
+    // ---- Training data for the model ----------------------------------------------------
 
-    /** Replaces the community list: number → {category, reports}. */
-    public void replaceCommunity(Map<String, String[]> rows) {
-        SQLiteDatabase db = getWritableDatabase();
-        db.beginTransaction();
-        try {
-            db.delete("community", null, null);
-            ContentValues v = new ContentValues();
-            for (Map.Entry<String, String[]> r : rows.entrySet()) {
-                v.clear();
-                v.put("number", r.getKey());
-                v.put("category", r.getValue()[0]);
-                int reports = 1;
-                try {
-                    reports = Integer.parseInt(r.getValue()[1]);
-                } catch (Exception ignored) {
-                }
-                v.put("reports", reports);
-                db.insertWithOnConflict("community", null, v, SQLiteDatabase.CONFLICT_REPLACE);
+    /**
+     * What the model learns from: blocked numbers (spam, with the hours they called), allowed
+     * numbers (not spam, weight 2: you said so), and calls that rang and were never blocked
+     * afterwards (probably not spam, weight 0.3).
+     */
+    public List<Learner.Sample> trainingSamples() {
+        List<Learner.Sample> out = new ArrayList<>();
+        try (Cursor c = getReadableDatabase().rawQuery("SELECT number, list FROM numbers WHERE number NOT LIKE '%*'", null)) {
+            while (c.moveToNext()) {
+                boolean spam = c.getInt(1) == BLOCKED;
+                out.add(new Learner.Sample(c.getString(0), -1, spam, spam ? 1 : 2));
             }
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
         }
-    }
-
-    public int communitySize() {
-        return count("SELECT COUNT(*) FROM community");
+        ZoneId zone = ZoneId.systemDefault();
+        try (Cursor c = getReadableDatabase().rawQuery(
+                "SELECT calls.number, calls.time, calls.action, numbers.list FROM calls "
+                        + "LEFT JOIN numbers ON numbers.number = calls.number WHERE calls.number <> ''", null)) {
+            while (c.moveToNext()) {
+                int hour = Instant.ofEpochMilli(c.getLong(1)).atZone(zone).getHour();
+                boolean listedSpam = !c.isNull(3) && c.getInt(3) == BLOCKED;
+                boolean listedHam = !c.isNull(3) && c.getInt(3) == ALLOWED;
+                if (listedSpam) out.add(new Learner.Sample(c.getString(0), hour, true, 1));
+                else if (listedHam) out.add(new Learner.Sample(c.getString(0), hour, false, 2));
+                else if (c.getInt(2) == Engine.Action.ALLOW.ordinal()) out.add(new Learner.Sample(c.getString(0), hour, false, 0.3));
+            }
+        }
+        return out;
     }
 
     // ---- Call history ------------------------------------------------------------------
@@ -255,6 +274,7 @@ public final class Store extends SQLiteOpenHelper implements Engine.Lists {
 
     public void clearHistory() {
         getWritableDatabase().delete("calls", null, null);
+        Learning.retrainSoon(context);
     }
 
     private List<Stats.Event> query(String sql, String... args) {

@@ -2,7 +2,6 @@
 package io.github.dabaneghassan.chut.engine;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -23,7 +22,6 @@ public class EngineTest {
     static class FakeLists implements Engine.Lists {
         final Set<String> allowed = new HashSet<>();
         final Set<String> blocked = new HashSet<>();
-        final Map<String, String> community = new HashMap<>();
         final Map<String, Long> lastCall = new HashMap<>();
 
         @Override
@@ -39,20 +37,6 @@ public class EngineTest {
         }
 
         @Override
-        public String communityCategory(String n) {
-            return community.get(n);
-        }
-
-        @Override
-        public int blockedNeighbours(String block, String n) {
-            Set<String> all = new HashSet<>(blocked);
-            all.addAll(community.keySet());
-            int k = 0;
-            for (String b : all) if (!b.endsWith("*") && b.startsWith(block) && !b.equals(n)) k++;
-            return k;
-        }
-
-        @Override
         public int callsSince(String n, long since) {
             Long t = lastCall.get(n);
             return t != null && t >= since ? 1 : 0;
@@ -61,8 +45,12 @@ public class EngineTest {
 
     static final long NOON = ZonedDateTime.of(2026, 11, 10, 12, 0, 0, 0, ZoneId.of("Europe/Paris")).toInstant().toEpochMilli();
 
+    static Engine.Verdict eval(String number, Engine.Config cfg, FakeLists lists, Learner.Model model) {
+        return Engine.evaluate(new Engine.Call(number, false, 12, NOON), cfg, lists, model);
+    }
+
     static Engine.Verdict eval(String number, Engine.Config cfg, FakeLists lists) {
-        return Engine.evaluate(new Engine.Call(number, Engine.VERIFICATION_UNKNOWN, false, 12, NOON), cfg, lists);
+        return eval(number, cfg, lists, null);
     }
 
     @Test
@@ -120,7 +108,7 @@ public class EngineTest {
         Engine.Verdict v = eval("01 62 43 41 66", cfg, new FakeLists());
         assertEquals(Engine.Action.BLOCK, v.action);
         assertEquals(Engine.Category.TELEMARKETING, v.category);
-        assertTrue(v.has(Engine.Signal.ARCEP_RANGE));
+        assertEquals("ARCEP_RANGE:0162", v.reasonCodes());
 
         cfg.sensitivity = 0;
         assertEquals(Engine.Action.SILENCE, eval("0162434166", cfg, new FakeLists()).action);
@@ -143,70 +131,60 @@ public class EngineTest {
 
         l.blocked.add("+33187*");
         assertEquals(Engine.Action.BLOCK, eval("0187686895", new Engine.Config(), l).action);
+        assertNull(l.blockedBy("+33100000000"));
     }
 
     @Test
     public void contactsAlwaysRing() {
-        Engine.Verdict v = Engine.evaluate(new Engine.Call("0162434166", 0, true, 12, NOON), new Engine.Config(), new FakeLists());
+        Engine.Verdict v = Engine.evaluate(new Engine.Call("0162434166", true, 12, NOON), new Engine.Config(), new FakeLists(), null);
         assertEquals(Engine.Action.ALLOW, v.action);
         assertTrue(v.has(Engine.Signal.CONTACT));
     }
 
     @Test
-    public void learnsFromNeighbouringSpamNumbers() {
-        // The user's real history: three numbers in the 03 77 25 9x xx block.
+    public void learnedModelFlagsNeighboursOfBlockedNumbers() {
+        // Three numbers you blocked in 03 77 25 9x xx, plus a few others.
         FakeLists l = new FakeLists();
-        l.blocked.add("+33377259405");
-        l.blocked.add("+33377259522");
-        l.blocked.add("+33377259230");
+        List<Learner.Sample> history = new ArrayList<>();
+        for (String n : new String[]{"+33377259405", "+33377259522", "+33377259230", "+33568305160", "+33568305236", "+33424288384"}) {
+            l.blocked.add(n);
+            history.add(new Learner.Sample(n, -1, true, 1));
+        }
+        Learner.Model model = Learner.train(history, 42, NOON);
         Engine.Config cfg = new Engine.Config();
-        cfg.arcepRanges = false;   // learning alone
-        Engine.Verdict v = eval("03 77 25 91 11", cfg, l);
-        assertTrue(v.has(Engine.Signal.LEARNED_STRONG));
-        assertEquals(Engine.Action.SILENCE, v.action);
+        cfg.arcepRanges = false;   // the model alone
 
-        // A number outside any spam block is left alone.
-        assertEquals(Engine.Action.ALLOW, eval("03 88 12 34 56", cfg, l).action);
+        Engine.Verdict v = eval("03 77 25 91 11", cfg, l, model);
+        assertTrue(v.reasonCodes(), v.has(Engine.Signal.LEARNED));
+        assertTrue(v.action != Engine.Action.ALLOW);
+        assertEquals(Engine.Category.LEARNED, v.category);
+        assertTrue(v.reasonCodes().contains(":0377259"));
+
+        // A number unlike anything you blocked is left alone.
+        assertEquals(Engine.Action.ALLOW, eval("06 98 76 54 32", cfg, l, model).action);
+        // Learning off: nothing.
+        cfg.learn = false;
+        assertEquals(Engine.Action.ALLOW, eval("03 77 25 91 11", cfg, l, model).action);
     }
 
     @Test
     public void signalsCombineAsNoisyOr() {
         List<Engine.Reason> r = new ArrayList<>();
-        r.add(new Engine.Reason(Engine.Signal.ARCEP_RANGE, null));       // 70
-        r.add(new Engine.Reason(Engine.Signal.LEARNED_STRONG, "3"));     // 60
+        r.add(new Engine.Reason(Engine.Signal.ARCEP_RANGE, null, 70));
+        r.add(new Engine.Reason(Engine.Signal.LEARNED, "60", 60));
         assertEquals(88, Engine.combine(r));
-        r.add(new Engine.Reason(Engine.Signal.USER_LIST, null));         // 100
+        r.add(new Engine.Reason(Engine.Signal.USER_LIST, null, 100));
         assertEquals(100, Engine.combine(r));
-    }
-
-    @Test
-    public void spoofedCallerIdIsSilenced() {
-        Engine.Verdict v = Engine.evaluate(new Engine.Call("0612345678", Engine.VERIFICATION_FAILED, false, 12, NOON),
-                new Engine.Config(), new FakeLists());
-        assertEquals(Engine.Action.SILENCE, v.action);
-        assertEquals(Engine.Category.SPOOFED, v.category);
-    }
-
-    @Test
-    public void communityScamIsBlocked() {
-        FakeLists l = new FakeLists();
-        l.community.put("+33612345678", "scam");
-        Engine.Verdict v = eval("0612345678", new Engine.Config(), l);
-        assertEquals(Engine.Action.BLOCK, v.action);
-        assertEquals(Engine.Category.SCAM, v.category);
-
-        Engine.Config off = new Engine.Config();
-        off.community = false;
-        assertEquals(Engine.Action.ALLOW, eval("0612345678", off, l).action);
     }
 
     @Test
     public void foreignNumbers() {
         Engine.Config cfg = new Engine.Config();
         assertEquals(Engine.Action.ALLOW, eval("+442079460958", cfg, new FakeLists()).action);
-        assertEquals(Engine.Action.SILENCE, eval("+2250712345678", cfg, new FakeLists()).action);
         cfg.blockForeign = true;
-        assertEquals(Engine.Action.BLOCK, eval("+442079460958", cfg, new FakeLists()).action);
+        Engine.Verdict v = eval("+442079460958", cfg, new FakeLists());
+        assertEquals(Engine.Action.BLOCK, v.action);
+        assertEquals("FOREIGN_BLOCKED:44", v.reasonCodes());
         // Overseas France is not foreign.
         assertEquals(Engine.Action.ALLOW, eval("+262692123456", cfg, new FakeLists()).action);
     }
@@ -243,27 +221,11 @@ public class EngineTest {
         Engine.Verdict v = eval("0612345678", cfg, new FakeLists());
         assertEquals(Engine.Action.SILENCE, v.action);
         assertTrue(v.has(Engine.Signal.SENIOR_UNKNOWN));
-        // strict: a spoofed number is blocked outright
-        v = Engine.evaluate(new Engine.Call("0612345678", Engine.VERIFICATION_FAILED, false, 12, NOON), cfg, new FakeLists());
-        assertEquals(Engine.Action.BLOCK, v.action);
+        assertEquals(Engine.Category.UNKNOWN, v.category);
         // contacts still ring
-        v = Engine.evaluate(new Engine.Call("0612345678", 0, true, 12, NOON), cfg, new FakeLists());
+        v = Engine.evaluate(new Engine.Call("0612345678", true, 12, NOON), cfg, new FakeLists(), null);
         assertEquals(Engine.Action.ALLOW, v.action);
-    }
-
-    @Test
-    public void quietHoursWrapAroundMidnight() {
-        assertTrue(Engine.inQuietHours(23, 22, 8));
-        assertTrue(Engine.inQuietHours(3, 22, 8));
-        assertFalse(Engine.inQuietHours(12, 22, 8));
-        assertTrue(Engine.inQuietHours(13, 12, 14));
-        assertFalse(Engine.inQuietHours(5, 5, 5));
-    }
-
-    @Test
-    public void reasonCodesRoundTrip() {
-        Engine.Verdict v = eval("0162434166", new Engine.Config(), new FakeLists());
-        assertEquals("ARCEP_RANGE:0162", v.reasonCodes());
-        assertNull(new FakeLists().blockedBy("+33100000000"));
+        // hidden numbers are silenced too
+        assertEquals(Engine.Action.SILENCE, eval("", cfg, new FakeLists()).action);
     }
 }

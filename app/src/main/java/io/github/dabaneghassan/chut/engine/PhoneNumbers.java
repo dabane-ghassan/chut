@@ -37,16 +37,6 @@ public final class PhoneNumbers {
     private static final Set<String> OVERSEAS = new HashSet<>(Arrays.asList(
             "262", "269", "508", "590", "594", "596", "681", "687", "689"));
 
-    /**
-     * Country codes most used for "Wangiri" one-ring callback scams and premium-rate fraud
-     * (lists published by French operators and the FFTélécoms). A call from one is
-     * suspicious, not proof: numbers from your contacts always ring.
-     */
-    private static final Set<String> HIGH_RISK = new HashSet<>(Arrays.asList(
-            "222", "223", "224", "225", "231", "232", "235", "242", "243", "247", "252", "261",
-            "373", "675", "676", "677", "678", "679", "682", "683", "686", "688", "690", "691", "692",
-            "870", "881", "882", "883"));
-
     private static final Set<String> CC_1 = new HashSet<>(Arrays.asList("1", "7"));
     private static final Set<String> CC_2 = new HashSet<>(Arrays.asList(
             "20", "27", "30", "31", "32", "33", "34", "36", "39", "40", "41", "43", "44", "45", "46",
@@ -106,10 +96,6 @@ public final class PhoneNumbers {
         if (!e164.startsWith("+33")) return false;
         for (String p : ARCEP_TELEMARKETING) if (n.startsWith(p)) return true;
         return false;
-    }
-
-    public static boolean isHighRiskCountry(String e164) {
-        return HIGH_RISK.contains(countryCode(e164));
     }
 
     public static Kind kind(String e164) {

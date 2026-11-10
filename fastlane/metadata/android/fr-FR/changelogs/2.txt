@@ -1,0 +1,5 @@
+• Entièrement en français, avec un choix de langue (français / anglais) dans les réglages.
+• Nouveau modèle appris sur le téléphone : il reconnaît les numéros qui ressemblent à ceux que vous bloquez (blocs de numéros, heures), mesuré par validation croisée.
+• Vos 62 numéros de démarchage sont fournis dans la liste noire.
+• Plus d’accès à internet : la liste communautaire est retirée.
+• Testé sur Android 14 avec de vrais appels : appli jamais ouverte, arrêtée, tuée, après redémarrage.

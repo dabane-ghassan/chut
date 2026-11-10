@@ -16,12 +16,10 @@ import java.util.List;
 
 import io.github.dabaneghassan.chut.MainActivity;
 import io.github.dabaneghassan.chut.R;
-import io.github.dabaneghassan.chut.data.Community;
-import io.github.dabaneghassan.chut.data.Prefs;
 import io.github.dabaneghassan.chut.data.Store;
 import io.github.dabaneghassan.chut.engine.PhoneNumbers;
 
-/** Your block list, your allow list and the community list. No limits. */
+/** Your block list (with the numbers chut ships with) and your allow list. No limits. */
 public final class ListsScreen {
 
     private static final int MAX_SHOWN = 400;
@@ -38,21 +36,22 @@ public final class ListsScreen {
         scroll.addView(col);
         col.addView(StatsScreen.header(a, a.getString(R.string.tab_lists), a.getString(R.string.lists_subtitle)));
 
+        if (a.listsTab > 1) a.listsTab = 0;
         String[] tabs = {
                 a.getString(R.string.list_blocked_n, store.size(Store.BLOCKED)),
-                a.getString(R.string.list_allowed_n, store.size(Store.ALLOWED)),
-                a.getString(R.string.list_community)
+                a.getString(R.string.list_allowed_n, store.size(Store.ALLOWED))
         };
         col.addView(Ui.segmented(a, tabs, a.listsTab, i -> {
             a.listsTab = i;
             a.refresh();
         }));
         col.addView(Ui.space(a, 12));
-
-        if (a.listsTab == 2) {
-            community(a, store, col);
-            return scroll;
+        if (a.listsTab == 0) {
+            TextView learn = Ui.muted(a, a.getString(R.string.lists_learning_note));
+            learn.setPadding(Ui.dp(a, 4), 0, Ui.dp(a, 4), Ui.dp(a, 10));
+            col.addView(learn);
         }
+
         int list = a.listsTab == 1 ? Store.ALLOWED : Store.BLOCKED;
 
         // Add
@@ -124,7 +123,9 @@ public final class ListsScreen {
         texts.addView(Ui.text(a, PhoneNumbers.pretty(e.number), 15.5f, R.color.ink, Ui.semibold()));
         String kind = PhoneNumbers.isPrefixRule(e.number) ? a.getString(R.string.prefix_rule)
                 : Labels.region(a, PhoneNumbers.region(e.number));
-        texts.addView(Ui.muted(a, kind + " · " + DateUtils.getRelativeTimeSpanString(e.added)));
+        String when = Store.SOURCE_PRESET.equals(e.source) ? a.getString(R.string.source_preset)
+                : DateUtils.getRelativeTimeSpanString(e.added).toString();
+        texts.addView(Ui.muted(a, kind + " · " + when));
         row.addView(texts, Ui.weight(1));
         row.setPadding(0, Ui.dp(a, 2), 0, Ui.dp(a, 2));
         row.setBackground(Ui.pressable(a, 0x00000000, Ui.dp(a, 10)));
@@ -136,9 +137,6 @@ public final class ListsScreen {
                         a.refresh();
                     })
                     .setNegativeButton(android.R.string.cancel, null);
-            if (list == Store.BLOCKED && !PhoneNumbers.isPrefixRule(e.number)) {
-                b.setNeutralButton(R.string.report, (d, w) -> a.report(e.number, false));
-            }
             b.show();
         });
         return row;
@@ -161,52 +159,5 @@ public final class ListsScreen {
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
-    }
-
-    private static void community(MainActivity a, Store store, LinearLayout col) {
-        Prefs prefs = new Prefs(a);
-        LinearLayout card = Ui.card(a);
-        card.addView(Ui.display(a, String.valueOf(store.communitySize()), 40, R.color.brand_ink));
-        card.addView(Ui.muted(a, a.getString(R.string.community_count)));
-        card.addView(Ui.space(a, 10));
-        card.addView(Ui.body(a, a.getString(R.string.community_explain)));
-        long last = prefs.time(Prefs.LAST_SYNC);
-        TextView when = Ui.muted(a, last == 0 ? a.getString(R.string.community_bundled)
-                : a.getString(R.string.community_updated, DateUtils.getRelativeTimeSpanString(last)));
-        when.setPadding(0, Ui.dp(a, 8), 0, 0);
-        card.addView(when);
-        LinearLayout.LayoutParams lp = Ui.matchWrap();
-        lp.topMargin = Ui.dp(a, 12);
-        card.addView(Ui.button(a, a.getString(R.string.community_update_now), true, v -> {
-            a.toast(a.getString(R.string.community_updating));
-            new Thread(() -> {
-                int n = Community.update(a);
-                a.runOnUiThread(() -> {
-                    a.toast(n < 0 ? a.getString(R.string.community_failed) : a.getString(R.string.community_done, n));
-                    a.refresh();
-                });
-            }).start();
-        }), lp);
-        col.addView(card);
-
-        LinearLayout settings = Ui.card(a);
-        settings.addView(Ui.switchRow(a, R.string.set_community, R.string.set_community_sub, prefs.flag(Prefs.COMMUNITY),
-                (b, on) -> prefs.setFlag(Prefs.COMMUNITY, on)));
-        settings.addView(Ui.switchRow(a, R.string.set_sync, R.string.set_sync_sub, prefs.flag(Prefs.SYNC), (b, on) -> {
-            prefs.setFlag(Prefs.SYNC, on);
-            io.github.dabaneghassan.chut.BackgroundJobs.schedule(a);
-        }));
-        col.addView(settings);
-
-        LinearLayout help = Ui.card(a);
-        help.addView(Ui.title(a, a.getString(R.string.community_contribute)));
-        TextView t = Ui.muted(a, a.getString(R.string.community_contribute_explain));
-        t.setPadding(0, Ui.dp(a, 4), 0, Ui.dp(a, 6));
-        help.addView(t);
-        help.addView(Ui.linkRow(a, a.getString(R.string.community_report), null,
-                v -> a.openUrl(Community.REPO + "/issues/new?template=report.yml")));
-        help.addView(Ui.linkRow(a, a.getString(R.string.community_browse), null,
-                v -> a.openUrl(Community.REPO + "/blob/main/community/numbers.csv")));
-        col.addView(help);
     }
 }

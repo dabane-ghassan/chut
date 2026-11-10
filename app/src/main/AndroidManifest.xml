@@ -6,10 +6,8 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />     <!-- "Contacts always ring" -->
     <uses-permission android:name="android.permission.READ_CALL_LOG" />     <!-- "Import from call log" -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- Only to download the public community list, if you turn that on. Nothing is uploaded. -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- Keeps the weekly report and list update scheduled after a restart. -->
+    <!-- Keeps the weekly report and model retraining scheduled after a restart.
+         chut has no internet permission: nothing can leave the phone. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application

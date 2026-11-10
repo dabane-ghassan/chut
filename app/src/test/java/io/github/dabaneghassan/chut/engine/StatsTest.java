@@ -24,7 +24,7 @@ public class StatsTest {
         // Tuesday 10 November 2026 is "today".
         ev.add(new Stats.Event(at(11, 10, 9), "+33162434166", Engine.Action.BLOCK, Engine.Category.TELEMARKETING, "ARCEP_RANGE:0162", 70));
         ev.add(new Stats.Event(at(11, 10, 11), "+33162434166", Engine.Action.BLOCK, Engine.Category.TELEMARKETING, "ARCEP_RANGE:0162", 70));
-        ev.add(new Stats.Event(at(11, 9, 18), "+33612345678", Engine.Action.SILENCE, Engine.Category.SPOOFED, "SPOOFED", 60));
+        ev.add(new Stats.Event(at(11, 9, 18), "+33612345678", Engine.Action.SILENCE, Engine.Category.LEARNED, "LEARNED:60:061234", 60));
         ev.add(new Stats.Event(at(11, 9, 18), "+33698765432", Engine.Action.ALLOW, Engine.Category.CLEAN, "", 0));
         ev.add(new Stats.Event(at(11, 3, 10), "+33424036062", Engine.Action.BLOCK, Engine.Category.PERSONAL, "USER_LIST:+33424036062", 100));
         ev.add(new Stats.Event(at(10, 1, 10), "", Engine.Action.BLOCK, Engine.Category.HIDDEN, "HIDDEN", 100));

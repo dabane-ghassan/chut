@@ -21,11 +21,10 @@ public final class Labels {
         switch (cat) {
             case PERSONAL: return c.getString(R.string.cat_personal);
             case TELEMARKETING: return c.getString(R.string.cat_telemarketing);
-            case SCAM: return c.getString(R.string.cat_scam);
-            case SPOOFED: return c.getString(R.string.cat_spoofed);
-            case SUSPICIOUS: return c.getString(R.string.cat_suspicious);
+            case LEARNED: return c.getString(R.string.cat_learned);
             case FOREIGN: return c.getString(R.string.cat_foreign);
             case HIDDEN: return c.getString(R.string.cat_hidden);
+            case UNKNOWN: return c.getString(R.string.cat_unknown_senior);
             default: return c.getString(R.string.cat_unknown);
         }
     }
@@ -73,29 +72,32 @@ public final class Labels {
                         : c.getString(R.string.sig_user_list);
             case HIDDEN: return c.getString(R.string.sig_hidden);
             case ARCEP_RANGE:
-                return c.getString(R.string.sig_arcep, detail == null ? "" : detail.substring(0, 2) + " " + detail.substring(2));
-            case COMMUNITY_SCAM: return c.getString(R.string.sig_community_scam);
-            case COMMUNITY_TELEMARKETING: return c.getString(R.string.sig_community_tm);
-            case SPOOFED: return c.getString(R.string.sig_spoofed);
-            case LEARNED_STRONG:
-            case LEARNED:
-            case LEARNED_WEAK:
-                int k = 1;
-                try {
-                    k = Integer.parseInt(detail);
-                } catch (Exception ignored) {
-                }
-                return c.getResources().getQuantityString(R.plurals.sig_learned, k, k);
-            case PREMIUM: return c.getString(R.string.sig_premium);
-            case HIGH_RISK_COUNTRY: return c.getString(R.string.sig_high_risk, detail == null ? "" : detail);
+                return detail != null && detail.length() == 4
+                        ? c.getString(R.string.sig_arcep, detail.substring(0, 2) + " " + detail.substring(2))
+                        : c.getString(R.string.sig_arcep_short);
+            case LEARNED: {
+                // detail: "87" or "87:0377259"
+                String pct = detail == null ? "?" : detail.split(":")[0];
+                String prefix = detail != null && detail.contains(":") ? detail.substring(detail.indexOf(':') + 1) : null;
+                return prefix == null || prefix.isEmpty()
+                        ? c.getString(R.string.sig_learned, pct)
+                        : c.getString(R.string.sig_learned_prefix, pct, prettyPrefix(prefix));
+            }
             case FOREIGN_BLOCKED: return c.getString(R.string.sig_foreign_blocked, detail == null ? "" : detail);
-            case FOREIGN: return c.getString(R.string.sig_foreign, detail == null ? "" : detail);
-            case INVALID_FORMAT: return c.getString(R.string.sig_invalid);
-            case QUIET_HOURS: return c.getString(R.string.sig_quiet);
             case SENIOR_UNKNOWN: return c.getString(R.string.sig_senior);
             case CALLED_BACK: return c.getString(R.string.sig_called_back);
             default: return s.name();
         }
+    }
+
+    /** "0377259" → "03 77 25 9". */
+    public static String prettyPrefix(String national) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < national.length(); i++) {
+            if (i > 0 && i % 2 == 0) sb.append(' ');
+            sb.append(national.charAt(i));
+        }
+        return sb.toString();
     }
 
     /** All reasons of a verdict, one per line. */

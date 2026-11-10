@@ -229,12 +229,8 @@ public final class StatsScreen {
         switch (s) {
             case USER_LIST: return a.getString(R.string.sig_user_list);
             case ARCEP_RANGE: return a.getString(R.string.sig_arcep_short);
-            case LEARNED_STRONG:
-            case LEARNED:
-            case LEARNED_WEAK: return a.getString(R.string.sig_learned_short);
-            case HIGH_RISK_COUNTRY: return a.getString(R.string.sig_high_risk_short);
-            case FOREIGN_BLOCKED:
-            case FOREIGN: return a.getString(R.string.sig_foreign_short);
+            case LEARNED: return a.getString(R.string.sig_learned_short);
+            case FOREIGN_BLOCKED: return a.getString(R.string.sig_foreign_short);
             default: return Labels.signal(a, s, null);
         }
     }

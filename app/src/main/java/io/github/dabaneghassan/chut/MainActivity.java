@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.role.RoleManager;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -32,7 +33,8 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-import io.github.dabaneghassan.chut.data.Community;
+import io.github.dabaneghassan.chut.data.Lang;
+import io.github.dabaneghassan.chut.data.Learning;
 import io.github.dabaneghassan.chut.data.Phone;
 import io.github.dabaneghassan.chut.data.Store;
 import io.github.dabaneghassan.chut.engine.Engine;
@@ -66,6 +68,18 @@ public class MainActivity extends Activity {
     public int listsTab = 0;
 
     @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(Lang.wrap(base));   // French unless English was chosen in chut
+    }
+
+    /** Switches chut's language and redraws everything in it. */
+    public void setLanguage(String lang) {
+        new io.github.dabaneghassan.chut.data.Prefs(this).setLanguage(lang);
+        Notifier.createChannels(Lang.wrap(this));
+        recreate();
+    }
+
+    @Override
     protected void onCreate(Bundle saved) {
         super.onCreate(saved);
         Ui.init(this);
@@ -85,8 +99,9 @@ public class MainActivity extends Activity {
         setContentView(root);
         edgeToEdge(root);
 
+        // Opens the database (adding the preset list on first launch) and trains the model if needed.
         new Thread(() -> {
-            Community.loadBundledIfNeeded(this);
+            Learning.model(this);
             runOnUiThread(this::refresh);
         }).start();
     }
@@ -261,8 +276,8 @@ public class MainActivity extends Activity {
         boolean[] checked = new boolean[n];
         for (int i = 0; i < n; i++) {
             Phone.Caller c = callers.get(i);
-            Engine.Verdict v = Engine.evaluate(new Engine.Call(c.number, 0, false, 12, System.currentTimeMillis()),
-                    new io.github.dabaneghassan.chut.data.Prefs(this).engineConfig(), store);
+            Engine.Verdict v = Engine.evaluate(new Engine.Call(c.number, false, -1, System.currentTimeMillis()),
+                    new io.github.dabaneghassan.chut.data.Prefs(this).engineConfig(), store, Learning.model(this));
             String tag = v.action == Engine.Action.ALLOW ? "" : "  ·  " + Labels.category(this, v.category);
             items[i] = PhoneNumbers.pretty(c.number) + "  ×" + c.calls + tag;
             checked[i] = v.action != Engine.Action.ALLOW;      // pre-tick what chut finds suspicious
@@ -383,22 +398,10 @@ public class MainActivity extends Activity {
                     refresh();
                 });
             }
-            b.setNeutralButton(R.string.report, (d, w) -> report(e.number, e.category == Engine.Category.SCAM));
         } else {
             b.setPositiveButton(android.R.string.ok, null);
         }
         b.show();
-    }
-
-    /** Asks the user what kind of spam it is, then opens the public report form. */
-    public void report(String number, boolean scamGuess) {
-        new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.report_title_dialog, PhoneNumbers.pretty(number)))
-                .setMessage(R.string.report_explain)
-                .setPositiveButton(R.string.report_telemarketing, (d, w) -> openIntent(Community.reportIntent(number, false)))
-                .setNegativeButton(R.string.report_scam, (d, w) -> openIntent(Community.reportIntent(number, true)))
-                .setNeutralButton(android.R.string.cancel, null)
-                .show();
     }
 
     public void openUrl(String url) {

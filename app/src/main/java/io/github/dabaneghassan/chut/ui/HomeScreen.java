@@ -116,8 +116,8 @@ public final class HomeScreen {
         Engine.Config cfg = prefs.engineConfig();
         String[] modes = a.getResources().getStringArray(R.array.sensitivity);
         StringBuilder sb = new StringBuilder(cfg.seniorMode ? a.getString(R.string.senior_short) : modes[cfg.sensitivity]);
+        sb.append(" · ").append(a.getString(R.string.list_short, store.size(Store.BLOCKED)));
         if (cfg.arcepRanges) sb.append(" · ARCEP");
-        if (cfg.community) sb.append(" · ").append(a.getString(R.string.community_short, store.communitySize()));
         if (cfg.learn) sb.append(" · ").append(a.getString(R.string.learning_short));
         return a.getString(R.string.status_on_explain, sb.toString());
     }

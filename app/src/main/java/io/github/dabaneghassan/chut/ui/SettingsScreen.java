@@ -3,7 +3,7 @@
 package io.github.dabaneghassan.chut.ui;
 
 import android.app.AlertDialog;
-import android.app.TimePickerDialog;
+import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -13,15 +13,17 @@ import io.github.dabaneghassan.chut.BackgroundJobs;
 import io.github.dabaneghassan.chut.BuildConfigLite;
 import io.github.dabaneghassan.chut.MainActivity;
 import io.github.dabaneghassan.chut.R;
-import io.github.dabaneghassan.chut.data.Community;
+import io.github.dabaneghassan.chut.data.Learning;
 import io.github.dabaneghassan.chut.data.Phone;
 import io.github.dabaneghassan.chut.data.Prefs;
 import io.github.dabaneghassan.chut.data.Store;
+import io.github.dabaneghassan.chut.engine.Learner;
 
-/** How strict chut is, what it looks at, notifications, data and about. */
+/** Language, how strict chut is, the learned model, notifications, data and about. */
 public final class SettingsScreen {
 
     public static final String SITE = "https://dabane-ghassan.github.io/chut/";
+    public static final String REPO = "https://github.com/dabane-ghassan/chut";
 
     private SettingsScreen() {
     }
@@ -35,31 +37,43 @@ public final class SettingsScreen {
         scroll.addView(col);
         col.addView(StatsScreen.header(a, a.getString(R.string.tab_settings), null));
 
+        // Language: always shown in both languages, so anyone can find it.
+        LinearLayout lang = Ui.card(a);
+        lang.addView(Ui.title(a, a.getString(R.string.language)));
+        lang.addView(Ui.space(a, 10));
+        int current = "en".equals(p.language()) ? 1 : 0;
+        lang.addView(Ui.segmented(a, new String[]{"Français", "English"}, current, i -> {
+            if (i != current) a.setLanguage(i == 1 ? "en" : "fr");
+        }));
+        col.addView(lang);
+
         // Sensitivity
         col.addView(Ui.eyebrow(a, a.getString(R.string.sec_filter)));
         LinearLayout sens = Ui.card(a);
         sens.addView(Ui.title(a, a.getString(R.string.sensitivity)));
         sens.addView(Ui.space(a, 10));
-        int current = p.number(Prefs.SENSITIVITY, 1);
-        sens.addView(Ui.segmented(a, a.getResources().getStringArray(R.array.sensitivity), current, i -> {
+        int level = p.number(Prefs.SENSITIVITY, 1);
+        sens.addView(Ui.segmented(a, a.getResources().getStringArray(R.array.sensitivity), level, i -> {
             p.setNumber(Prefs.SENSITIVITY, i);
             a.refresh();
         }));
         String[] explain = a.getResources().getStringArray(R.array.sensitivity_explain);
-        TextView ex = Ui.muted(a, p.flag(Prefs.SENIOR) ? a.getString(R.string.senior_overrides) : explain[current]);
+        TextView ex = Ui.muted(a, p.flag(Prefs.SENIOR) ? a.getString(R.string.senior_overrides) : explain[level]);
         ex.setPadding(0, Ui.dp(a, 10), 0, 0);
         sens.addView(ex);
         col.addView(sens);
 
         LinearLayout signals = Ui.card(a);
         signals.addView(flag(a, p, Prefs.ARCEP, R.string.set_arcep, R.string.set_arcep_sub));
-        signals.addView(flag(a, p, Prefs.COMMUNITY, R.string.set_community, R.string.set_community_sub));
         signals.addView(flag(a, p, Prefs.LEARN, R.string.set_learn, R.string.set_learn_sub));
-        signals.addView(flag(a, p, Prefs.SPOOF, R.string.set_spoof, R.string.set_spoof_sub));
         signals.addView(flag(a, p, Prefs.CALLBACKS, R.string.set_callbacks, R.string.set_callbacks_sub));
         signals.addView(flag(a, p, Prefs.HIDDEN, R.string.set_hidden, R.string.set_hidden_sub));
         signals.addView(flag(a, p, Prefs.FOREIGN, R.string.set_foreign, R.string.set_foreign_sub));
         col.addView(signals);
+
+        // The learned model
+        col.addView(Ui.eyebrow(a, a.getString(R.string.sec_model)));
+        col.addView(modelCard(a));
 
         // Contacts
         LinearLayout contacts = Ui.card(a);
@@ -71,27 +85,6 @@ public final class SettingsScreen {
             contacts.addView(Ui.button(a, a.getString(R.string.allow_contacts), false, v -> a.requestContacts()));
         }
         col.addView(contacts);
-
-        // Quiet hours
-        LinearLayout quiet = Ui.card(a);
-        quiet.addView(Ui.switchRow(a, R.string.set_quiet, R.string.set_quiet_sub, p.flag(Prefs.QUIET), (b, on) -> {
-            p.setFlag(Prefs.QUIET, on);
-            a.refresh();
-        }));
-        if (p.flag(Prefs.QUIET)) {
-            int start = p.number(Prefs.QUIET_START, 22), end = p.number(Prefs.QUIET_END, 8);
-            quiet.addView(Ui.linkRow(a, a.getString(R.string.quiet_from), hour(start), v ->
-                    new TimePickerDialog(a, (tp, h, m) -> {
-                        p.setNumber(Prefs.QUIET_START, h);
-                        a.refresh();
-                    }, start, 0, true).show()));
-            quiet.addView(Ui.linkRow(a, a.getString(R.string.quiet_to), hour(end), v ->
-                    new TimePickerDialog(a, (tp, h, m) -> {
-                        p.setNumber(Prefs.QUIET_END, h);
-                        a.refresh();
-                    }, end, 0, true).show()));
-        }
-        col.addView(quiet);
 
         // Senior protection
         col.addView(Ui.eyebrow(a, a.getString(R.string.sec_senior)));
@@ -155,19 +148,50 @@ public final class SettingsScreen {
         about.addView(Ui.space(a, 8));
         about.addView(Ui.linkRow(a, a.getString(R.string.how_it_works), null, v -> howItWorks(a)));
         about.addView(Ui.linkRow(a, a.getString(R.string.website), "dabane-ghassan.github.io/chut", v -> a.openUrl(SITE)));
-        about.addView(Ui.linkRow(a, a.getString(R.string.source_code), "GitHub", v -> a.openUrl(Community.REPO)));
-        about.addView(Ui.linkRow(a, a.getString(R.string.report_bug), null, v -> a.openUrl(Community.REPO + "/issues")));
-        about.addView(Ui.linkRow(a, a.getString(R.string.license), "GPL-3.0+", v -> a.openUrl(Community.REPO + "/blob/main/LICENSE")));
+        about.addView(Ui.linkRow(a, a.getString(R.string.source_code), "GitHub", v -> a.openUrl(REPO)));
+        about.addView(Ui.linkRow(a, a.getString(R.string.report_bug), null, v -> a.openUrl(REPO + "/issues")));
+        about.addView(Ui.linkRow(a, a.getString(R.string.license), "GPL-3.0+", v -> a.openUrl(REPO + "/blob/main/LICENSE")));
         col.addView(about);
         return scroll;
     }
 
-    private static View flag(MainActivity a, Prefs p, String key, int title, int sub) {
-        return Ui.switchRow(a, title, sub, p.flag(key), (b, on) -> p.setFlag(key, on));
+    /** What the model learned, how well it does, and a button to retrain it. */
+    private static LinearLayout modelCard(MainActivity a) {
+        LinearLayout card = Ui.card(a);
+        Learner.Model m = Learning.model(a);
+        if (!m.ready()) {
+            card.addView(Ui.body(a, a.getString(R.string.model_not_ready, Learner.MIN_POSITIVES)));
+            return card;
+        }
+        card.addView(Ui.grid(a, 2,
+                tile(a, m.recall < 0 ? "–" : Math.round(m.recall * 100) + " %", a.getString(R.string.model_recall), R.color.allow),
+                tile(a, m.falseAlarms < 0 ? "–" : String.format(java.util.Locale.ROOT, "%.1f %%", m.falseAlarms * 100),
+                        a.getString(R.string.model_false_alarms), R.color.ink)));
+        TextView t = Ui.muted(a, a.getString(R.string.model_line, m.positives, m.negatives,
+                DateUtils.getRelativeTimeSpanString(m.trainedAt)));
+        card.addView(t);
+        LinearLayout.LayoutParams lp = Ui.matchWrap();
+        lp.topMargin = Ui.dp(a, 12);
+        card.addView(Ui.button(a, a.getString(R.string.model_retrain), false, v -> {
+            new Thread(() -> {
+                Learning.retrainNow(a);
+                a.runOnUiThread(() -> {
+                    a.toast(a.getString(R.string.model_retrained));
+                    a.refresh();
+                });
+            }).start();
+        }), lp);
+        return card;
     }
 
-    private static String hour(int h) {
-        return String.format(java.util.Locale.ROOT, "%02d:00", h);
+    private static LinearLayout tile(MainActivity a, String value, String caption, int colorRes) {
+        LinearLayout t = Ui.tile(a, value, caption, colorRes);
+        t.setBackground(Ui.round(a.getColor(R.color.surface_alt), Ui.dp(a, 16)));
+        return t;
+    }
+
+    private static View flag(MainActivity a, Prefs p, String key, int title, int sub) {
+        return Ui.switchRow(a, title, sub, p.flag(key), (b, on) -> p.setFlag(key, on));
     }
 
     static void howItWorks(MainActivity a) {

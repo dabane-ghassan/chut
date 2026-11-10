@@ -1,14 +1,12 @@
-<p><b>chut</b> vérifie chaque appel inconnu <b>avant que votre téléphone sonne</b> et fait taire le démarchage et les arnaques. Gratuit, open source, sans compte, sans pub ni pisteur. Toutes les fonctions et toutes les statistiques, pour tout le monde.</p>
-<p><b>Ce qu'il stoppe</b></p>
+<p><b>chut</b> vérifie chaque appel inconnu <b>avant que votre téléphone sonne</b> et fait taire le démarchage. Gratuit, open source, sans compte, sans pub, sans pisteur et sans accès à internet. Toutes les fonctions et toutes les statistiques, pour tout le monde.</p>
+<p><b>Comment il filtre</b></p>
 <ul>
-<li>Les 12 tranches que l'ARCEP réserve au démarchage (01 62, 09 48…), sans liste</li>
-<li>Les numéros signalés par la communauté, dans une liste publique vérifiée au grand jour</li>
-<li>Les numéros usurpés, grâce au contrôle d'authentification de l'opérateur (Android 11+)</li>
-<li>Les rappels surtaxés, les arnaques au rappel depuis l'étranger, les numéros mal formés</li>
-<li>Votre propre liste noire, illimitée, y compris des tranches entières (0162*)</li>
+<li>Votre liste noire, illimitée, avec 62 numéros de démarchage déjà fournis et des tranches entières (0162*)</li>
+<li>Les 12 tranches que l'ARCEP réserve au démarchage (01 62, 09 48…)</li>
+<li>Un modèle appris sur le téléphone à partir de vos blocages : il reconnaît les numéros qui ressemblent à ceux que vous bloquez (mêmes blocs de numéros, mêmes heures). Sa précision est mesurée par validation croisée et affichée dans l'appli.</li>
+<li>Votre liste blanche et vos contacts sonnent toujours</li>
 </ul>
-<p><b>Un moteur qui s'explique</b> : chaque appel reçoit un score de spam de 0 à 100, calculé sur le téléphone. Les appels douteux sonnent en silencieux avec une notification, le spam probable est bloqué, et vous savez toujours pourquoi. Il apprend de vous : bloquez quelques numéros d'un bloc de spam, et ses voisins deviennent suspects.</p>
-<p><b>Toutes les statistiques</b> : par jour, par semaine, par type, raison, région, heure et jour, les numéros les plus insistants, le temps gagné et un bilan hebdomadaire.</p>
-<p><b>Protection senior</b> : un réglage, et seuls les contacts sonnent normalement. Idéal sur le téléphone d'un parent.</p>
-<p><b>Privé par conception</b> : fonctionne hors ligne ; vos listes et votre historique ne quittent jamais le téléphone. Chaque permission est facultative.</p>
-<p>Android 10 ou plus récent. Licence GNU GPL v3 ou ultérieure.</p>
+<p>Les appels douteux sonnent en silencieux avec une notification « Bloquer / Pas du spam » ; chaque geste réentraîne le modèle. Chaque décision garde ses raisons.</p>
+<p><b>Toutes les statistiques</b> : par jour, semaine, type, raison, région, heure et jour, les numéros les plus insistants, le temps gagné et un bilan hebdomadaire.</p>
+<p><b>Protection senior</b> : un réglage, et seuls les contacts sonnent normalement.</p>
+<p>Fonctionne même appli fermée ou après un redémarrage. En français, ou en anglais au choix. Android 10 ou plus récent. Licence GNU GPL v3 ou ultérieure.</p>
