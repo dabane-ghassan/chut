@@ -136,8 +136,8 @@ for p in POST_NOTIFICATIONS READ_CONTACTS READ_CALL_LOG; do sh pm grant "$PKG" "
 
 section "Calls while chut has never been opened"
 check "app process is not running" not_running
-check "chut ships no list of numbers" eq "$(sql "SELECT COUNT(*) FROM numbers")" 0
 expect_call "a telemarketing range is blocked (02 70 11 12 22)" "+33270111222" 2 "ARCEP_RANGE" 0
+check "chut ships no list of numbers" eq "$(sql "SELECT COUNT(*) FROM numbers")" 0
 t="$(calllog_type +33270111222)"
 check "it is in the phone's call log as rejected/blocked (type $t)" is_rejected "$t"
 [ -n "$t" ] || { say "  call log:"; calllog | head -5 | sed 's/^/    /' | tee -a "$REPORT" >/dev/null; }
