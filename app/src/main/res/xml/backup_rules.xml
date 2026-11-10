@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Your lists, history and settings move with your phone backup (Android encrypts it). -->
+<full-backup-content>
+    <include domain="database" path="chut.db" />
+    <include domain="sharedpref" path="settings.xml" />
+</full-backup-content>

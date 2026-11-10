@@ -1,0 +1,105 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# The community list, without a server: each "Report a number" issue becomes a line of
+# community/reports.csv, community/build.py rebuilds the list, and the bot answers and
+# closes the issue. Apps download community/numbers.csv; new versions also ship it.
+name: Community list
+
+on:
+  issues:
+    types: [opened]
+  push:
+    branches: [main]
+    paths: ["community/reports.csv", "community/ignore.csv", "community/build.py"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: community
+  cancel-in-progress: false
+
+jobs:
+  report:
+    # The form adds the "report" label when it exists; its "### Numéro" heading works either way.
+    if: >-
+      github.event_name == 'issues' &&
+      (contains(github.event.issue.labels.*.name, 'report') || contains(github.event.issue.body, '### Numéro'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Record the report
+        id: rec
+        run: python3 community/process_report.py
+
+      - name: Save the list
+        if: steps.rec.outputs.status == 'recorded'
+        run: |
+          git config user.name "chut community bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add community/reports.csv community/numbers.csv app/src/main/res/raw/community.csv
+          git commit -qm "Community: report for ${{ steps.rec.outputs.number }} (#${{ github.event.issue.number }})"
+          for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && break; sleep 3; done
+
+      - name: Answer and close
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STATUS: ${{ steps.rec.outputs.status }}
+          NUMBER: ${{ steps.rec.outputs.number }}
+          CATEGORY: ${{ steps.rec.outputs.category }}
+          PEOPLE: ${{ steps.rec.outputs.reporters }}
+          LISTED: ${{ steps.rec.outputs.listed }}
+          ISSUE: ${{ github.event.issue.number }}
+        run: |
+          case "$STATUS" in
+            invalid)
+              msg="Je n'ai pas reconnu de numéro valide (« $NUMBER »). Pouvez-vous ouvrir un nouveau signalement avec le numéro complet, par exemple 01 62 43 41 66 ?
+
+          *I couldn't read a valid number. Please open a new report with the full number.*"
+              gh issue comment "$ISSUE" --body "$msg"
+              gh issue close "$ISSUE" --reason "not planned"
+              exit 0 ;;
+            duplicate)
+              msg="Vous aviez déjà signalé $NUMBER : merci, c'est bien noté. *You already reported this number.*" ;;
+            *)
+              if [ "$CATEGORY" = "not_spam" ]; then
+                msg="Merci : votre avis « pas du spam » pour $NUMBER est enregistré. Un numéro qui reçoit autant d'avis contraires que de signalements quitte la liste.
+
+          *Thanks: your \"not spam\" vote is recorded.*"
+              elif [ "$LISTED" = "true" ]; then
+                msg="Merci ! $NUMBER est dans la liste communautaire ($PEOPLE signalement(s)). Les applis chut le recevront à leur prochaine mise à jour.
+
+          *Thanks! The number is on the community list.*"
+              else
+                msg="Merci ! Votre signalement de $NUMBER est enregistré. Il rejoindra la liste dès qu'une deuxième personne le signalera.
+
+          *Thanks! It joins the list once a second person reports it.*"
+              fi ;;
+          esac
+          gh issue comment "$ISSUE" --body "$msg"
+          gh issue close "$ISSUE" --reason completed
+
+  rebuild:
+    # Hand edits to the reports or the ignore list rebuild the published list.
+    if: github.event_name != 'issues'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Rebuild
+        run: |
+          python3 community/build.py
+          if git diff --quiet; then exit 0; fi
+          git config user.name "chut community bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add community/numbers.csv app/src/main/res/raw/community.csv
+          git commit -qm "Community: rebuild the list"
+          git push -q origin HEAD:main

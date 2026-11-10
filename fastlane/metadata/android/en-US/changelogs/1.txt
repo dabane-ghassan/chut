@@ -1,0 +1,1 @@
+• First release: on-device spam engine, ARCEP telemarketing ranges, community list, learning from your blocks, senior protection, full statistics and weekly report.

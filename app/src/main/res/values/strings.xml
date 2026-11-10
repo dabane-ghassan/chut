@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. English. French is in values-fr. -->
+<resources>
+    <string name="app_name">chut</string>
+    <string name="tagline">Spam calls, silenced. Free and open source.</string>
+
+    <!-- Tabs -->
+    <string name="tab_home">Home</string>
+    <string name="tab_stats">Stats</string>
+    <string name="tab_lists">Lists</string>
+    <string name="tab_settings">Settings</string>
+
+    <!-- Home -->
+    <string name="status_on">Protection is on</string>
+    <string name="status_on_explain">Every unknown call is checked before your phone rings. %1$s.</string>
+    <string name="status_off">Protection is off</string>
+    <string name="status_off_explain">Make chut your Caller ID &amp; spam app: Android will then ask chut about each incoming call, before it rings.</string>
+    <string name="activate">Turn on protection</string>
+    <string name="role_unavailable">This phone does not let apps screen calls (Android 10 or newer is needed).</string>
+    <string name="notif_permission_explain">Allow notifications so chut can tell you about silenced calls. They never make a sound.</string>
+    <string name="allow_notifications">Allow notifications</string>
+    <string name="at_a_glance">Calls stopped</string>
+    <string name="today">today</string>
+    <string name="this_week">this week</string>
+    <string name="since_install">in total</string>
+    <string name="last_14_days">Last 14 days</string>
+    <string name="latest_calls">Latest unknown calls</string>
+    <string name="no_calls_yet">No unknown call yet. chut is watching.</string>
+    <string name="no_calls_off">Turn on protection and filtered calls will show up here.</string>
+    <string name="senior_short">Senior protection</string>
+    <string name="community_short">community (%1$d)</string>
+    <string name="learning_short">learning</string>
+    <string name="legend_blocked">Blocked</string>
+    <string name="legend_silenced">Silenced</string>
+    <string name="chart_description">Bar chart of %1$d periods, %2$d calls stopped in all</string>
+
+    <!-- Verdicts and categories -->
+    <string name="verdict_blocked">Blocked</string>
+    <string name="verdict_silenced">Silenced</string>
+    <string name="verdict_allowed">Rang</string>
+    <string name="hidden_number">Hidden number</string>
+    <string name="cat_personal">Your block list</string>
+    <string name="cat_telemarketing">Telemarketing</string>
+    <string name="cat_scam">Probable scam</string>
+    <string name="cat_spoofed">Spoofed number</string>
+    <string name="cat_suspicious">Suspicious</string>
+    <string name="cat_foreign">Foreign number</string>
+    <string name="cat_hidden">Hidden number</string>
+    <string name="cat_unknown">Unknown number</string>
+    <string name="score_line">Spam score %1$d/100 · %2$s</string>
+    <string name="score_only">score %1$d/100</string>
+    <string name="no_reason">Nothing suspicious about this number.</string>
+
+    <!-- Reasons (signals) -->
+    <string name="sig_allowlist">On your allow list</string>
+    <string name="sig_contact">One of your contacts</string>
+    <string name="sig_user_list">On your block list</string>
+    <string name="sig_user_prefix">Matches your rule %1$s</string>
+    <string name="sig_hidden">Hidden number, and you block those</string>
+    <string name="sig_arcep">Range %1$s, reserved by ARCEP for telemarketing</string>
+    <string name="sig_arcep_short">ARCEP telemarketing range</string>
+    <string name="sig_community_scam">Reported as a scam by the community</string>
+    <string name="sig_community_tm">Reported as telemarketing by the community</string>
+    <string name="sig_spoofed">Caller ID failed the operator\'s authentication check: probably spoofed</string>
+    <string name="sig_learned_short">Next to numbers you blocked</string>
+    <string name="sig_premium">Premium-rate number (08 9x): calling back costs money</string>
+    <string name="sig_high_risk">Country code +%1$s, often used for one-ring callback scams</string>
+    <string name="sig_high_risk_short">High-risk country code</string>
+    <string name="sig_foreign_blocked">Foreign number (+%1$s), and you block those</string>
+    <string name="sig_foreign">Foreign number (+%1$s)</string>
+    <string name="sig_foreign_short">Foreign number</string>
+    <string name="sig_invalid">Not a valid French number: often a forged caller ID</string>
+    <string name="sig_quiet">Unknown number during your quiet hours</string>
+    <string name="sig_senior">Unknown number (senior protection)</string>
+    <string name="sig_called_back">Called back within 5 minutes, so it rang</string>
+    <plurals name="sig_learned">
+        <item quantity="one">%1$d number you or the community blocked is in the same block of 1,000</item>
+        <item quantity="other">%1$d numbers you or the community blocked are in the same block of 1,000</item>
+    </plurals>
+
+    <!-- Regions -->
+    <string name="region_idf">Île-de-France (01)</string>
+    <string name="region_nw">North-West (02)</string>
+    <string name="region_ne">North-East (03)</string>
+    <string name="region_se">South-East (04)</string>
+    <string name="region_sw">South-West (05)</string>
+    <string name="region_mobile">Mobile (06, 07)</string>
+    <string name="region_voip">Internet phone (09)</string>
+    <string name="region_special">Special numbers (08)</string>
+    <string name="region_overseas">Overseas France</string>
+    <string name="region_foreign">Abroad</string>
+    <string name="region_hidden">Hidden</string>
+    <string name="region_other">Other</string>
+
+    <!-- Call details -->
+    <string name="action_block">Block</string>
+    <string name="action_trust">Not spam</string>
+    <string name="unblock">Unblock</string>
+    <string name="remove_trust">Remove</string>
+    <string name="report">Report</string>
+    <string name="toast_blocked">%1$s is blocked</string>
+    <string name="toast_trusted">%1$s will always ring</string>
+    <plurals name="calls_from_number">
+        <item quantity="one">%1$d call from this number</item>
+        <item quantity="other">%1$d calls from this number</item>
+    </plurals>
+    <string name="report_title_dialog">Report %1$s</string>
+    <string name="report_explain">This opens a public form on GitHub. Once two people report a number, it joins the community list that protects every chut user. Your report is public and linked to your GitHub account; nothing else about you is shared.</string>
+    <string name="report_telemarketing">Telemarketing</string>
+    <string name="report_scam">Scam</string>
+    <string name="no_browser">No browser found to open the link.</string>
+
+    <!-- Stats -->
+    <string name="stats_subtitle">Computed on your phone, from your history. Nothing is sent anywhere.</string>
+    <string name="stats_empty">No statistics yet. They will build up as chut screens your calls.</string>
+    <string name="stat_stopped">calls stopped</string>
+    <string name="stat_share">of unknown calls were spam</string>
+    <string name="stat_blocked">blocked, never rang</string>
+    <string name="stat_silenced">silenced, rang without sound</string>
+    <string name="stat_saved">of your time saved (estimate)</string>
+    <string name="stat_distinct">different spam numbers</string>
+    <string name="minutes_short">%1$d min</string>
+    <string name="hours_short">%1$d h %2$02d</string>
+    <string name="this_week_vs_last">This week</string>
+    <string name="week_line">%1$d calls stopped this week, %2$d last week: %3$s.</string>
+    <string name="trend_same">the same</string>
+    <string name="trend_more">%1$d more</string>
+    <string name="trend_less">%1$d fewer</string>
+    <string name="last_30_days">Last 30 days</string>
+    <string name="last_12_weeks">Last 12 weeks</string>
+    <string name="by_type">By type</string>
+    <string name="by_reason">Why they were stopped</string>
+    <string name="by_region">Where they came from</string>
+    <string name="by_hour">When they call</string>
+    <string name="busiest_hour">Spammers call you most between %1$d:00 and %2$d:00.</string>
+    <string name="top_callers">Most insistent numbers</string>
+    <plurals name="calls_short">
+        <item quantity="one">%1$d call</item>
+        <item quantity="other">%1$d calls</item>
+    </plurals>
+    <string name="stats_privacy">chut keeps the history of unknown numbers for 400 days on this phone, and never the calls of your contacts.</string>
+    <string name="export_csv">Export lists and history (CSV)</string>
+    <string name="export_done">Exported</string>
+    <string name="export_failed">Could not write the file</string>
+
+    <!-- Lists -->
+    <string name="lists_subtitle">Unlimited, and yours: import and export them as plain files.</string>
+    <string name="list_blocked_n">Blocked (%1$d)</string>
+    <string name="list_allowed_n">Allowed (%1$d)</string>
+    <string name="list_community">Community</string>
+    <string name="add_hint_block">Number to block</string>
+    <string name="add_hint_allow">Number that must always ring</string>
+    <string name="add">Add</string>
+    <string name="prefix_tip">End with * to block a whole range: 0162* blocks every number starting with 01 62.</string>
+    <string name="invalid_or_exists">Not a valid number, or already on this list</string>
+    <string name="import_paste">Paste a list of numbers</string>
+    <string name="import_file">Import a file</string>
+    <string name="import_calllog">Pick from your call log</string>
+    <string name="import_do">Import</string>
+    <string name="import_failed">Could not read the file</string>
+    <string name="paste_hint">Numbers separated by commas or new lines, as exported by your phone\'s blocked numbers</string>
+    <plurals name="imported">
+        <item quantity="one">%1$d number added</item>
+        <item quantity="other">%1$d numbers added</item>
+    </plurals>
+    <string name="calllog_title">Unknown numbers that called you</string>
+    <string name="calllog_empty">No unknown number in your call log.</string>
+    <string name="block_selected">Block selected</string>
+    <string name="blocked_empty">Nothing here yet. chut already stops telemarketing ranges and community numbers without a list.</string>
+    <string name="allowed_empty">Numbers here always ring, whatever chut thinks of them: your doctor\'s robot, your bank, your child\'s school.</string>
+    <string name="more_entries">… and %1$d more (all of them are used)</string>
+    <string name="prefix_rule">Range rule</string>
+
+    <!-- Community -->
+    <string name="community_count">numbers on the community list</string>
+    <string name="community_explain">Numbers that chut users reported and that at least two people confirmed. The list is public, reviewed in the open, and a copy ships with the app.</string>
+    <string name="community_bundled">Using the copy that came with this version.</string>
+    <string name="community_updated">Updated %1$s.</string>
+    <string name="community_update_now">Update now</string>
+    <string name="community_updating">Downloading the list…</string>
+    <string name="community_failed">Could not download the list. Check your connection.</string>
+    <string name="community_done">Up to date: %1$d numbers</string>
+    <string name="community_contribute">Help everyone</string>
+    <string name="community_contribute_explain">Report a spam number from its details, or from here. No account with chut, ever: reports go through GitHub.</string>
+    <string name="community_report">Report a number</string>
+    <string name="community_browse">See the whole list</string>
+
+    <!-- Settings -->
+    <string name="sec_filter">Filtering</string>
+    <string name="sensitivity">Sensitivity</string>
+    <string-array name="sensitivity">
+        <item>Relaxed</item>
+        <item>Balanced</item>
+        <item>Strict</item>
+    </string-array>
+    <string-array name="sensitivity_explain">
+        <item>Blocks only near-certain spam (score 90+). Likely spam (60+) rings silently.</item>
+        <item>Blocks likely spam (score 70+), such as ARCEP telemarketing ranges. Doubtful calls (40+) ring silently.</item>
+        <item>Blocks from score 50, silences from 25. Best if you rarely get calls from unknown numbers.</item>
+    </string-array>
+    <string name="senior_overrides">Senior protection is on: chut is strict, and unknown numbers ring silently.</string>
+    <string name="set_arcep">Telemarketing ranges</string>
+    <string name="set_arcep_sub">Since 2023, telemarketers in France must call from 01 62, 01 63, 02 70, 02 71, 03 77, 03 78, 04 24, 04 25, 05 68, 05 69, 09 48 and 09 49.</string>
+    <string name="set_community">Community list</string>
+    <string name="set_community_sub">Numbers reported by other chut users.</string>
+    <string name="set_sync">Update the community list daily</string>
+    <string name="set_sync_sub">Downloads one public file. Nothing about you or your calls is sent.</string>
+    <string name="set_learn">Learn from your blocks</string>
+    <string name="set_learn_sub">Spam platforms rotate through blocks of numbers. When you block a few numbers of a block, its other numbers become suspicious.</string>
+    <string name="set_spoof">Spoofed numbers</string>
+    <string name="set_spoof_sub">Uses your operator\'s caller-ID check (Android 11+), when it has one.</string>
+    <string name="set_callbacks">Let insistent callers through</string>
+    <string name="set_callbacks_sub">A silenced number that calls back within 5 minutes rings. Blocked numbers never do.</string>
+    <string name="set_hidden">Block hidden numbers</string>
+    <string name="set_hidden_sub">Some doctors and hospitals call with a hidden number.</string>
+    <string name="set_foreign">Block foreign numbers</string>
+    <string name="set_foreign_sub">Every number outside France and overseas France. Contacts still ring.</string>
+    <string name="set_contacts">Contacts always ring</string>
+    <string name="set_contacts_sub">chut checks if a number is in your contacts, on the phone. It never reads names.</string>
+    <string name="allow_contacts">Allow access to contacts</string>
+    <string name="set_quiet">Quiet hours</string>
+    <string name="set_quiet_sub">Unknown numbers are more suspicious at night.</string>
+    <string name="quiet_from">From</string>
+    <string name="quiet_to">To</string>
+    <string name="sec_senior">Senior protection</string>
+    <string name="set_senior">Protect an elderly person</string>
+    <string name="set_senior_sub">Strict filtering, and every number that is not a contact rings silently with a notification. Ideal for a parent\'s phone: scammers target them first.</string>
+    <string name="sec_notifications">Notifications</string>
+    <string name="set_notify_silenced">Silenced calls</string>
+    <string name="set_notify_silenced_sub">A silent notification with Block and Not spam buttons.</string>
+    <string name="set_notify_blocked">Blocked calls</string>
+    <string name="set_notify_blocked_sub">Off by default: blocked calls just disappear.</string>
+    <string name="set_weekly">Weekly report</string>
+    <string name="set_weekly_sub">What chut stopped this week.</string>
+    <string name="sec_data">Your data</string>
+    <string name="clear_history">Clear the call history</string>
+    <string name="clear_history_confirm">The statistics start over. Your lists are kept.</string>
+    <string name="clear">Clear</string>
+    <string name="privacy_note">No account, no ads, no trackers. chut works offline; your lists and history never leave this phone.</string>
+    <string name="sec_about">About</string>
+    <string name="about_line">Free software by Ghassan Dabane</string>
+    <string name="how_it_works">How chut decides</string>
+    <string name="how_it_works_text">Android asks chut about every incoming call, before it rings. chut answers on the phone, in a fraction of a millisecond, without the internet.\n\n1. Hard rules first. Numbers on your allow list and your contacts always ring. Numbers on your block list never do.\n\n2. Then signals, each with a weight: ARCEP telemarketing range (70), community report (75, or 85 for a scam), failed caller-ID check (60), numbers next to ones you blocked (20 to 60), premium rate (50), high-risk country code (45), malformed number (40), quiet hours (30).\n\n3. The weights combine into a spam score from 0 to 100: two weak signals make a stronger one, but the score never passes 100.\n\n4. Your sensitivity turns the score into a decision: ring, ring silently with a notification, or block.\n\nEvery decision keeps its reasons: tap a call to see why. Tap Block or Not spam and chut learns from you.</string>
+    <string name="website">Website</string>
+    <string name="source_code">Source code</string>
+    <string name="report_bug">Report a bug, suggest an idea</string>
+    <string name="license">License</string>
+
+    <!-- Notifications -->
+    <string name="channel_silenced">Silenced calls</string>
+    <string name="channel_silenced_desc">Calls chut let ring without sound</string>
+    <string name="channel_blocked">Blocked calls</string>
+    <string name="channel_report">Weekly report</string>
+    <string name="notif_silenced">Silenced: %1$s</string>
+    <string name="notif_blocked">Blocked: %1$s</string>
+    <string name="report_title">Your week with chut</string>
+    <plurals name="report_text">
+        <item quantity="one">%1$d spam call stopped (%2$d blocked, %3$d silenced). About %4$d minutes of peace.</item>
+        <item quantity="other">%1$d spam calls stopped (%2$d blocked, %3$d silenced). About %4$d minutes of peace.</item>
+    </plurals>
+</resources>

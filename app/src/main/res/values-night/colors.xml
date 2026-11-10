@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#100F1A</color>
+    <color name="card">#1B1A29</color>
+    <color name="surface_alt">#272539</color>
+    <color name="ink">#EEEDF7</color>
+    <color name="muted">#A19EB8</color>
+    <color name="line">#2C2A40</color>
+    <color name="ripple">#33A9A3FF</color>
+    <color name="brand">#8F87F5</color>
+    <color name="brand_ink">#B4AEFF</color>
+    <color name="brand_soft">#2A2750</color>
+    <color name="on_brand">#12102A</color>
+    <color name="block">#FF7377</color>
+    <color name="silence">#F5B544</color>
+    <color name="silence_soft">#3A2D12</color>
+    <color name="allow">#4CD39E</color>
+    <color name="allow_soft">#143327</color>
+    <color name="allow_ink">#9BEBC9</color>
+    <color name="launcher_background">#3D35A8</color>
+</resources>

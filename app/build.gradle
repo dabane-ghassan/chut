@@ -1,0 +1,60 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace = 'io.github.dabaneghassan.chut'
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = 'io.github.dabaneghassan.chut'
+        minSdk = 29          // Android 10: the call-screening role
+        targetSdk = 35
+        // Bump both for a release: CI publishes a GitHub release for every new versionName.
+        versionCode = 1
+        versionName = "1.0.0"
+    }
+
+    // CI signs releases with the chut key from repository secrets when they exist
+    // (see BUILDING.md). This committed key only signs test builds, so they install
+    // over each other; it protects nothing and is not the release key.
+    signingConfigs {
+        test {
+            storeFile = file('test-signing.jks')
+            storePassword = 'chut-test'
+            keyAlias = 'chut-test'
+            keyPassword = 'chut-test'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig = signingConfigs.test
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    // Reproducible, tracker-free APK (F-Droid friendly).
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+    }
+}
+
+dependencies {
+    // The app itself has no dependencies: framework APIs only.
+    testImplementation 'junit:junit:4.13.2'
+}

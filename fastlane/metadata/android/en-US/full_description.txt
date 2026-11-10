@@ -1,0 +1,14 @@
+<p><b>chut</b> (French for "shh!") checks every unknown call <b>before your phone rings</b> and silences telemarketing and scams. Free, open source, with no account, no ads and no trackers. Every feature and every statistic, for everyone.</p>
+<p><b>What it stops</b></p>
+<ul>
+<li>The 12 number ranges ARCEP reserves for telemarketing in France (01 62, 09 48…), with no list needed</li>
+<li>Numbers reported by the community, in a public list reviewed in the open</li>
+<li>Spoofed numbers, using your operator's caller-ID check (Android 11+)</li>
+<li>Premium-rate callbacks, one-ring scams from high-risk country codes, malformed numbers</li>
+<li>Your own block list, without limits, including whole ranges (0162*)</li>
+</ul>
+<p><b>An engine that explains itself</b>: each call gets a spam score from 0 to 100, computed on the phone in a fraction of a millisecond. Doubtful calls ring silently with a notification, likely spam is blocked, and you can always see why. It learns from you: block a few numbers of a spam block and its neighbours become suspicious.</p>
+<p><b>All the statistics</b>: per day, per week, by type, reason, region, hour and weekday, the most insistent numbers, time saved and a weekly report.</p>
+<p><b>Senior protection</b>: one switch and only contacts ring normally. Ideal for a parent's phone.</p>
+<p><b>Private by design</b>: works offline; your lists and history never leave the phone. Every permission is optional.</p>
+<p>Android 10 or newer. Licensed under the GNU GPL v3 or later.</p>
