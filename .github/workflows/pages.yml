@@ -38,11 +38,11 @@ jobs:
       - id: deployment
         uses: actions/deploy-pages@v4
 
-  # Writes what happened (step results, the repository's Pages settings, the live page's
+  # On failure, writes what happened (step results, the repository's Pages settings, the live page's
   # status) to the "pages-log" branch, so a failed deploy can be diagnosed with plain git.
   report:
     needs: deploy
-    if: always()
+    if: failure()
     runs-on: ubuntu-latest
     permissions:
       contents: write
