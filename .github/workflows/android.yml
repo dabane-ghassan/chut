@@ -160,7 +160,7 @@ jobs:
             test-summary.txt
             device-report.txt
             build-log.txt
-            *.png
+            shots/*.png
 
   publish:
     needs: [build, device]

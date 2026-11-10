@@ -228,7 +228,7 @@ section "Optional: show numbers"
 $UI tap "Plus de réglages" 8 >/dev/null
 check "turn on Show numbers" $UI tap "Afficher les numéros" 12
 sh input keyevent 4
-check "home now lists the latest calls" $UI has "Derniers appels inconnus" 8
+check "home now lists the latest calls" $UI has "DERNIERS APPELS INCONNUS" 8
 check "with their numbers" number_on_screen
 $UI tap "Mes listes" 8 >/dev/null
 check "my lists show only my own numbers" $UI has "04 78 12 34 56" 6
