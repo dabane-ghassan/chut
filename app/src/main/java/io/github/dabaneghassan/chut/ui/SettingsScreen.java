@@ -123,7 +123,7 @@ public final class SettingsScreen {
             col.addView(Ui.muted(a, a.getString(R.string.model_not_ready, Learner.MIN_POSITIVES)));
         } else {
             String recall = m.recall < 0 ? "–" : Math.round(m.recall * 100) + " %";
-            String fa = m.falseAlarms < 0 ? "–" : String.format(java.util.Locale.ROOT, "%.1f %%", m.falseAlarms * 100);
+            String fa = m.falseAlarms < 0 ? "–" : String.format(java.util.Locale.getDefault(), "%.1f %%", m.falseAlarms * 100);
             col.addView(Ui.body(a, a.getString(R.string.model_summary, recall, fa)));
             TextView t = Ui.muted(a, a.getString(R.string.model_line, m.positives, m.negatives,
                     DateUtils.getRelativeTimeSpanString(m.trainedAt)));
