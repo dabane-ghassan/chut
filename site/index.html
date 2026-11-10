@@ -1,606 +1,135 @@
 <!doctype html>
-<!-- SPDX-License-Identifier: GPL-3.0-or-later · chut companion site. Static: host it anywhere. -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later · chut companion site -->
 <html lang="fr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>chut, bloqueur d'appels libre</title>
-<meta name="description" content="chut filtre le démarchage avant que votre téléphone Android sonne, et apprend de vos blocages. Gratuit, open source, sans compte, sans publicité, sans accès à internet. Toutes les fonctions et toutes les statistiques, pour tout le monde.">
+<meta name="description" content="chut fait taire le démarchage téléphonique avant que votre téléphone Android sonne, et apprend de vos blocages. Libre, gratuit, sans internet.">
 <meta property="og:title" content="chut · le démarchage, en silence">
-<meta property="og:description" content="Bloqueur d'appels libre et gratuit pour Android : vos listes, les tranches ARCEP et un modèle appris de vos blocages, sur le téléphone. Statistiques complètes.">
+<meta property="og:description" content="Bloqueur d'appels libre et gratuit pour Android, qui apprend de vos blocages. Sans compte, sans internet.">
 <meta property="og:image" content="https://dabane-ghassan.github.io/chut/img/social.png">
 <meta property="og:url" content="https://dabane-ghassan.github.io/chut/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://dabane-ghassan.github.io/chut/">
-<meta name="theme-color" content="#2B2580">
+<meta name="theme-color" content="#F7F6FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#100F1A" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <style>
-/* Layout: a night-indigo hero with ringing waves and the app on a phone, then a light page:
-   numbers, features, a live number checker, how the engine decides, seniors, stats, "free, really",
-   privacy, anti-scam tips, FAQ. */
 @font-face{font-family:"Barlow";font-weight:400;font-display:swap;src:url(fonts/barlow-400.woff2) format("woff2")}
 @font-face{font-family:"Barlow";font-weight:600;font-display:swap;src:url(fonts/barlow-600.woff2) format("woff2")}
-@font-face{font-family:"Barlow Condensed";font-weight:700;font-display:swap;src:url(fonts/barlow-condensed-700.woff2) format("woff2")}
 @font-face{font-family:"Barlow Condensed";font-weight:800;font-display:swap;src:url(fonts/barlow-condensed-800.woff2) format("woff2")}
-
-:root{
-  --night:#2B2580; --night-2:#3D35A8; --night-3:#5A51D6; --on-night:#F4F3FF; --on-night-2:rgba(244,243,255,.78);
-  --paper:#F5F4FA; --card:#FFFFFF; --ink:#1B1930; --muted:#615E7A; --line:#E4E1EF; --soft:#ECEAF5;
-  --brand:#3D35A8; --brand-ink:#3D35A8; --brand-soft:#E7E5FA;
-  --lips:#FF6B57; --block:#E5484D; --block-soft:#FDE7E8; --silence:#C98200; --silence-soft:#FCF0D9; --allow:#1E9A68; --allow-soft:#DDF3E9;
-  --f-display:"Barlow Condensed","Arial Narrow","Roboto Condensed",sans-serif;
-  --f-body:"Barlow","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  color-scheme:light;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --night:#17134A; --night-2:#241E6E; --night-3:#3D35A8;
-  --paper:#100F1A; --card:#1B1A29; --ink:#EEEDF7; --muted:#A3A0BA; --line:#2C2A40; --soft:#232236;
-  --brand:#8F87F5; --brand-ink:#B4AEFF; --brand-soft:#2A2750;
-  --block:#FF7377; --block-soft:#3A1D22; --silence:#F5B544; --silence-soft:#3A2D12; --allow:#4CD39E; --allow-soft:#143327;
-  color-scheme:dark}}
-:root[data-theme="dark"]{
-  --night:#17134A; --night-2:#241E6E; --night-3:#3D35A8;
-  --paper:#100F1A; --card:#1B1A29; --ink:#EEEDF7; --muted:#A3A0BA; --line:#2C2A40; --soft:#232236;
-  --brand:#8F87F5; --brand-ink:#B4AEFF; --brand-soft:#2A2750;
-  --block:#FF7377; --block-soft:#3A1D22; --silence:#F5B544; --silence-soft:#3A2D12; --allow:#4CD39E; --allow-soft:#143327;
-  color-scheme:dark}
-
+:root{--bg:#F7F6FB;--ink:#17152B;--muted:#6B6884;--line:#E6E3F0;--soft:#EEECF6;--brand:#3D35A8;--lips:#FF6B57;
+  --block:#E5484D;--silence:#C98200;--allow:#1E9A68;
+  --display:"Barlow Condensed","Arial Narrow",sans-serif;--body:"Barlow","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#100F1A;--ink:#EEEDF7;--muted:#A19EB8;--line:#2A2840;--soft:#1D1C2C;--brand:#A9A3FF;
+  --block:#FF7377;--silence:#F5B544;--allow:#4CD39E;color-scheme:dark}}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
-a{color:var(--brand-ink)}
-:focus-visible{outline:3px solid var(--lips);outline-offset:3px;border-radius:6px}
-.wrap{max-width:1120px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
-h1,h2,h3{text-wrap:balance;margin:0}
-p{margin:0 0 1em}
-.eyebrow{font-family:var(--f-display);font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-size:14px;color:var(--brand-ink)}
-.display{font-family:var(--f-display);font-weight:800;line-height:.95;letter-spacing:-.01em}
-.muted{color:var(--muted)}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-
-/* Buttons */
-.btn{display:inline-flex;align-items:center;gap:10px;font:600 17px/1 var(--f-body);text-decoration:none;border-radius:14px;padding:15px 22px;border:0;cursor:pointer;transition:transform .15s ease,background .15s ease}
-.btn:hover{transform:translateY(-1px)}
-.btn-lips{background:var(--lips);color:#2A0E0A}
-.btn-ghost{background:rgba(255,255,255,.12);color:var(--on-night);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28)}
-.btn-brand{background:var(--brand);color:#fff}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn-brand{color:#12102A}}
-.btn svg{width:20px;height:20px;flex:none}
-
-/* Nav */
-.nav{position:absolute;top:0;left:0;right:0;z-index:5;padding-top:max(14px,env(safe-area-inset-top,0px))}
-.nav .wrap{display:flex;align-items:center;gap:18px}
-.brand{display:flex;align-items:center;gap:10px;color:var(--on-night);text-decoration:none}
-.brand img{width:36px;height:36px}
-.brand b{font:800 30px/1 var(--f-display);letter-spacing:-.01em}
-.nav ul{display:flex;gap:4px;list-style:none;margin:0 0 0 auto;padding:0}
-.nav ul a{display:block;color:var(--on-night-2);text-decoration:none;font-weight:600;font-size:15px;padding:8px 10px;border-radius:10px}
-.nav ul a:hover{color:var(--on-night);background:rgba(255,255,255,.08)}
-.nav .btn{padding:10px 16px;font-size:15px}
-@media (max-width:900px){.nav ul{display:none}.nav .btn{margin-left:auto}}
-
-/* Hero */
-.hero{position:relative;overflow:hidden;background:radial-gradient(120% 90% at 85% 10%,var(--night-3) 0%,var(--night-2) 38%,var(--night) 100%);color:var(--on-night);padding:120px 0 90px}
-.hero .wrap{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}
-.waves{position:absolute;right:-180px;top:50%;width:900px;height:900px;transform:translateY(-50%);pointer-events:none}
-.waves span{position:absolute;inset:0;margin:auto;border-radius:50%;border:2px solid rgba(255,255,255,.09);animation:ring 6s ease-out infinite}
-.waves span:nth-child(2){animation-delay:1.5s}.waves span:nth-child(3){animation-delay:3s}.waves span:nth-child(4){animation-delay:4.5s}
-@keyframes ring{0%{transform:scale(.25);opacity:1}100%{transform:scale(1);opacity:0}}
-.hero .eyebrow{color:#FFB4A9}
-.hero h1{font:800 clamp(56px,9vw,112px)/.9 var(--f-display);margin:14px 0 22px;letter-spacing:-.015em}
-.hero h1 em{font-style:normal;color:#FFB4A9}
-.hero .lead{font-size:clamp(18px,2.2vw,21px);color:var(--on-night-2);max-width:34em;margin-bottom:28px}
-.hero .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:22px}
-.facts{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14.5px;color:var(--on-night-2);list-style:none;padding:0;margin:0}
-.facts li::before{content:"✓ ";color:#9BEBC9;font-weight:600}
-@media (max-width:860px){.hero{padding:96px 0 64px}.hero .wrap{grid-template-columns:1fr}.phone{margin:8px auto 0}}
-
-/* Phone mockup (illustration of the app, drawn in HTML) */
-.phone{width:300px;max-width:100%;aspect-ratio:9/18.5;background:#0E0C24;border-radius:44px;padding:12px;box-shadow:0 30px 80px rgba(5,3,30,.55),inset 0 0 0 2px rgba(255,255,255,.08);justify-self:center;position:relative}
-.screen{height:100%;border-radius:34px;background:#F5F4FA;color:#1B1930;overflow:hidden;padding:30px 14px 14px;font-size:12px;display:flex;flex-direction:column;gap:9px}
-.screen .top{display:flex;align-items:center;gap:8px;margin-bottom:2px}
-.screen .top img{width:26px;height:26px}
-.screen .top b{font:800 22px/1 var(--f-display)}
-.s-card{background:#fff;border-radius:16px;padding:11px 12px}
-.s-ok{background:#DDF3E9;color:#11573B;font-weight:600}
-.s-ok small{display:block;font-weight:400;opacity:.85;margin-top:2px}
-.s-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.s-tiles div{background:#fff;border-radius:13px;padding:8px}
-.s-tiles b{display:block;font:800 25px/1 var(--f-display)}
-.s-tiles span{color:#686580;font-size:10.5px}
-.s-bars{display:flex;align-items:flex-end;gap:5px;height:56px;margin-top:6px}
-.s-bars i{flex:1;border-radius:4px 4px 0 0;background:#E5484D;display:block}
-.s-bars i.s{background:#E09100}
-.s-row{display:flex;align-items:center;gap:9px;padding:5px 0}
-.s-row+.s-row{border-top:1px solid #ECEAF5}
-.s-row i{width:9px;height:9px;border-radius:50%;flex:none}
-.s-row b{display:block;font-size:12.5px}
-.s-row span{color:#686580;font-size:10.5px}
-.toast{position:absolute;left:-46px;right:24px;top:58%;background:rgba(255,255,255,.97);color:#1B1930;border-radius:18px;padding:12px 14px;box-shadow:0 18px 40px rgba(5,3,30,.4);font-size:13px;animation:pop 7s ease-in-out infinite}
-.toast b{display:block;font-size:14px}
-.toast .acts{display:flex;gap:14px;margin-top:6px;color:#3D35A8;font-weight:600;font-size:12.5px}
-@keyframes pop{0%,12%{opacity:0;transform:translateY(10px)}18%,82%{opacity:1;transform:none}90%,100%{opacity:0;transform:translateY(-6px)}}
-@media (max-width:420px){.toast{left:-6px;right:-6px}}
-
-/* Sections */
-section{padding:84px 0}
-section h2{font:800 clamp(38px,5.4vw,58px)/.98 var(--f-display);margin:10px 0 16px;letter-spacing:-.01em}
-section .intro{font-size:19px;color:var(--muted);max-width:40em;margin-bottom:36px}
-.alt{background:var(--card)}
-
-/* Numbers strip */
-.strip{background:var(--card);border-bottom:1px solid var(--line);padding:30px 0}
-.strip ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
-.strip b{display:block;font:800 44px/1 var(--f-display);color:var(--brand-ink)}
-.strip span{font-size:14.5px;color:var(--muted)}
-@media (max-width:820px){.strip ul{grid-template-columns:repeat(2,1fr)}.strip li:last-child{grid-column:span 2}}
-
-/* Feature grid */
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.feat{background:var(--card);border-radius:22px;padding:22px;border:1px solid var(--line)}
-.alt .feat{background:var(--paper)}
-.feat .ico{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--brand-soft);color:var(--brand-ink);margin-bottom:14px}
-.feat .ico svg{width:24px;height:24px}
-.feat h3{font:700 24px/1.05 var(--f-display);margin-bottom:6px}
-.feat p{color:var(--muted);font-size:15.5px;margin:0}
-@media (max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:560px){.grid{grid-template-columns:1fr}}
-
-/* Checker */
-.checker{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:24px}
-.check-form{display:flex;gap:10px;flex-wrap:wrap}
-.check-form input{flex:1;min-width:0;font:600 22px/1 var(--f-body);padding:14px 16px;border-radius:14px;border:2px solid var(--line);background:var(--paper);color:var(--ink)}
-.check-form input:focus{outline:none;border-color:var(--brand)}
-.samples{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.samples button{font:600 14px/1 var(--f-body);padding:9px 12px;border-radius:999px;border:0;background:var(--soft);color:var(--ink);cursor:pointer}
-.samples button:hover{background:var(--brand-soft)}
-#blocklist{width:100%;margin-top:8px;font:500 13.5px/1.45 ui-monospace,Menlo,Consolas,monospace;padding:12px;border-radius:14px;border:2px solid var(--line);background:var(--paper);color:var(--ink);resize:vertical}
-#blocklist:focus{outline:none;border-color:var(--brand)}
-.seg{display:flex;background:var(--soft);border-radius:14px;padding:4px;margin-top:18px}
-.seg button{flex:1;font:600 15px/1 var(--f-body);padding:10px 6px;border:0;border-radius:11px;background:none;color:var(--ink);cursor:pointer}
-.seg button[aria-pressed="true"]{background:var(--brand);color:#fff}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{color:#12102A}}
-.verdict{display:flex;align-items:center;gap:14px;margin-bottom:14px}
-.badge{font:800 26px/1 var(--f-display);padding:10px 14px;border-radius:14px;text-transform:uppercase;letter-spacing:.02em}
-.badge.block{background:var(--block-soft);color:var(--block)}
-.badge.silence{background:var(--silence-soft);color:var(--silence)}
-.badge.allow{background:var(--allow-soft);color:var(--allow)}
-.score{flex:1}
-.score .bar{height:10px;border-radius:99px;background:var(--soft);overflow:hidden;margin-top:6px;position:relative}
-.score .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,var(--allow),var(--silence),var(--block));transition:width .35s ease}
-.reasons{list-style:none;margin:0;padding:0}
-.reasons li{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15.5px}
-.reasons li b{font:700 18px/1.2 var(--f-display);min-width:42px;color:var(--brand-ink)}
-.note{font-size:14px;color:var(--muted);margin-top:14px}
-@media (max-width:860px){.checker{grid-template-columns:1fr}}
-
-/* Engine explainer */
-.weights{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 28px;margin:0;padding:0;list-style:none}
-.weights li{display:grid;grid-template-columns:1fr 46px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
-.weights .w{height:8px;border-radius:99px;background:var(--soft);grid-column:1/-1;position:relative;margin-top:-2px}
-.weights .w i{position:absolute;inset:0 auto 0 0;border-radius:99px;background:var(--brand)}
-.weights b{font:800 22px/1 var(--f-display);text-align:right;color:var(--brand-ink)}
-.formula{font:700 clamp(24px,3.4vw,34px)/1.2 var(--f-display);background:var(--brand-soft);color:var(--brand-ink);border-radius:18px;padding:18px 22px;margin:26px 0 12px;text-align:center}
-.thresholds{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
-.thr{border-radius:18px;padding:16px;background:var(--paper);border:1px solid var(--line)}
-.thr h3{font:700 22px/1 var(--f-display);margin-bottom:10px}
-.track{display:flex;height:12px;border-radius:99px;overflow:hidden}
-.track i{display:block}
-.thr p{font-size:14px;color:var(--muted);margin:10px 0 0}
-@media (max-width:760px){.weights{grid-template-columns:1fr}.thresholds{grid-template-columns:1fr}}
-
-/* Two-column blocks */
-.split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
-ul.ticks{list-style:none;padding:0;margin:0}
-.ticks li{padding:9px 0 9px 32px;position:relative;border-top:1px solid var(--line)}
-.ticks li::before{content:"";position:absolute;left:0;top:13px;width:20px;height:20px;border-radius:50%;background:var(--allow-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 10.5l3 3 6-7' fill='none' stroke='%231E9A68' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/20px no-repeat}
-@media (max-width:860px){.split{grid-template-columns:1fr;gap:28px}}
-
-/* Stats illustration */
-.statpanel{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:22px}
-.statpanel .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.statpanel .tiles div{background:var(--paper);border-radius:16px;padding:12px}
-.statpanel .tiles b{display:block;font:800 32px/1 var(--f-display)}
-.statpanel .tiles span{font-size:12.5px;color:var(--muted)}
-.hbar{display:grid;grid-template-columns:1fr 34px;gap:4px 10px;font-size:14px;margin-top:10px}
-.hbar .m{grid-column:1/-1;height:8px;border-radius:99px;background:var(--soft);position:relative}
-.hbar .m i{position:absolute;inset:0 auto 0 0;border-radius:99px}
-.hbar b{text-align:right}
-.hours{display:flex;align-items:flex-end;gap:3px;height:70px;margin-top:16px}
-.hours i{flex:1;background:var(--block);border-radius:3px 3px 0 0;opacity:.85}
-
-/* Free */
-.free{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:stretch}
-.price{background:linear-gradient(160deg,var(--night-2),var(--night));color:var(--on-night);border-radius:28px;padding:30px;position:relative;overflow:hidden}
-.price .amount{font:800 120px/.85 var(--f-display);margin:8px 0}
-.price .amount small{font-size:28px;margin-left:6px;opacity:.8}
-.price ul{list-style:none;padding:0;margin:18px 0 0;columns:2;column-gap:24px}
-.price li{padding:5px 0 5px 24px;position:relative;break-inside:avoid;font-size:15.5px}
-.price li::before{content:"✓";position:absolute;left:0;color:#9BEBC9;font-weight:700}
-.never{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:30px}
-.never h3{font:800 32px/1 var(--f-display);margin-bottom:14px}
-.never .ticks li::before{background:var(--block-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6.5 6.5l7 7M13.5 6.5l-7 7' fill='none' stroke='%23E5484D' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/20px no-repeat}
-@media (max-width:860px){.free{grid-template-columns:1fr}.price ul{columns:1}}
-
-/* Privacy table */
-.table{width:100%;border-collapse:collapse;background:var(--card);border-radius:20px;overflow:hidden}
-.table th,.table td{text-align:left;padding:14px 16px;border-bottom:1px solid var(--line);vertical-align:top;font-size:15.5px}
-.table th{font:700 15px/1.2 var(--f-display);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:var(--soft)}
-.table td:first-child{font-weight:600;width:28%}
-.pill{display:inline-block;font-size:12.5px;font-weight:600;border-radius:99px;padding:3px 9px}
-.pill.y{background:var(--allow-soft);color:var(--allow)}
-.pill.o{background:var(--silence-soft);color:var(--silence)}
-.pill.n{background:var(--block-soft);color:var(--block)}
-.tablewrap{overflow-x:auto;border-radius:20px;border:1px solid var(--line)}
-
-/* Tips */
-.tips{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.tip{border-radius:22px;padding:22px;background:var(--paper);border:1px solid var(--line)}
-.tip h3{font:700 24px/1.05 var(--f-display);margin-bottom:8px}
-.tip p{font-size:15.5px;color:var(--muted);margin:0}
-.law{margin-top:22px;border-radius:22px;padding:22px 24px;background:var(--brand-soft);color:var(--ink)}
-.law h3{font:800 28px/1 var(--f-display);margin-bottom:8px;color:var(--brand-ink)}
-@media (max-width:860px){.tips{grid-template-columns:1fr}}
-
-/* Steps */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:s;list-style:none;padding:0;margin:0}
-.steps li{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;counter-increment:s}
-.steps li::before{content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--lips);color:#2A0E0A;font:800 26px/1 var(--f-display);margin-bottom:14px}
-.steps h3{font:700 25px/1.05 var(--f-display);margin-bottom:6px}
-.steps p{color:var(--muted);font-size:15.5px;margin:0}
-@media (max-width:860px){.steps{grid-template-columns:1fr}}
-
-/* FAQ */
-details{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:0 20px;margin-bottom:10px}
-summary{cursor:pointer;font:700 22px/1.2 var(--f-display);padding:18px 0;list-style:none;display:flex;justify-content:space-between;gap:16px}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 18px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--lips);outline-offset:3px;border-radius:4px}
+main,header,footer{max-width:680px;margin:0 auto;padding:0 max(24px,env(safe-area-inset-left))}
+header{display:flex;align-items:center;gap:10px;padding-top:max(28px,env(safe-area-inset-top))}
+header img{width:28px;height:28px}
+header b{font:800 26px/1 var(--display)}
+header a.dl{margin-left:auto;font:600 15px/1 var(--body);text-decoration:none;color:var(--muted)}
+header a.dl:hover{color:var(--ink)}
+.label{font:500 12.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;margin:0 0 18px}
+.label i{width:7px;height:7px;border-radius:50%;background:var(--lips);display:inline-block}
+section{padding:72px 0 0}
+h1{font:800 clamp(56px,13vw,96px)/.92 var(--display);letter-spacing:-.01em;margin:96px 0 24px;text-wrap:balance}
+.lead{font-size:20px;color:var(--muted);max-width:30em;margin:0 0 32px}
+.btn{display:inline-block;background:var(--ink);color:var(--bg);text-decoration:none;font:600 16px/1 var(--body);padding:15px 22px;border-radius:999px}
+.btn:hover{opacity:.88}
+.meta{font:400 13px/1.6 var(--mono);color:var(--muted);margin:18px 0 0}
+.check{display:flex;gap:10px;border-bottom:1.5px solid var(--line);padding-bottom:10px}
+.check input{flex:1;min-width:0;border:0;background:none;color:var(--ink);font:600 26px/1.2 var(--body);padding:4px 0;outline:none}
+.check input::placeholder{color:var(--muted);opacity:.6}
+.samples{display:flex;flex-wrap:wrap;gap:6px 16px;margin:12px 0 0}
+.samples button{border:0;background:none;padding:0;font:400 14px/1.6 var(--mono);color:var(--muted);cursor:pointer;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px}
+.samples button:hover{color:var(--ink)}
+.verdict{display:flex;align-items:baseline;gap:14px;margin:28px 0 6px}
+.verdict b{font:800 40px/1 var(--display);text-transform:uppercase;letter-spacing:.01em}
+.verdict b.block{color:var(--block)}.verdict b.silence{color:var(--silence)}.verdict b.allow{color:var(--allow)}
+.verdict span{font:400 14px/1 var(--mono);color:var(--muted)}
+.reasons{list-style:none;margin:0;padding:0;color:var(--muted)}
+.reasons li::before{content:"· ";color:var(--ink)}
+.kind{font:400 13px/1.6 var(--mono);color:var(--muted);margin:10px 0 0}
+ol.how{list-style:none;margin:0;padding:0;counter-reset:n}
+ol.how li{counter-increment:n;display:grid;grid-template-columns:44px 1fr;padding:18px 0;border-top:1px solid var(--line)}
+ol.how li::before{content:"0" counter(n);font:400 13px/1.9 var(--mono);color:var(--muted)}
+ol.how b{display:block;font-weight:600}
+ol.how span{color:var(--muted)}
+details{border-top:1px solid var(--line);padding:16px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:16px}
 summary::-webkit-details-marker{display:none}
-summary::after{content:"+";color:var(--brand-ink);font-size:28px;line-height:.9}
+summary::after{content:"+";color:var(--muted);font-family:var(--mono)}
 details[open] summary::after{content:"–"}
-details p{color:var(--muted);margin:0 0 18px}
-
-/* Download */
-.download{background:radial-gradient(100% 120% at 20% 0%,var(--night-3),var(--night));color:var(--on-night);text-align:center;padding:90px 0}
-.download h2{color:var(--on-night)}
-.download .intro{color:var(--on-night-2);margin-left:auto;margin-right:auto}
-.download .ctas{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
-.download small{display:block;margin-top:18px;color:var(--on-night-2);font-size:14.5px}
-.download a:not(.btn){color:#FFB4A9}
-
-footer{padding:36px 0 max(36px,env(safe-area-inset-bottom,0px));font-size:14.5px;color:var(--muted)}
-footer .wrap{display:flex;flex-wrap:wrap;gap:12px 26px;align-items:center}
-footer .brand{color:var(--ink)}
-footer .brand b{font-size:24px}
-footer nav{display:flex;flex-wrap:wrap;gap:8px 18px;margin-left:auto}
-footer a{color:var(--muted)}
+details p{color:var(--muted);margin:10px 0 0}
+.note{font-size:15.5px;color:var(--muted)}
+footer{display:flex;flex-wrap:wrap;gap:8px 20px;padding-top:96px;padding-bottom:max(40px,env(safe-area-inset-bottom));font:400 13px/1.6 var(--mono);color:var(--muted)}
+footer a{text-decoration:none}footer a:hover{color:var(--ink)}
+@media (max-width:520px){h1{margin-top:64px}section{padding-top:56px}}
 </style>
 </head>
 <body>
-
-<header class="nav">
-  <div class="wrap">
-    <a class="brand" href="#"><img src="favicon.svg" alt=""><b>chut</b></a>
-    <ul>
-      <li><a href="#fonctions">Fonctions</a></li>
-      <li><a href="#tester">Tester un numéro</a></li>
-      <li><a href="#intelligence">Intelligence</a></li>
-      <li><a href="#seniors">Seniors</a></li>
-      <li><a href="#gratuit">Gratuit</a></li>
-      <li><a href="#faq">FAQ</a></li>
-    </ul>
-    <a class="btn btn-lips" href="#telecharger">Télécharger</a>
-  </div>
+<header>
+  <img src="favicon.svg" alt=""><b>chut</b>
+  <a class="dl" href="https://github.com/dabane-ghassan/chut/releases/latest/download/chut.apk">Télécharger ↓</a>
 </header>
 
 <main>
-<section class="hero" aria-labelledby="h1">
-  <div class="waves" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-  <div class="wrap">
-    <div>
-      <p class="eyebrow">Bloqueur d'appels libre pour Android</p>
-      <h1 id="h1">Le démarchage, <em>en&nbsp;silence.</em></h1>
-      <p class="lead">chut vérifie chaque appel inconnu <strong>avant que votre téléphone sonne</strong>, même appli fermée, et fait taire le démarchage. Il <strong>apprend de vos blocages</strong> pour reconnaître les prochains numéros. Gratuit, sans compte, sans pub, open source, sans accès à internet.</p>
-      <div class="ctas">
-        <a class="btn btn-lips" href="https://github.com/dabane-ghassan/chut/releases/latest/download/chut.apk">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a1 1 0 0 1 1 1v9.6l3.3-3.3a1 1 0 1 1 1.4 1.4l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.4l3.3 3.3V4a1 1 0 0 1 1-1zM5 19h14a1 1 0 1 1 0 2H5a1 1 0 1 1 0-2z"/></svg>
-          Télécharger l'APK
-        </a>
-        <a class="btn btn-ghost" href="#tester">Tester un numéro</a>
-      </div>
-      <ul class="facts">
-        <li>Android 10 et plus</li><li>Moins de 1&nbsp;Mo</li><li>Sans accès à internet</li><li>En français</li><li>Licence GPL-3.0</li>
-      </ul>
+  <h1>Le démarchage, en silence.</h1>
+  <p class="lead">chut vérifie chaque appel inconnu avant que votre téléphone sonne, même appli fermée, et apprend de ce que vous bloquez.</p>
+  <a class="btn" href="https://github.com/dabane-ghassan/chut/releases/latest/download/chut.apk">Télécharger pour Android</a>
+  <p class="meta">Android 10+ · gratuit · libre · sans compte · sans internet</p>
+
+  <section id="tester" aria-labelledby="t-tester">
+    <p class="label" id="t-tester"><i></i>Tester un numéro</p>
+    <form class="check" id="check-form" autocomplete="off">
+      <label class="sr" for="num" hidden>Numéro</label>
+      <input id="num" type="tel" inputmode="tel" placeholder="01 62 43 41 66" value="01 62 99 99 99" aria-label="Numéro de téléphone">
+    </form>
+    <div class="samples" aria-label="Exemples">
+      <button type="button" data-n="01 62 99 99 99">01 62 99 99 99</button>
+      <button type="button" data-n="03 77 25 91 11">03 77 25 91 11</button>
+      <button type="button" data-n="06 12 34 56 78">06 12 34 56 78</button>
     </div>
-
-    <div class="phone" role="img" aria-label="Illustration de l'application chut : protection active, 3 appels stoppés aujourd'hui, et une notification d'appel mis en silencieux.">
-      <div class="screen" aria-hidden="true">
-        <div class="top"><img src="favicon.svg" alt=""><b>chut</b></div>
-        <div class="s-card s-ok">Protection active<small>Équilibrée · 65 numéros bloqués · ARCEP · apprentissage</small></div>
-        <div class="s-tiles"><div><b>3</b><span>aujourd'hui</span></div><div><b>17</b><span>cette semaine</span></div><div><b style="color:#3D35A8">412</b><span>au total</span></div></div>
-        <div class="s-card"><b>14 derniers jours</b>
-          <div class="s-bars"><i style="height:30%"></i><i style="height:55%"></i><i class="s" style="height:20%"></i><i style="height:70%"></i><i style="height:40%"></i><i style="height:15%"></i><i style="height:5%"></i><i style="height:60%"></i><i style="height:90%"></i><i class="s" style="height:35%"></i><i style="height:50%"></i><i style="height:25%"></i><i style="height:45%"></i><i style="height:65%"></i></div>
-        </div>
-        <div class="s-card">
-          <div class="s-row"><i style="background:#E5484D"></i><div><b>01 62 43 41 66</b><span>Bloqué · Tranche 01 62, démarchage</span></div></div>
-          <div class="s-row"><i style="background:#E09100"></i><div><b>03 77 25 91 11</b><span>Silencieux · Ressemble à 87 % à vos blocages</span></div></div>
-          <div class="s-row"><i style="background:#E5484D"></i><div><b>09 48 26 25 99</b><span>Bloqué · Votre liste noire</span></div></div>
-        </div>
-      </div>
-      <div class="toast" aria-hidden="true"><b>Silencieux : 05 12 34 02 22</b>Score spam 58/100 · Ressemble à vos numéros bloqués commençant par 05 12 34 0<div class="acts"><span>BLOQUER</span><span>PAS DU SPAM</span></div></div>
+    <div aria-live="polite">
+      <div class="verdict"><b id="badge" class="block">Bloqué</b><span>score <span id="score">0</span>/100</span></div>
+      <ul class="reasons" id="reasons"></ul>
+      <p class="kind" id="kind"></p>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="strip">
-  <div class="wrap">
-    <ul>
-      <li><b>0&nbsp;€</b><span>pour toujours, tout inclus</span></li>
-      <li><b>0</b><span>compte, publicité, pisteur ou accès à internet</span></li>
-      <li><b>12</b><span>tranches ARCEP de démarchage filtrées</span></li>
-      <li><b>94&nbsp;%</b><span>des spams jamais vus reconnus par le modèle</span></li>
-      <li><b>&lt;&nbsp;1&nbsp;ms</b><span>pour décider, sur le téléphone</span></li>
-    </ul>
-  </div>
-</div>
-
-<section id="fonctions">
-  <div class="wrap">
-    <p class="eyebrow">Fonctionnalités</p>
-    <h2>Tout ce qu'il faut. Rien à payer.</h2>
-    <p class="intro">Les applis payantes réservent l'essentiel à leur abonnement. Dans chut, chaque fonction est là, pour tout le monde, sans limite.</p>
-    <div class="grid">
-      <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3l7.5 3v5.5c0 4.4-3.1 8.2-7.5 9.5-4.4-1.3-7.5-5.1-7.5-9.5V6zM8.8 12.2l2.2 2.2 4.2-4.4"/></svg></div>
-        <h3>Avant la sonnerie</h3><p>chut utilise le filtrage d'appels officiel d'Android : un appel bloqué ne sonne jamais, et reste dans votre historique.</p></article>
-      <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 6h16M4 12h10M4 18h7"/><circle cx="18" cy="16" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
-        <h3>Tranches ARCEP</h3><p>Les 12 tranches que l'ARCEP réserve au démarchage (01 62, 09 48…) sont reconnues d'office. Pas besoin de liste.</p></article>
-      <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 19l5-6 4 3 7-9"/><circle cx="20" cy="7" r="1.6" fill="currentColor"/></svg></div>
-        <h3>Apprend de vous</h3><p>Chaque numéro bloqué entraîne un modèle sur le téléphone. Il reconnaît les blocs de numéros et les heures des démarcheurs.</p></article>
-      <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v3M12 18v3M4.2 7l2.6 1.5M17.2 15.5 19.8 17M4.2 17l2.6-1.5M17.2 8.5 19.8 7"/><circle cx="12" cy="12" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
-        <h3>Même fermé</h3><p>Android consulte chut à chaque appel, même appli fermée, arrêtée ou après un redémarrage. Testé avant chaque version.</p></article>
-      <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h9"/></svg></div>
-        <h3>Listes illimitées</h3><p>62 numéros de démarchage déjà fournis, plus les vôtres, des tranches entières (0162*), une liste blanche. Import et export.</p></article>
-      <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M5 20v-7M10 20V6M15 20v-9M20 20V9"/></svg></div>
-        <h3>Toutes les stats</h3><p>Par jour, par semaine, par type, par région, par heure ; les numéros les plus insistants ; un bilan chaque semaine.</p></article>
-      <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7.5-4.4-7.5-10.3A4.2 4.2 0 0 1 12 8a4.2 4.2 0 0 1 7.5 2.7C19.5 16.6 12 21 12 21z"/></svg></div>
-        <h3>Protection senior</h3><p>Un réglage, et seuls les contacts sonnent normalement. Idéal sur le téléphone d'un parent, première cible des arnaqueurs.</p></article>
-      <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M8 10V7.5a4 4 0 0 1 8 0V10"/></svg></div>
-        <h3>Rien ne sort</h3><p>chut n'a même pas la permission d'accéder à internet. Vos listes, votre historique et le modèle restent sur le téléphone.</p></article>
-    </div>
-  </div>
-</section>
-
-<section id="tester" class="alt">
-  <div class="wrap">
-    <p class="eyebrow">Essayez</p>
-    <h2>Qu'en penserait chut&nbsp;?</h2>
-    <p class="intro">Tapez un numéro qui vous a appelé. Ce sont les mêmes règles que dans l'appli, et le même modèle, entraîné ici sous vos yeux sur la liste fournie avec chut. Ajoutez des numéros à bloquer : le modèle réapprend. Rien n'est envoyé, tout se calcule dans votre navigateur.</p>
-    <div class="checker">
-      <div class="panel">
-        <form class="check-form" id="check-form" autocomplete="off">
-          <label class="sr" for="num">Numéro de téléphone</label>
-          <input id="num" type="tel" inputmode="tel" placeholder="01 62 43 41 66" value="05 12 34 02 22">
-          <button class="btn btn-brand" type="submit">Tester</button>
-        </form>
-        <div class="samples" aria-label="Exemples">
-                    <button type="button" data-n="04 24 03 60 62">Dans la liste</button>
-          <button type="button" data-n="01 62 99 99 99">Tranche ARCEP</button>
-          <button type="button" data-n="05 12 34 02 22">Voisin appris</button>
-          <button type="button" data-n="06 12 34 56 78">Un mobile</button>
-        </div>
-        <label class="eyebrow" for="blocklist" style="display:block;margin-top:20px">Votre liste noire (le modèle apprend d'elle)</label>
-        <textarea id="blocklist" rows="4" spellcheck="false"></textarea>
-        <div class="samples"><button type="button" id="teach">+ bloquer 3 numéros en 05 12 34 0x xx</button><span class="muted" id="model-info" style="font-size:14px;align-self:center"></span></div>
-        <div class="seg" role="group" aria-label="Sensibilité">
-          <button type="button" data-s="0" aria-pressed="false">Souple</button>
-          <button type="button" data-s="1" aria-pressed="true">Équilibrée</button>
-          <button type="button" data-s="2" aria-pressed="false">Stricte</button>
-        </div>
-      </div>
-      <div class="panel" aria-live="polite" id="result">
-        <div class="verdict">
-          <span class="badge allow" id="badge">Sonne</span>
-          <div class="score"><span class="muted">Score spam <b id="score">70</b>/100</span><div class="bar"><i id="scorebar" style="width:70%"></i></div></div>
-        </div>
-        <ul class="reasons" id="reasons"></ul>
-        <p class="note" id="kind"></p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="comment">
-  <div class="wrap">
-    <p class="eyebrow">Comment ça marche</p>
-    <h2>Trois gestes, puis on oublie.</h2>
-    <p class="intro">Pas de compte à créer, pas de numéro à donner.</p>
-    <ol class="steps">
-      <li><h3>Installez</h3><p>Téléchargez l'APK sur votre téléphone et ouvrez-le. Android vous demande d'autoriser l'installation : c'est normal hors du Play Store.</p></li>
-      <li><h3>Activez</h3><p>Touchez « Activer la protection » et choisissez chut comme appli d'identification de l'appelant et de spam.</p></li>
-      <li><h3>Oubliez</h3><p>Le démarchage ne sonne plus. Les appels douteux sonnent en silencieux, avec une notification pour les bloquer ou les garder.</p></li>
+  <section aria-labelledby="t-how">
+    <p class="label" id="t-how"><i></i>Comment</p>
+    <ol class="how">
+      <li><div><b>Vos listes</b><span>62 numéros de démarchage déjà fournis, plus ceux que vous bloquez. Vos contacts sonnent toujours.</span></div></li>
+      <li><div><b>Les tranches ARCEP</b><span>Les 12 préfixes que la loi réserve au démarchage : 01 62, 09 48…</span></div></li>
+      <li><div><b>Un modèle appris</b><span>Entraîné sur le téléphone à partir de vos blocages, il reconnaît les numéros qui leur ressemblent.</span></div></li>
     </ol>
-  </div>
-</section>
+  </section>
 
-<section id="intelligence" class="alt">
-  <div class="wrap">
-    <p class="eyebrow">L'intelligence, sur votre téléphone</p>
-    <h2>Un score, des raisons, aucun nuage.</h2>
-    <p class="intro">chut n'envoie vos appels à aucune IA distante. Il entraîne son propre modèle sur le téléphone, à partir de ce que vous bloquez, et explique chacune de ses décisions.</p>
-    <div class="split" style="align-items:start">
-      <div>
-        <h3 class="display" style="font-size:30px;margin-bottom:10px">1. Les règles fermes d'abord</h3>
-        <p class="muted">Vos contacts et votre liste blanche sonnent toujours. Votre liste noire ne sonne jamais. Ensuite seulement, chut cherche des indices.</p>
-        <h3 class="display" style="font-size:30px;margin:22px 0 10px">2. Les tranches ARCEP</h3>
-        <p class="muted">Depuis 2023, les démarcheurs doivent appeler depuis 12 tranches connues (01 62, 01 63, 02 70… 09 49). Un appel qui en vient compte pour 70 points.</p>
-        <h3 class="display" style="font-size:30px;margin:22px 0 10px">3. Le modèle appris</h3>
-        <p class="muted">Une régression logistique, entraînée sur le téléphone. Chaque numéro est décrit par ses préfixes de 4 à 9 chiffres, son type de ligne et l'heure de l'appel. Elle compare vos numéros bloqués à ceux que vous laissez sonner et à 3 000 numéros français pris au hasard (apprentissage « positif / non étiqueté »).</p>
-        <ul class="weights">
-          <li><span>1 numéro bloqué dans un bloc de 1 000</span><b>35</b><span class="w"><i style="width:35%"></i></span></li>
-          <li><span>2 numéros bloqués dans le même bloc</span><b>41</b><span class="w"><i style="width:41%"></i></span></li>
-          <li><span>3 numéros bloqués dans le même bloc</span><b>58</b><span class="w"><i style="width:58%"></i></span></li>
-          <li><span>Le reste du bloc de 10 000</span><b>23</b><span class="w"><i style="width:23%"></i></span></li>
-        </ul>
-        <p class="note">Probabilités du modèle pour un numéro jamais vu (sur 100). Sur les 62 numéros fournis, en validation croisée sur 5 plis, il reconnaît 94 % des numéros qu'on lui a cachés, pour 0,6 % de fausses alertes sur des numéros au hasard.</p>
-      </div>
-      <div>
-        <h3 class="display" style="font-size:30px;margin-bottom:10px">4. Un score qui combine</h3>
-        <p class="muted">Deux indices faibles en font un plus fort, sans jamais dépasser 100 :</p>
-        <div class="formula">score = 1 − (1 − a)(1 − b)…</div>
-        <p class="muted">Une tranche ARCEP (70) que le modèle juge suspecte à 60 donne 88. Le modèle seul plafonne à 95 : une ressemblance n'est jamais une certitude.</p>
-        <h3 class="display" style="font-size:30px;margin:22px 0 10px">5. Votre sensibilité décide</h3>
-        <div class="thresholds">
-          <div class="thr"><h3>Souple</h3><div class="track"><i style="width:60%;background:var(--allow)"></i><i style="width:30%;background:var(--silence)"></i><i style="width:10%;background:var(--block)"></i></div><p>Silencieux dès 60, bloqué dès 90.</p></div>
-          <div class="thr"><h3>Équilibrée</h3><div class="track"><i style="width:40%;background:var(--allow)"></i><i style="width:30%;background:var(--silence)"></i><i style="width:30%;background:var(--block)"></i></div><p>Silencieux dès 40, bloqué dès 70.</p></div>
-          <div class="thr"><h3>Stricte</h3><div class="track"><i style="width:25%;background:var(--allow)"></i><i style="width:25%;background:var(--silence)"></i><i style="width:50%;background:var(--block)"></i></div><p>Silencieux dès 25, bloqué dès 50.</p></div>
-        </div>
-        <p class="note">Un numéro mis en silencieux qui rappelle dans les 5 minutes sonne : une vraie personne insiste, un robot passe au suivant. Et chaque « Bloquer » ou « Pas du spam » réentraîne le modèle aussitôt.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="seniors">
-  <div class="wrap split">
-    <div>
-      <p class="eyebrow">Famille et seniors</p>
-      <h2>Protégez ceux qu'on cible en premier.</h2>
-      <p class="intro" style="margin-bottom:22px">Faux conseiller bancaire, faux petit-fils, faux livreur : les arnaques téléphoniques visent d'abord les personnes âgées. Installez chut sur le téléphone d'un parent et activez la protection senior.</p>
-      <ul class="ticks">
-        <li>Filtrage strict, quoi que dise la sensibilité.</li>
-        <li>Seuls les contacts sonnent normalement ; les inconnus sonnent en silencieux, avec une notification.</li>
-        <li>Les numéros usurpés et surtaxés sont bloqués d'office.</li>
-        <li>Une liste blanche pour le médecin, la pharmacie, l'aide à domicile.</li>
-        <li>Gratuit, même pour toute la famille : installez-le sur autant de téléphones que vous voulez.</li>
-      </ul>
-    </div>
-    <div class="statpanel" role="img" aria-label="Illustration des statistiques de chut">
-      <div class="tiles"><div><b style="color:var(--brand-ink)">412</b><span>appels stoppés</span></div><div><b>78 %</b><span>des inconnus étaient du spam</span></div><div><b style="color:var(--allow)">≈ 10 h</b><span>de temps gagné</span></div></div>
-      <b class="display" style="font-size:22px">Par type</b>
-      <div class="hbar"><span>Démarchage</span><b>301</b><span class="m"><i style="width:100%;background:var(--brand)"></i></span>
-        <span>Votre liste noire</span><b>62</b><span class="m"><i style="width:21%;background:var(--brand)"></i></span>
-        <span>Arnaque probable</span><b>31</b><span class="m"><i style="width:10%;background:var(--brand)"></i></span>
-        <span>Appris de vos blocages</span><b>18</b><span class="m"><i style="width:6%;background:var(--brand)"></i></span></div>
-      <b class="display" style="font-size:22px;display:block;margin-top:18px">Quand ils appellent</b>
-      <div class="hours" aria-hidden="true"><i style="height:2%"></i><i style="height:1%"></i><i style="height:1%"></i><i style="height:1%"></i><i style="height:1%"></i><i style="height:1%"></i><i style="height:3%"></i><i style="height:8%"></i><i style="height:38%"></i><i style="height:72%"></i><i style="height:88%"></i><i style="height:76%"></i><i style="height:30%"></i><i style="height:46%"></i><i style="height:81%"></i><i style="height:100%"></i><i style="height:84%"></i><i style="height:62%"></i><i style="height:40%"></i><i style="height:12%"></i><i style="height:4%"></i><i style="height:2%"></i><i style="height:1%"></i><i style="height:1%"></i></div>
-      <p class="note" style="margin-bottom:0">Illustration. Vos vraies statistiques se calculent sur votre téléphone : par jour, semaine, type, raison, région, heure et jour, plus les numéros les plus insistants et un bilan hebdomadaire.</p>
-    </div>
-  </div>
-</section>
-
-<section id="gratuit" class="alt">
-  <div class="wrap">
-    <p class="eyebrow">Tarifs</p>
-    <h2>Gratuit. Vraiment.</h2>
-    <p class="intro">Pas d'essai de 14 jours, pas de version Pro, pas de limite de 20 numéros, pas de « famille » à 5,99&nbsp;€. chut est un logiciel libre : il appartient à tout le monde.</p>
-    <div class="free">
-      <div class="price">
-        <p class="eyebrow" style="color:#FFB4A9">Une seule formule</p>
-        <div class="amount">0&nbsp;€<small>pour toujours</small></div>
-        <ul>
-          <li>Blocage avant la sonnerie</li><li>Tranches ARCEP</li><li>Modèle appris sur le téléphone</li><li>62 numéros fournis</li>
-          <li>Numéros illimités</li><li>Tranches entières (0162*)</li><li>Import et export</li><li>Toutes les statistiques</li>
-          <li>Bilan hebdomadaire</li><li>Protection senior</li><li>Autant de téléphones que voulu</li><li>Code source ouvert</li>
-        </ul>
-      </div>
-      <div class="never">
-        <h3>Ce que chut ne fera jamais</h3>
-        <ul class="ticks">
-          <li>Vous demander un compte, un e-mail ou votre numéro.</li>
-          <li>Afficher une publicité ou intégrer un pisteur.</li>
-          <li>Envoyer vos appels ou vos contacts où que ce soit : il n'a pas accès à internet.</li>
-          <li>Verrouiller une fonction derrière un abonnement.</li>
-        </ul>
-        <p class="note">chut vous rend service ? <a href="https://buymeacoffee.com/ghassandabane">Offrez un café</a> ou <a href="https://github.com/dabane-ghassan/chut">contribuez au code</a>.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="vie-privee">
-  <div class="wrap">
-    <p class="eyebrow">Vie privée</p>
-    <h2>Ce que chut touche, et pourquoi.</h2>
-    <p class="intro">Chaque permission est facultative et demandée seulement quand vous activez la fonction qui en a besoin.</p>
-    <div class="tablewrap">
-      <table class="table">
-        <thead><tr><th>Accès</th><th>Pour quoi faire</th><th>Statut</th></tr></thead>
-        <tbody>
-          <tr><td>Filtrage des appels</td><td>Android donne à chut le numéro de chaque appel entrant, avant la sonnerie. C'est tout le principe.</td><td><span class="pill y">nécessaire</span></td></tr>
-          <tr><td>Contacts</td><td>Vérifier qu'un numéro est un contact, pour qu'il sonne toujours. chut ne lit jamais les noms.</td><td><span class="pill o">facultatif</span></td></tr>
-          <tr><td>Journal d'appels</td><td>Vous proposer les numéros inconnus récents à bloquer, quand vous le demandez.</td><td><span class="pill o">facultatif</span></td></tr>
-          <tr><td>Notifications</td><td>Les appels mis en silencieux et le bilan hebdomadaire. Sans aucun son.</td><td><span class="pill o">facultatif</span></td></tr>
-          <tr><td>Internet</td><td>Aucun. chut ne demande pas la permission d'accéder au réseau : rien ne peut quitter le téléphone.</td><td><span class="pill n">jamais</span></td></tr>
-          <tr><td>Compte, publicité, pisteurs, analytics</td><td>Il n'y en a pas.</td><td><span class="pill n">jamais</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<section id="conseils" class="alt">
-  <div class="wrap">
-    <p class="eyebrow">Conseils anti-arnaque</p>
-    <h2>Les bons réflexes.</h2>
-    <p class="intro">Aucun filtre n'est parfait. Ces quelques réflexes complètent chut.</p>
-    <div class="tips">
-      <div class="tip"><h3>Raccrochez, rappelez</h3><p>Votre banque, la police ou un service public au téléphone ? Raccrochez et rappelez le numéro officiel que vous connaissez. Un vrai conseiller ne vous demandera jamais un code reçu par SMS.</p></div>
-      <div class="tip"><h3>Méfiez-vous de l'urgence</h3><p>« Votre compte va être bloqué », « votre petit-fils a eu un accident » : la pression est l'outil principal des escrocs. Prenez le temps.</p></div>
-      <div class="tip"><h3>Ne rappelez pas l'inconnu</h3><p>Un appel d'une sonnerie depuis l'étranger, ou un message qui vous demande de rappeler un 089 : c'est souvent une arnaque au rappel surtaxé.</p></div>
-    </div>
-    <div class="law">
-      <h3>Depuis le 11 août 2026, la loi est de votre côté</h3>
-      <p style="margin-bottom:.6em">Le démarchage téléphonique sans votre consentement préalable est interdit, et la liste Bloctel a été supprimée. Une entreprise qui vous appelle sans votre accord (hors contrat en cours) est en infraction : signalez-la sur <a href="https://signal.conso.gouv.fr/">SignalConso</a>.</p>
-      <p style="margin:0">SMS frauduleux ou appel « ping » vers un numéro surtaxé : <a href="https://www.33700.fr/">33700</a>. Victime d'une escroquerie : Info Escroqueries au <strong>0805 805 817</strong> (gratuit), et <a href="https://www.cybermalveillance.gouv.fr/">cybermalveillance.gouv.fr</a>.</p>
-    </div>
-  </div>
-</section>
-
-<section id="faq">
-  <div class="wrap">
-    <p class="eyebrow">Questions fréquentes</p>
-    <h2>FAQ</h2>
-    <div style="margin-top:28px">
-      <details><summary>chut va-t-il bloquer des appels importants&nbsp;?</summary><p>Vos contacts sonnent toujours. Les appels douteux sonnent en silencieux plutôt que d'être bloqués, avec une notification. Un numéro mis en silencieux qui rappelle dans les 5 minutes sonne normalement. Et chaque appel filtré reste dans l'historique du téléphone et dans chut, avec la raison : un geste suffit pour le mettre en liste blanche.</p></details>
-      <details><summary>Est-ce que ça vide la batterie&nbsp;?</summary><p>Non. chut ne tourne pas en arrière-plan : Android le réveille le temps d'un appel, quelques millisecondes. Deux petites tâches hebdomadaires s'ajoutent (le bilan et le réentraînement du modèle), lancées par Android au moment le plus économe. L'entraînement prend moins d'une seconde.</p></details>
-      <details><summary>Faut-il internet&nbsp;?</summary><p>Non, et chut n'y a même pas accès. Le filtrage, vos listes, l'historique et l'entraînement du modèle se font sur le téléphone.</p></details>
-      <details><summary>Ça marche si l'appli est fermée&nbsp;?</summary><p>Oui. Android consulte chut à chaque appel entrant, que l'appli soit ouverte, fermée, arrêtée de force ou que le téléphone vienne de redémarrer. Avant chaque version, ces cas sont testés sur Android 14 avec de vrais appels : <a href="https://github.com/dabane-ghassan/chut/releases/tag/test-report">voir le dernier rapport de tests</a>.</p></details>
-      <details><summary>Pourquoi pas sur le Play Store&nbsp;?</summary><p>chut se télécharge directement depuis GitHub, sans compte Google. Pour être prévenu des nouvelles versions, utilisez <a href="https://obtainium.imranr.dev/">Obtainium</a>. Une publication sur F-Droid est prévue.</p></details>
-      <details><summary>Et sur iPhone&nbsp;?</summary><p>iOS ne permet de filtrer les appels qu'avec une appli distribuée par l'App Store. chut est pour l'instant réservé à Android 10 et plus.</p></details>
-      <details><summary>Comment chut apprend-il&nbsp;?</summary><p>Quand vous bloquez un numéro, chut réentraîne un petit modèle sur le téléphone (une régression logistique). Il apprend quels blocs de numéros et quelles heures reviennent dans ce que vous bloquez, et ce qui distingue les appels que vous laissez sonner. Un seul blocage ne rend pas ses voisins suspects ; plusieurs dans le même bloc de 1 000 numéros, oui. Dans Réglages, l'appli affiche sa précision, mesurée par validation croisée.</p></details>
-      <details><summary>Je viens d'une autre appli de blocage. Je garde mes numéros&nbsp;?</summary><p>Oui. Exportez vos numéros bloqués depuis l'appli Téléphone ou votre ancienne appli, puis « Listes › Importer un fichier » ou « Coller une liste ». chut lit les numéros séparés par des virgules ou des retours à la ligne, sous toutes les formes (01 62…, +33 1 62…, 0033…).</p></details>
-      <details><summary>Qui fait chut&nbsp;?</summary><p>Ghassan Dabane, sur son temps libre. Le code est sous licence GNU GPL v3 ou ultérieure. Les idées et les contributions sont bienvenues sur <a href="https://github.com/dabane-ghassan/chut">GitHub</a>.</p></details>
-    </div>
-  </div>
-</section>
-
-<section class="download" id="telecharger">
-  <div class="wrap">
-    <img src="favicon.svg" alt="" width="84" height="84" style="margin-bottom:16px">
-    <h2>Offrez-vous le silence.</h2>
-    <p class="intro">Android 10 ou plus récent. Gratuit, pour toujours.</p>
-    <div class="ctas">
-      <a class="btn btn-lips" href="https://github.com/dabane-ghassan/chut/releases/latest/download/chut.apk">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a1 1 0 0 1 1 1v9.6l3.3-3.3a1 1 0 1 1 1.4 1.4l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.4l3.3 3.3V4a1 1 0 0 1 1-1zM5 19h14a1 1 0 1 1 0 2H5a1 1 0 1 1 0-2z"/></svg>
-        Télécharger chut.apk</a>
-      <a class="btn btn-ghost" href="https://github.com/dabane-ghassan/chut">Code source</a>
-    </div>
-    <small>Toutes les versions et leurs notes : <a href="https://github.com/dabane-ghassan/chut/releases">github.com/dabane-ghassan/chut/releases</a></small>
-  </div>
-</section>
+  <section aria-labelledby="t-faq">
+    <p class="label" id="t-faq"><i></i>Questions</p>
+    <details><summary>Ça marche appli fermée&nbsp;?</summary><p>Oui. Android consulte chut à chaque appel, même appli fermée ou après un redémarrage. Chaque version est testée ainsi, avec de vrais appels, avant d'être publiée.</p></details>
+    <details><summary>Vous voyez mes appels&nbsp;?</summary><p>Non. chut n'a pas accès à internet : vos appels, vos listes et le modèle restent sur le téléphone. Il n'affiche même aucun numéro, sauf si vous l'activez.</p></details>
+    <details><summary>Un appel important peut-il être bloqué&nbsp;?</summary><p>Vos contacts sonnent toujours. Les appels douteux sonnent en silencieux avec une notification « Bloquer / Pas du spam », et un numéro qui rappelle dans les 5 minutes sonne.</p></details>
+    <details><summary>Et sur iPhone&nbsp;?</summary><p>Pas pour l'instant : chut est pour Android 10 et plus.</p></details>
+    <p class="note" style="margin-top:28px">Depuis le 11 août 2026, le démarchage sans votre accord est interdit : signalez-le sur <a href="https://signal.conso.gouv.fr/">SignalConso</a>.</p>
+  </section>
 </main>
 
 <footer>
-  <div class="wrap">
-    <a class="brand" href="#"><img src="favicon.svg" alt="" width="28" height="28"><b>chut</b></a>
-    <span>Logiciel libre sous GPL-3.0</span>
-    <nav>
-      <a href="https://github.com/dabane-ghassan/chut">GitHub</a>
-      <a href="https://github.com/dabane-ghassan/chut/releases/tag/test-report">Rapport de tests</a>
-      <a href="https://github.com/dabane-ghassan/chut/issues">Un bug, une idée</a>
-    </nav>
-  </div>
+  <span>chut · GPL-3.0</span>
+  <a href="https://github.com/dabane-ghassan/chut">Code source</a>
+  <a href="https://github.com/dabane-ghassan/chut/releases/tag/test-report">Rapport de tests</a>
+  <a href="https://dabane-ghassan.github.io/">Ghassan Dabane</a>
 </footer>
 
 <script>
@@ -709,31 +238,20 @@ footer a{color:var(--muted)}
   function show() {
     const v = evaluate($("num").value);
     $("badge").className = "badge " + v.action; $("badge").textContent = LABEL[v.action];
-    $("score").textContent = v.score; $("scorebar").style.width = Math.max(2, v.score) + "%";
+    $("score").textContent = v.score;
     const ul = $("reasons"); ul.textContent = "";
     const rs = v.reasons.length ? v.reasons : [[0, "Rien de suspect sur ce numéro."]];
-    for (const [w, text] of rs) { const li = document.createElement("li"); const bb = document.createElement("b"); bb.textContent = w ? "+" + w : "·"; li.append(bb, document.createTextNode(text)); ul.append(li); }
-    $("kind").textContent = v.n ? `${pretty(v.n)} · ${KIND_FR[v.k] || ""}. Dans l'appli, vos contacts et votre liste blanche sonnent toujours.` : "";
+    for (const [w, text] of rs) { const li = document.createElement("li"); li.textContent = text; ul.append(li); }
+    $("kind").textContent = v.n ? `${pretty(v.n)} · ${KIND_FR[v.k] || ""}` : "";
   }
-  let timer = null;
   function relearn() {
-    blocked = new Set($("blocklist").value.split(/[,;\n]+/).map(normalize).filter(n => n.startsWith("+") && n.length >= 9));
-    const t0 = performance.now();
-    model = train([...blocked]);
-    $("model-info").textContent = model ? `Modèle entraîné sur ${blocked.size} numéros en ${Math.round(performance.now() - t0)} ms` : "Bloquez au moins 5 numéros pour activer le modèle";
+    blocked = new Set(PRESET);
+    model = train(PRESET);
     show();
   }
-  $("blocklist").value = PRESET.map(n => pretty(n)).join(", ");
-  $("blocklist").addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(relearn, 500); });
-  $("teach").addEventListener("click", () => {
-    $("blocklist").value = $("blocklist").value.trim() + ", 05 12 34 00 01, 05 12 34 04 57, 05 12 34 09 30";
-    $("teach").disabled = true; relearn();
-  });
   $("check-form").addEventListener("submit", e => { e.preventDefault(); show(); });
   $("num").addEventListener("input", show);
   document.querySelectorAll(".samples button[data-n]").forEach(b => b.addEventListener("click", () => { $("num").value = b.dataset.n; show(); }));
-  document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
-    sensitivity = +b.dataset.s; document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x === b)); show(); }));
   relearn();
 })();
 </script>
