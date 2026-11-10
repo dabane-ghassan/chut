@@ -75,9 +75,14 @@ is_rejected() { [ "$1" = 5 ] || [ "$1" = 6 ]; }
 newer() { [ -n "$2" ] && [ "$2" -gt "$1" ] 2>/dev/null; }
 
 # Type of the newest entry for a number in the phone's own call log (1 in, 3 missed, 5 rejected, 6 blocked).
+calllog() { adb shell "content query --uri content://call_log/calls --projection number:type:date --sort 'date DESC'" 2>/dev/null | tr -d '\r'; }
 calllog_type() {
-  sh content query --uri content://call_log/calls --projection number:type --sort "date DESC" \
-    | grep -m1 -F "${1#+}" | sed -n 's/.*type=\([0-9]*\).*/\1/p'
+  local digits="${1#+33}"
+  for _ in 1 2 3 4 5; do
+    local t; t="$(calllog | grep -m1 -E "number=(\+33|0033|33|0)?$digits," | sed -n 's/.*type=\([0-9]*\).*/\1/p')"
+    [ -n "$t" ] && { echo "$t"; return; }
+    sleep 2
+  done
 }
 
 # Places a call, notes whether the phone is ringing after a few seconds, hangs up.
@@ -129,6 +134,7 @@ check "app process is not running" not_running
 expect_call "preset spam number is blocked (04 24 03 60 62)" "+33424036062" 2 "USER_LIST" 0
 t="$(calllog_type +33424036062)"
 check "it is in the phone's call log as rejected/blocked (type $t)" is_rejected "$t"
+[ -n "$t" ] || { say "  call log:"; calllog | head -5 | sed 's/^/    /' | tee -a "$REPORT" >/dev/null; }
 check "background jobs were scheduled without opening the app" jobs_scheduled
 
 section "Calls after chut was force-stopped"
@@ -182,8 +188,10 @@ check "statistics are computed" $UI has "appels stoppés" 0
 check "statistics break calls down by type" $UI has "Par type" 6
 $UI tap "Réglages" 0 >/dev/null
 check "settings show the language switch" $UI has "Langue · Language" 0
-check "settings show the learned model" $UI has "Modèle appris" 8
-check "the model reports its cross-validated recall" $UI has "des numéros de spam jamais vus reconnus" 3
+check "settings show the learned model" $UI has "MODÈLE APPRIS" 8
+$UI tap "Accueil" 0 >/dev/null
+$UI tap "Réglages" 0 >/dev/null
+check "the model reports its cross-validated recall" $UI has "des numéros de spam jamais vus reconnus" 10
 
 section "Language switch"
 $UI tap "Réglages" 0 >/dev/null
