@@ -19,7 +19,7 @@ import io.github.dabaneghassan.chut.data.Prefs;
 import io.github.dabaneghassan.chut.data.Store;
 import io.github.dabaneghassan.chut.engine.Learner;
 
-/** Language, how strict chut is, the learned model, notifications, data and about. */
+/** The few choices that matter, and everything else folded under "More settings". */
 public final class SettingsScreen {
 
     public static final String SITE = "https://dabane-ghassan.github.io/chut/";
@@ -32,64 +32,68 @@ public final class SettingsScreen {
         Prefs p = new Prefs(a);
         ScrollView scroll = new ScrollView(a);
         LinearLayout col = Ui.column(a);
-        int pad = Ui.dp(a, 16);
-        col.setPadding(pad, Ui.dp(a, 8), pad, Ui.dp(a, 24));
+        int pad = Ui.dp(a, 24);
+        col.setPadding(pad, Ui.dp(a, 4), pad, Ui.dp(a, 32));
         scroll.addView(col);
+        col.addView(a.backLink(MainActivity.PAGE_HOME, R.string.tab_home));
         col.addView(StatsScreen.header(a, a.getString(R.string.tab_settings), null));
 
-        // Language: always shown in both languages, so anyone can find it.
-        LinearLayout lang = Ui.card(a);
-        lang.addView(Ui.title(a, a.getString(R.string.language)));
-        lang.addView(Ui.space(a, 10));
+        // Language, written in both so anyone finds it.
+        col.addView(StatsScreen.section(a, a.getString(R.string.language)));
         int current = "en".equals(p.language()) ? 1 : 0;
-        lang.addView(Ui.segmented(a, new String[]{"Français", "English"}, current, i -> {
+        col.addView(Ui.segmented(a, new String[]{"Français", "English"}, current, i -> {
             if (i != current) a.setLanguage(i == 1 ? "en" : "fr");
         }));
-        col.addView(lang);
+        col.addView(Ui.space(a, 28));
 
-        // Sensitivity
-        col.addView(Ui.eyebrow(a, a.getString(R.string.sec_filter)));
-        LinearLayout sens = Ui.card(a);
-        sens.addView(Ui.title(a, a.getString(R.string.sensitivity)));
-        sens.addView(Ui.space(a, 10));
+        col.addView(StatsScreen.section(a, a.getString(R.string.sensitivity)));
         int level = p.number(Prefs.SENSITIVITY, 1);
-        sens.addView(Ui.segmented(a, a.getResources().getStringArray(R.array.sensitivity), level, i -> {
+        col.addView(Ui.segmented(a, a.getResources().getStringArray(R.array.sensitivity), level, i -> {
             p.setNumber(Prefs.SENSITIVITY, i);
             a.refresh();
         }));
         String[] explain = a.getResources().getStringArray(R.array.sensitivity_explain);
         TextView ex = Ui.muted(a, p.flag(Prefs.SENIOR) ? a.getString(R.string.senior_overrides) : explain[level]);
-        ex.setPadding(0, Ui.dp(a, 10), 0, 0);
-        sens.addView(ex);
-        col.addView(sens);
+        ex.setPadding(0, Ui.dp(a, 10), 0, Ui.dp(a, 16));
+        col.addView(ex);
 
-        LinearLayout signals = Ui.card(a);
-        signals.addView(flag(a, p, Prefs.ARCEP, R.string.set_arcep, R.string.set_arcep_sub));
-        signals.addView(flag(a, p, Prefs.LEARN, R.string.set_learn, R.string.set_learn_sub));
-        signals.addView(flag(a, p, Prefs.CALLBACKS, R.string.set_callbacks, R.string.set_callbacks_sub));
-        signals.addView(flag(a, p, Prefs.HIDDEN, R.string.set_hidden, R.string.set_hidden_sub));
-        signals.addView(flag(a, p, Prefs.FOREIGN, R.string.set_foreign, R.string.set_foreign_sub));
-        col.addView(signals);
-
-        // The learned model
-        col.addView(Ui.eyebrow(a, a.getString(R.string.sec_model)));
-        col.addView(modelCard(a));
-
-        // Contacts
-        LinearLayout contacts = Ui.card(a);
-        contacts.addView(Ui.switchRow(a, R.string.set_contacts, R.string.set_contacts_sub, p.flag(Prefs.CONTACTS), (b, on) -> {
+        col.addView(flag(a, p, Prefs.ARCEP, R.string.set_arcep, R.string.set_arcep_sub));
+        col.addView(flag(a, p, Prefs.LEARN, R.string.set_learn, R.string.set_learn_sub));
+        col.addView(Ui.switchRow(a, R.string.set_contacts, R.string.set_contacts_sub, p.flag(Prefs.CONTACTS), (b, on) -> {
             p.setFlag(Prefs.CONTACTS, on);
             if (on && !Phone.canReadContacts(a)) a.requestContacts();
         }));
-        if (p.flag(Prefs.CONTACTS) && !Phone.canReadContacts(a)) {
-            contacts.addView(Ui.button(a, a.getString(R.string.allow_contacts), false, v -> a.requestContacts()));
-        }
-        col.addView(contacts);
+        col.addView(flag(a, p, Prefs.NOTIFY_SILENCED, R.string.set_notify_silenced, R.string.set_notify_silenced_sub));
 
-        // Senior protection
-        col.addView(Ui.eyebrow(a, a.getString(R.string.sec_senior)));
-        LinearLayout senior = Ui.card(a, R.color.brand_soft);
-        senior.addView(Ui.switchRow(a, R.string.set_senior, R.string.set_senior_sub, p.flag(Prefs.SENIOR), (b, on) -> {
+        col.addView(Ui.space(a, 12));
+        col.addView(Ui.divider(a));
+        col.addView(Ui.linkRow(a, a.getString(R.string.more_settings), a.showAdvanced ? "–" : "+", v -> {
+            a.showAdvanced = !a.showAdvanced;
+            a.refresh();
+        }));
+        if (a.showAdvanced) advanced(a, p, col);
+
+        // About
+        col.addView(Ui.divider(a));
+        col.addView(Ui.space(a, 8));
+        LinearLayout brand = Ui.row(a);
+        brand.addView(a.logo(24));
+        TextView v = Ui.muted(a, "chut " + BuildConfigLite.versionName(a) + " · " + a.getString(R.string.about_line));
+        v.setPadding(Ui.dp(a, 10), 0, 0, 0);
+        brand.addView(v, Ui.weight(1));
+        col.addView(brand);
+        col.addView(Ui.space(a, 6));
+        col.addView(Ui.linkRow(a, a.getString(R.string.how_it_works), null, x -> howItWorks(a)));
+        col.addView(Ui.linkRow(a, a.getString(R.string.website), null, x -> a.openUrl(SITE)));
+        col.addView(Ui.linkRow(a, a.getString(R.string.source_code), "GPL-3.0", x -> a.openUrl(REPO)));
+        return scroll;
+    }
+
+    private static void advanced(MainActivity a, Prefs p, LinearLayout col) {
+        col.addView(flag(a, p, Prefs.CALLBACKS, R.string.set_callbacks, R.string.set_callbacks_sub));
+        col.addView(flag(a, p, Prefs.HIDDEN, R.string.set_hidden, R.string.set_hidden_sub));
+        col.addView(flag(a, p, Prefs.FOREIGN, R.string.set_foreign, R.string.set_foreign_sub));
+        col.addView(Ui.switchRow(a, R.string.set_senior, R.string.set_senior_sub, p.flag(Prefs.SENIOR), (b, on) -> {
             p.setFlag(Prefs.SENIOR, on);
             if (on) {
                 p.setFlag(Prefs.CONTACTS, true);
@@ -98,28 +102,49 @@ public final class SettingsScreen {
             }
             a.refresh();
         }));
-        col.addView(senior);
-
-        // Notifications
-        col.addView(Ui.eyebrow(a, a.getString(R.string.sec_notifications)));
-        LinearLayout notif = Ui.card(a);
-        notif.addView(flag(a, p, Prefs.NOTIFY_SILENCED, R.string.set_notify_silenced, R.string.set_notify_silenced_sub));
-        notif.addView(flag(a, p, Prefs.NOTIFY_BLOCKED, R.string.set_notify_blocked, R.string.set_notify_blocked_sub));
-        notif.addView(Ui.switchRow(a, R.string.set_weekly, R.string.set_weekly_sub, p.flag(Prefs.WEEKLY), (b, on) -> {
+        col.addView(flag(a, p, Prefs.NOTIFY_BLOCKED, R.string.set_notify_blocked, R.string.set_notify_blocked_sub));
+        col.addView(Ui.switchRow(a, R.string.set_weekly, R.string.set_weekly_sub, p.flag(Prefs.WEEKLY), (b, on) -> {
             p.setFlag(Prefs.WEEKLY, on);
             BackgroundJobs.schedule(a);
         }));
+        col.addView(Ui.switchRow(a, R.string.set_show_numbers, R.string.set_show_numbers_sub, p.flag(Prefs.SHOW_NUMBERS), (b, on) -> {
+            p.setFlag(Prefs.SHOW_NUMBERS, on);
+            a.refresh();
+        }));
         if (a.needsNotificationPermission()) {
-            notif.addView(Ui.button(a, a.getString(R.string.allow_notifications), false, v -> a.requestNotifications()));
+            col.addView(Ui.linkRow(a, a.getString(R.string.allow_notifications), "›", v -> a.requestNotifications()));
         }
-        col.addView(notif);
+
+        // The learned model
+        col.addView(Ui.space(a, 16));
+        col.addView(StatsScreen.section(a, a.getString(R.string.sec_model)));
+        Learner.Model m = Learning.model(a);
+        if (!m.ready()) {
+            col.addView(Ui.muted(a, a.getString(R.string.model_not_ready, Learner.MIN_POSITIVES)));
+        } else {
+            String recall = m.recall < 0 ? "–" : Math.round(m.recall * 100) + " %";
+            String fa = m.falseAlarms < 0 ? "–" : String.format(java.util.Locale.ROOT, "%.1f %%", m.falseAlarms * 100);
+            col.addView(Ui.body(a, a.getString(R.string.model_summary, recall, fa)));
+            TextView t = Ui.muted(a, a.getString(R.string.model_line, m.positives, m.negatives,
+                    DateUtils.getRelativeTimeSpanString(m.trainedAt)));
+            t.setPadding(0, Ui.dp(a, 6), 0, 0);
+            col.addView(t);
+            col.addView(Ui.linkRow(a, a.getString(R.string.model_retrain), null, v -> new Thread(() -> {
+                Learning.retrainNow(a);
+                a.runOnUiThread(() -> {
+                    a.toast(a.getString(R.string.model_retrained));
+                    a.refresh();
+                });
+            }).start()));
+        }
 
         // Data
-        col.addView(Ui.eyebrow(a, a.getString(R.string.sec_data)));
-        LinearLayout data = Ui.card(a);
-        data.addView(Ui.linkRow(a, a.getString(R.string.export_csv), null, v -> a.exportFile()));
-        data.addView(Ui.linkRow(a, a.getString(R.string.import_file), null, v -> a.importFile(Store.BLOCKED)));
-        data.addView(Ui.linkRow(a, a.getString(R.string.clear_history), null, v ->
+        col.addView(Ui.space(a, 16));
+        col.addView(StatsScreen.section(a, a.getString(R.string.sec_data)));
+        col.addView(Ui.linkRow(a, a.getString(R.string.import_calllog), null, v -> a.importFromCallLog()));
+        col.addView(Ui.linkRow(a, a.getString(R.string.import_file), null, v -> a.importFile(Store.BLOCKED)));
+        col.addView(Ui.linkRow(a, a.getString(R.string.export_csv), null, v -> a.exportFile()));
+        col.addView(Ui.linkRow(a, a.getString(R.string.clear_history), null, v ->
                 new AlertDialog.Builder(a)
                         .setTitle(R.string.clear_history)
                         .setMessage(R.string.clear_history_confirm)
@@ -130,64 +155,8 @@ public final class SettingsScreen {
                         .setNegativeButton(android.R.string.cancel, null)
                         .show()));
         TextView privacy = Ui.muted(a, a.getString(R.string.privacy_note));
-        privacy.setPadding(0, Ui.dp(a, 8), 0, 0);
-        data.addView(privacy);
-        col.addView(data);
-
-        // About
-        col.addView(Ui.eyebrow(a, a.getString(R.string.sec_about)));
-        LinearLayout about = Ui.card(a);
-        LinearLayout brand = Ui.row(a);
-        brand.addView(a.logo(36));
-        LinearLayout names = Ui.column(a);
-        names.setPadding(Ui.dp(a, 12), 0, 0, 0);
-        names.addView(Ui.title(a, "chut " + BuildConfigLite.versionName(a)));
-        names.addView(Ui.muted(a, a.getString(R.string.about_line)));
-        brand.addView(names, Ui.weight(1));
-        about.addView(brand);
-        about.addView(Ui.space(a, 8));
-        about.addView(Ui.linkRow(a, a.getString(R.string.how_it_works), null, v -> howItWorks(a)));
-        about.addView(Ui.linkRow(a, a.getString(R.string.website), "dabane-ghassan.github.io/chut", v -> a.openUrl(SITE)));
-        about.addView(Ui.linkRow(a, a.getString(R.string.source_code), "GitHub", v -> a.openUrl(REPO)));
-        about.addView(Ui.linkRow(a, a.getString(R.string.report_bug), null, v -> a.openUrl(REPO + "/issues")));
-        about.addView(Ui.linkRow(a, a.getString(R.string.license), "GPL-3.0+", v -> a.openUrl(REPO + "/blob/main/LICENSE")));
-        col.addView(about);
-        return scroll;
-    }
-
-    /** What the model learned, how well it does, and a button to retrain it. */
-    private static LinearLayout modelCard(MainActivity a) {
-        LinearLayout card = Ui.card(a);
-        Learner.Model m = Learning.model(a);
-        if (!m.ready()) {
-            card.addView(Ui.body(a, a.getString(R.string.model_not_ready, Learner.MIN_POSITIVES)));
-            return card;
-        }
-        card.addView(Ui.grid(a, 2,
-                tile(a, m.recall < 0 ? "–" : Math.round(m.recall * 100) + " %", a.getString(R.string.model_recall), R.color.allow),
-                tile(a, m.falseAlarms < 0 ? "–" : String.format(java.util.Locale.ROOT, "%.1f %%", m.falseAlarms * 100),
-                        a.getString(R.string.model_false_alarms), R.color.ink)));
-        TextView t = Ui.muted(a, a.getString(R.string.model_line, m.positives, m.negatives,
-                DateUtils.getRelativeTimeSpanString(m.trainedAt)));
-        card.addView(t);
-        LinearLayout.LayoutParams lp = Ui.matchWrap();
-        lp.topMargin = Ui.dp(a, 12);
-        card.addView(Ui.button(a, a.getString(R.string.model_retrain), false, v -> {
-            new Thread(() -> {
-                Learning.retrainNow(a);
-                a.runOnUiThread(() -> {
-                    a.toast(a.getString(R.string.model_retrained));
-                    a.refresh();
-                });
-            }).start();
-        }), lp);
-        return card;
-    }
-
-    private static LinearLayout tile(MainActivity a, String value, String caption, int colorRes) {
-        LinearLayout t = Ui.tile(a, value, caption, colorRes);
-        t.setBackground(Ui.round(a.getColor(R.color.surface_alt), Ui.dp(a, 16)));
-        return t;
+        privacy.setPadding(0, Ui.dp(a, 8), 0, Ui.dp(a, 16));
+        col.addView(privacy);
     }
 
     private static View flag(MainActivity a, Prefs p, String key, int title, int sub) {

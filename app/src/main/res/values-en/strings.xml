@@ -1,33 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- SPDX-License-Identifier: GPL-3.0-or-later. English, chosen in chut's settings. French (the default) is in values. -->
 <resources>
-    <string name="tagline">Spam calls, silenced. Free and open source.</string>
 
     <string name="tab_home">Home</string>
-    <string name="tab_stats">Stats</string>
-    <string name="tab_lists">Lists</string>
     <string name="tab_settings">Settings</string>
 
     <!-- Home -->
     <string name="status_on">Protection is on</string>
-    <string name="status_on_explain">Every unknown call is checked before your phone rings. %1$s.</string>
     <string name="status_off">Protection is off</string>
     <string name="status_off_explain">Make chut your Caller ID &amp; spam app: Android will then ask chut about each incoming call, before it rings, even when chut is closed.</string>
     <string name="activate">Turn on protection</string>
     <string name="role_unavailable">This phone does not let apps screen calls (Android 10 or newer is needed).</string>
-    <string name="notif_permission_explain">Allow notifications so chut can tell you about silenced calls. They never make a sound.</string>
     <string name="allow_notifications">Allow notifications</string>
-    <string name="at_a_glance">Calls stopped</string>
-    <string name="today">today</string>
-    <string name="this_week">this week</string>
-    <string name="since_install">in total</string>
-    <string name="last_14_days">Last 14 days</string>
     <string name="latest_calls">Latest unknown calls</string>
-    <string name="no_calls_yet">No unknown call yet. chut is watching.</string>
-    <string name="no_calls_off">Turn on protection and filtered calls will show up here.</string>
-    <string name="senior_short">Senior protection</string>
-    <string name="list_short">%1$d blocked numbers</string>
-    <string name="learning_short">learning</string>
     <string name="legend_blocked">Blocked</string>
     <string name="legend_silenced">Silenced</string>
     <string name="chart_description">Bar chart of %1$d periods, %2$d calls stopped in all</string>
@@ -92,54 +77,27 @@
     <string name="no_browser">No browser found to open the link.</string>
 
     <!-- Stats -->
-    <string name="stats_subtitle">Computed on your phone, from your history. Nothing is sent anywhere.</string>
     <string name="stats_empty">No statistics yet. They will build up as chut screens your calls.</string>
     <string name="stat_stopped">calls stopped</string>
-    <string name="stat_share">of unknown calls were spam</string>
-    <string name="stat_blocked">blocked, never rang</string>
-    <string name="stat_silenced">silenced, rang without sound</string>
-    <string name="stat_saved">of your time saved (estimate)</string>
-    <string name="stat_distinct">different spam numbers</string>
     <string name="minutes_short">%1$d min</string>
     <string name="hours_short">%1$d h %2$02d</string>
-    <string name="this_week_vs_last">This week</string>
-    <string name="week_line">%1$d calls stopped this week, %2$d last week: %3$s.</string>
-    <string name="trend_same">the same</string>
-    <string name="trend_more">%1$d more</string>
-    <string name="trend_less">%1$d fewer</string>
     <string name="last_30_days">Last 30 days</string>
-    <string name="last_12_weeks">Last 12 weeks</string>
-    <string name="by_type">By type</string>
     <string name="by_reason">Why they were stopped</string>
-    <string name="by_region">Where they came from</string>
     <string name="by_hour">When they call</string>
     <string name="busiest_hour">Spammers call you most between %1$d:00 and %2$d:00.</string>
-    <string name="top_callers">Most insistent numbers</string>
-    <plurals name="calls_short">
-        <item quantity="one">%1$d call</item>
-        <item quantity="other">%1$d calls</item>
-    </plurals>
-    <string name="stats_privacy">chut keeps the history of unknown numbers for 400 days on this phone, and never the calls of your contacts.</string>
     <string name="export_csv">Export lists and history (CSV)</string>
     <string name="export_done">Exported</string>
     <string name="export_failed">Could not write the file</string>
 
     <!-- Lists -->
-    <string name="lists_subtitle">Unlimited, and yours: import and export them as plain files.</string>
-    <string name="list_blocked_n">Blocked (%1$d)</string>
-    <string name="list_allowed_n">Allowed (%1$d)</string>
-    <string name="lists_learning_note">Every number you block trains the model: it learns the number blocks and the hours spammers use.</string>
     <string name="add_hint_block">Number to block</string>
     <string name="add_hint_allow">Number that must always ring</string>
     <string name="add">Add</string>
     <string name="prefix_tip">End with * to block a whole range: 0162* blocks every number starting with 01 62.</string>
     <string name="invalid_or_exists">Not a valid number, or already on this list</string>
-    <string name="import_paste">Paste a list of numbers</string>
     <string name="import_file">Import a file</string>
     <string name="import_calllog">Pick from your call log</string>
-    <string name="import_do">Import</string>
     <string name="import_failed">Could not read the file</string>
-    <string name="paste_hint">Numbers separated by commas or new lines, as exported by your phone\'s blocked numbers</string>
     <plurals name="imported">
         <item quantity="one">%1$d number added</item>
         <item quantity="other">%1$d numbers added</item>
@@ -151,11 +109,9 @@
     <string name="allowed_empty">Numbers here always ring, whatever chut thinks of them: your doctor\'s robot, your bank, your child\'s school.</string>
     <string name="more_entries">… and %1$d more (all of them are used)</string>
     <string name="prefix_rule">Range rule</string>
-    <string name="source_preset">shipped with chut</string>
 
     <!-- Settings -->
     <string name="language">Language · Langue</string>
-    <string name="sec_filter">Filtering</string>
     <string name="sensitivity">Sensitivity</string>
     <string-array name="sensitivity">
         <item>Relaxed</item>
@@ -180,18 +136,13 @@
     <string name="set_foreign_sub">Every number outside France and overseas France. Contacts still ring.</string>
     <string name="sec_model">Learned model</string>
     <string name="model_not_ready">The model starts once you have blocked at least %1$d numbers.</string>
-    <string name="model_recall">of never-seen spam numbers recognised</string>
-    <string name="model_false_alarms">false alarms on random numbers</string>
     <string name="model_line">Trained on %1$d blocked and %2$d trusted numbers, %3$s. Measured by cross-validation: the model must recognise blocked numbers that were hidden from it.</string>
     <string name="model_retrain">Retrain now</string>
     <string name="model_retrained">Model retrained</string>
     <string name="set_contacts">Contacts always ring</string>
     <string name="set_contacts_sub">chut checks if a number is in your contacts, on the phone. It never reads names.</string>
-    <string name="allow_contacts">Allow access to contacts</string>
-    <string name="sec_senior">Senior protection</string>
     <string name="set_senior">Protect an elderly person</string>
     <string name="set_senior_sub">Strict filtering, and every number that is not a contact rings silently with a notification. Ideal for a parent\'s phone: scammers target them first.</string>
-    <string name="sec_notifications">Notifications</string>
     <string name="set_notify_silenced">Silenced calls</string>
     <string name="set_notify_silenced_sub">A silent notification with Block and Not spam buttons.</string>
     <string name="set_notify_blocked">Blocked calls</string>
@@ -203,14 +154,11 @@
     <string name="clear_history_confirm">The statistics start over. Your lists are kept.</string>
     <string name="clear">Clear</string>
     <string name="privacy_note">No account, no ads, no trackers, no internet access. Your lists, history and model never leave this phone.</string>
-    <string name="sec_about">About</string>
     <string name="about_line">Free software by Ghassan Dabane</string>
     <string name="how_it_works">How chut decides</string>
     <string name="how_it_works_text">Android asks chut about every incoming call, before it rings, even when the app is closed. chut answers on the phone, in a fraction of a millisecond, without the internet.\n\n1. Your lists first. Your allow list and your contacts always ring. Your block list, with the numbers chut ships with, never does.\n\n2. ARCEP ranges: since 2023, telemarketers must call from 12 known ranges (01 62, 09 48…). They count for 70 points.\n\n3. The learned model. chut trains a logistic regression on the phone from what you block: blocks of numbers (4 to 9 digits) and call hours. It compares your blocked numbers with 3,000 random French numbers and with the ones you let ring. One block doesn\'t make its neighbours suspicious; several in the same block of 1,000 numbers do. Its probability becomes points, up to 95.\n\n4. Points combine into a score from 0 to 100, and your sensitivity decides: ring, ring silently with a notification, or block.\n\nEvery decision keeps its reasons: tap a call to see why. Block or Not spam retrains the model at once.</string>
     <string name="website">Website</string>
     <string name="source_code">Source code</string>
-    <string name="report_bug">Report a bug, suggest an idea</string>
-    <string name="license">License</string>
 
     <!-- Notifications -->
     <string name="channel_silenced">Silenced calls</string>
@@ -224,4 +172,16 @@
         <item quantity="one">%1$d spam call stopped (%2$d blocked, %3$d silenced). About %4$d minutes of peace.</item>
         <item quantity="other">%1$d spam calls stopped (%2$d blocked, %3$d silenced). About %4$d minutes of peace.</item>
     </plurals>
+    <string name="my_lists">My lists</string>
+    <string name="stat_share_short">spam among unknown calls</string>
+    <string name="stat_saved_short">of time saved</string>
+    <string name="page_stats">Statistics</string>
+    <string name="home_sub">%1$d today · %2$d this week</string>
+    <string name="more_settings">More settings</string>
+    <string name="set_show_numbers">Show numbers</string>
+    <string name="set_show_numbers_sub">Your lists and latest calls, number by number. Off: chut filters without ever showing a number.</string>
+    <string name="list_blocked">Blocked</string>
+    <string name="list_allowed">Allowed</string>
+    <string name="preset_count">+ %1$d telemarketing numbers shipped with chut</string>
+    <string name="model_summary">Recognises %1$s of never-seen spam numbers, with %2$s false alarms.</string>
 </resources>

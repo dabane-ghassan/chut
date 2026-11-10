@@ -2,33 +2,18 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later. Français : la langue par défaut de chut. L'anglais est dans values-en. -->
 <resources>
     <string name="app_name" translatable="false">chut</string>
-    <string name="tagline">Le démarchage, en silence. Libre et gratuit.</string>
 
     <string name="tab_home">Accueil</string>
-    <string name="tab_stats">Stats</string>
-    <string name="tab_lists">Listes</string>
     <string name="tab_settings">Réglages</string>
 
     <!-- Accueil -->
     <string name="status_on">Protection active</string>
-    <string name="status_on_explain">Chaque appel inconnu est vérifié avant que le téléphone sonne. %1$s.</string>
     <string name="status_off">Protection désactivée</string>
     <string name="status_off_explain">Choisissez chut comme appli d’identification de l’appelant et de spam : Android lui demandera son avis sur chaque appel, avant la sonnerie, même quand chut est fermé.</string>
     <string name="activate">Activer la protection</string>
     <string name="role_unavailable">Ce téléphone ne permet pas le filtrage d’appels (Android 10 ou plus récent requis).</string>
-    <string name="notif_permission_explain">Autorisez les notifications pour que chut vous signale les appels mis en silencieux. Elles ne font jamais de bruit.</string>
     <string name="allow_notifications">Autoriser les notifications</string>
-    <string name="at_a_glance">Appels stoppés</string>
-    <string name="today">aujourd’hui</string>
-    <string name="this_week">cette semaine</string>
-    <string name="since_install">au total</string>
-    <string name="last_14_days">14 derniers jours</string>
     <string name="latest_calls">Derniers appels inconnus</string>
-    <string name="no_calls_yet">Aucun appel inconnu pour l’instant. chut veille.</string>
-    <string name="no_calls_off">Activez la protection : les appels filtrés apparaîtront ici.</string>
-    <string name="senior_short">Protection senior</string>
-    <string name="list_short">%1$d numéros bloqués</string>
-    <string name="learning_short">apprentissage</string>
     <string name="legend_blocked">Bloqués</string>
     <string name="legend_silenced">Silencieux</string>
     <string name="chart_description">Graphique en barres de %1$d périodes, %2$d appels stoppés au total</string>
@@ -94,55 +79,27 @@
     <string name="no_browser">Aucun navigateur pour ouvrir le lien.</string>
 
     <!-- Stats -->
-    <string name="stats_subtitle">Calculées sur votre téléphone, à partir de votre historique. Rien n’est envoyé.</string>
     <string name="stats_empty">Pas encore de statistiques. Elles se construiront au fil des appels filtrés.</string>
     <string name="stat_stopped">appels stoppés</string>
-    <string name="stat_share">des appels inconnus étaient du spam</string>
-    <string name="stat_blocked">bloqués, n’ont jamais sonné</string>
-    <string name="stat_silenced">silencieux, ont sonné sans bruit</string>
-    <string name="stat_saved">de temps gagné (estimation)</string>
-    <string name="stat_distinct">numéros de spam différents</string>
     <string name="minutes_short">%1$d min</string>
     <string name="hours_short">%1$d h %2$02d</string>
-    <string name="this_week_vs_last">Cette semaine</string>
-    <string name="week_line">%1$d appels stoppés cette semaine, %2$d la semaine dernière : %3$s.</string>
-    <string name="trend_same">pareil</string>
-    <string name="trend_more">%1$d de plus</string>
-    <string name="trend_less">%1$d de moins</string>
     <string name="last_30_days">30 derniers jours</string>
-    <string name="last_12_weeks">12 dernières semaines</string>
-    <string name="by_type">Par type</string>
     <string name="by_reason">Pourquoi ils ont été stoppés</string>
-    <string name="by_region">D’où ils appellent</string>
     <string name="by_hour">Quand ils appellent</string>
     <string name="busiest_hour">Les démarcheurs vous appellent surtout entre %1$d h et %2$d h.</string>
-    <string name="top_callers">Les plus insistants</string>
-    <plurals name="calls_short">
-        <item quantity="one">%1$d appel</item>
-        <item quantity="many">%1$d appels</item>
-        <item quantity="other">%1$d appels</item>
-    </plurals>
-    <string name="stats_privacy">chut garde l’historique des numéros inconnus pendant 400 jours sur ce téléphone, et jamais les appels de vos contacts.</string>
     <string name="export_csv">Exporter listes et historique (CSV)</string>
     <string name="export_done">Exporté</string>
     <string name="export_failed">Impossible d’écrire le fichier</string>
 
     <!-- Listes -->
-    <string name="lists_subtitle">Illimitées, et à vous : importez-les et exportez-les en fichiers simples.</string>
-    <string name="list_blocked_n">Bloqués (%1$d)</string>
-    <string name="list_allowed_n">Autorisés (%1$d)</string>
-    <string name="lists_learning_note">Chaque numéro bloqué entraîne le modèle : il apprend à reconnaître les blocs de numéros et les heures des démarcheurs.</string>
     <string name="add_hint_block">Numéro à bloquer</string>
     <string name="add_hint_allow">Numéro qui doit toujours sonner</string>
     <string name="add">Ajouter</string>
     <string name="prefix_tip">Terminez par * pour bloquer une tranche entière : 0162* bloque tous les numéros qui commencent par 01 62.</string>
     <string name="invalid_or_exists">Numéro invalide, ou déjà dans cette liste</string>
-    <string name="import_paste">Coller une liste de numéros</string>
     <string name="import_file">Importer un fichier</string>
     <string name="import_calllog">Choisir dans le journal d’appels</string>
-    <string name="import_do">Importer</string>
     <string name="import_failed">Impossible de lire le fichier</string>
-    <string name="paste_hint">Numéros séparés par des virgules ou des retours à la ligne, comme dans l’export des numéros bloqués de votre téléphone</string>
     <plurals name="imported">
         <item quantity="one">%1$d numéro ajouté</item>
         <item quantity="many">%1$d numéros ajoutés</item>
@@ -155,11 +112,9 @@
     <string name="allowed_empty">Ces numéros sonnent toujours, quoi qu’en pense chut : le robot de votre médecin, votre banque, l’école de vos enfants.</string>
     <string name="more_entries">… et %1$d de plus (tous sont utilisés)</string>
     <string name="prefix_rule">Règle de tranche</string>
-    <string name="source_preset">fourni avec chut</string>
 
     <!-- Réglages -->
     <string name="language">Langue · Language</string>
-    <string name="sec_filter">Filtrage</string>
     <string name="sensitivity">Sensibilité</string>
     <string-array name="sensitivity">
         <item>Souple</item>
@@ -184,18 +139,13 @@
     <string name="set_foreign_sub">Tous les numéros hors de France et d’outre-mer. Vos contacts sonnent toujours.</string>
     <string name="sec_model">Modèle appris</string>
     <string name="model_not_ready">Le modèle s’active dès que vous avez bloqué au moins %1$d numéros.</string>
-    <string name="model_recall">des numéros de spam jamais vus reconnus</string>
-    <string name="model_false_alarms">de fausses alertes sur des numéros au hasard</string>
     <string name="model_line">Entraîné sur %1$d numéros bloqués et %2$d numéros fiables, %3$s. Mesuré par validation croisée : le modèle doit reconnaître des numéros bloqués qu’on lui a cachés.</string>
     <string name="model_retrain">Réentraîner maintenant</string>
     <string name="model_retrained">Modèle réentraîné</string>
     <string name="set_contacts">Les contacts sonnent toujours</string>
     <string name="set_contacts_sub">chut vérifie, sur le téléphone, si un numéro est dans vos contacts. Il ne lit jamais les noms.</string>
-    <string name="allow_contacts">Autoriser l’accès aux contacts</string>
-    <string name="sec_senior">Protection senior</string>
     <string name="set_senior">Protéger une personne âgée</string>
     <string name="set_senior_sub">Filtrage strict, et tout numéro hors contacts sonne en silencieux avec une notification. Idéal sur le téléphone d’un parent : les arnaqueurs les visent en premier.</string>
-    <string name="sec_notifications">Notifications</string>
     <string name="set_notify_silenced">Appels silencieux</string>
     <string name="set_notify_silenced_sub">Une notification sans bruit, avec les boutons Bloquer et Pas du spam.</string>
     <string name="set_notify_blocked">Appels bloqués</string>
@@ -207,14 +157,11 @@
     <string name="clear_history_confirm">Les statistiques repartent de zéro. Vos listes sont conservées.</string>
     <string name="clear">Effacer</string>
     <string name="privacy_note">Ni compte, ni pub, ni pisteur, ni accès à internet. Vos listes, votre historique et le modèle ne quittent jamais ce téléphone.</string>
-    <string name="sec_about">À propos</string>
     <string name="about_line">Logiciel libre de Ghassan Dabane</string>
     <string name="how_it_works">Comment chut décide</string>
     <string name="how_it_works_text">Android consulte chut pour chaque appel entrant, avant la sonnerie, même quand l’appli est fermée. chut répond sur le téléphone, en une fraction de milliseconde, sans internet.\n\n1. D’abord vos listes. Votre liste blanche et vos contacts sonnent toujours. Votre liste noire, avec les numéros fournis avec chut, ne sonne jamais.\n\n2. Les tranches ARCEP : depuis 2023, les démarcheurs doivent appeler depuis 12 tranches connues (01 62, 09 48…). Elles comptent pour 70 points.\n\n3. Le modèle appris. chut entraîne, sur le téléphone, une régression logistique sur ce que vous bloquez : les blocs de numéros (de 4 à 9 chiffres) et les heures d’appel. Il compare vos numéros bloqués à 3 000 numéros français pris au hasard, et à ceux que vous laissez sonner. Un seul blocage ne rend pas ses voisins suspects ; plusieurs dans le même bloc de 1 000 numéros, oui. Sa probabilité devient des points, jusqu’à 95.\n\n4. Les points se combinent en un score de 0 à 100, et votre sensibilité décide : sonner, sonner en silencieux avec une notification, ou bloquer.\n\nChaque décision garde ses raisons : touchez un appel pour savoir pourquoi. Bloquer ou « Pas du spam » réentraîne le modèle aussitôt.</string>
     <string name="website">Site web</string>
     <string name="source_code">Code source</string>
-    <string name="report_bug">Signaler un bug, proposer une idée</string>
-    <string name="license">Licence</string>
 
     <!-- Notifications -->
     <string name="channel_silenced">Appels silencieux</string>
@@ -229,4 +176,16 @@
         <item quantity="many">%1$d appels indésirables stoppés (%2$d bloqués, %3$d silencieux). Environ %4$d minutes de tranquillité.</item>
         <item quantity="other">%1$d appels indésirables stoppés (%2$d bloqués, %3$d silencieux). Environ %4$d minutes de tranquillité.</item>
     </plurals>
+    <string name="my_lists">Mes listes</string>
+    <string name="stat_share_short">de spam parmi les inconnus</string>
+    <string name="stat_saved_short">de temps gagné</string>
+    <string name="page_stats">Statistiques</string>
+    <string name="home_sub">%1$d aujourd’hui · %2$d cette semaine</string>
+    <string name="more_settings">Plus de réglages</string>
+    <string name="set_show_numbers">Afficher les numéros</string>
+    <string name="set_show_numbers_sub">Vos listes et les derniers appels, numéro par numéro. Désactivé : chut filtre sans jamais afficher de numéro.</string>
+    <string name="list_blocked">Bloqués</string>
+    <string name="list_allowed">Autorisés</string>
+    <string name="preset_count">+ %1$d numéros de démarchage fournis avec chut</string>
+    <string name="model_summary">Reconnaît %1$s des numéros de spam jamais vus, pour %2$s de fausses alertes.</string>
 </resources>

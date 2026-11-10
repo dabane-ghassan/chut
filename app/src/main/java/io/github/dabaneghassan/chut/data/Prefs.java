@@ -22,6 +22,8 @@ public final class Prefs {
     public static final String NOTIFY_BLOCKED = "notify_blocked";
     public static final String WEEKLY = "weekly";
     public static final String LANGUAGE = "language";
+    /** Off by default: chut never displays phone numbers unless asked to. */
+    public static final String SHOW_NUMBERS = "show_numbers";
 
     private final SharedPreferences p;
 
@@ -73,7 +75,7 @@ public final class Prefs {
             case WEEKLY:
                 return true;
             default:
-                return false;   // hidden, foreign, senior, notify_blocked
+                return false;   // hidden, foreign, senior, notify_blocked, show_numbers
         }
     }
 

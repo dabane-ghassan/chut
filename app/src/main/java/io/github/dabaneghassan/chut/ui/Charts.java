@@ -55,7 +55,7 @@ public final class Charts {
             int n = values.length;
             if (n == 0) return;
             float w = getWidth(), h = getHeight();
-            float labelH = 18 * density;
+            float labelH = labels == null ? 2 * density : 18 * density;
             float chartH = h - labelH;
             int max = 1;
             for (int[] v : values) max = Math.max(max, v[0] + v[1]);
@@ -87,10 +87,11 @@ public final class Charts {
                     canvas.drawText(labels[i], cx, h - 4 * density, label);
                 }
             }
-            // max value label at top-left
-            label.setTextAlign(Paint.Align.LEFT);
-            canvas.drawText(String.valueOf(max), 0, 11 * density, label);
-            label.setTextAlign(Paint.Align.CENTER);
+            if (labels != null) {   // the scale, except on the small home chart
+                label.setTextAlign(Paint.Align.LEFT);
+                canvas.drawText(String.valueOf(max), 0, 11 * density, label);
+                label.setTextAlign(Paint.Align.CENTER);
+            }
         }
     }
 

@@ -71,6 +71,11 @@ ge() { [ "$1" -ge "$2" ] 2>/dev/null; }
 not_running() { [ -z "$(sh pidof $PKG)" ]; }
 holds_role() { sh cmd role get-role-holders --user 0 android.app.role.CALL_SCREENING | grep -q "$PKG"; }
 jobs_scheduled() { sh dumpsys jobscheduler | grep -q "$PKG/.BackgroundJobs"; }
+no_number_on_screen() { ! $UI texts | grep -qE '0[1-9]( [0-9]{2}){4}'; }
+number_on_screen() { $UI texts | grep -qE '0[1-9]( [0-9]{2}){4}'; }
+not_on_screen() { ! $UI has "$1" 6; }
+mkdir -p shots
+shot() { adb exec-out screencap -p > "shots/$1.png" 2>/dev/null; }
 is_rejected() { [ "$1" = 5 ] || [ "$1" = 6 ]; }
 newer() { [ -n "$2" ] && [ "$2" -gt "$1" ] 2>/dev/null; }
 
@@ -179,45 +184,75 @@ check "weekly retraining job rewrites the model ($before → $after)" newer "$be
 section "Screens, French by default"
 open_app
 check "home is in French" $UI has "Protection active" 0
-check "navigation is in French" $UI has "Accueil" 0
-$UI tap "Listes" 0 >/dev/null
-check "lists show the preset numbers" $UI has "Bloqués (6" 0
-check "preset entries are labelled" $UI has "fourni avec chut" 2
-$UI tap "Stats" 0 >/dev/null
-check "statistics are computed" $UI has "appels stoppés" 0
-check "statistics break calls down by type" $UI has "Par type" 6
+check "home shows how many calls were stopped" $UI has "appels stoppés" 0
+check "no phone number is shown by default" no_number_on_screen
+shot home-fr
+$UI tap "Numéro à bloquer" 0 >/dev/null
+sh input text 0478123456
+sh input keyevent 66 >/dev/null
+sleep 2
+check "a number typed on the home screen goes on the block list" eq "$(sql "SELECT list FROM numbers WHERE number='+33478123456'")" 0
+expect_call "and its calls are blocked (04 78 12 34 56)" "+33478123456" 2 "USER_LIST" 0
+open_app
+$UI tap "Statistiques" 0 >/dev/null
+check "statistics page" $UI has "Pourquoi ils ont été stoppés" 4
+check "statistics show no phone number" no_number_on_screen
+shot stats-fr
+sh input keyevent 4
 $UI tap "Réglages" 0 >/dev/null
 check "settings show the language switch" $UI has "Langue · Language" 0
-check "settings show the learned model" $UI has "MODÈLE APPRIS" 8
-$UI tap "Accueil" 0 >/dev/null
-$UI tap "Réglages" 0 >/dev/null
-check "the model reports its cross-validated recall" $UI has "des numéros de spam jamais vus reconnus" 10
+check "advanced settings are folded" not_on_screen "Afficher les numéros"
+shot settings-fr
+$UI tap "Plus de réglages" 8 >/dev/null
+check "the learned model reports its cross-validated recall" $UI has "des numéros de spam jamais vus" 12
+shot settings-more-fr
 
 section "Language switch"
+sh input keyevent 4
 $UI tap "Réglages" 0 >/dev/null
 $UI tap "English" 0 >/dev/null
 sleep 2
 check "settings switch to English" $UI has "Settings" 0
-$UI tap "Home" 0 >/dev/null
+sh input keyevent 4
 check "home is in English" $UI has "Protection is on" 0
+shot home-en
 sh am force-stop "$PKG"
 open_app
 check "English is kept after the app is killed" $UI has "Protection is on" 0
-$UI tap "Settings" 0 >/dev/null
+$UI tap "Settings" 3 >/dev/null
 $UI tap "Français" 0 >/dev/null
 sleep 2
 check "back to French" $UI has "Réglages" 0
 
+section "Optional: show numbers"
+$UI tap "Plus de réglages" 8 >/dev/null
+check "turn on Show numbers" $UI tap "Afficher les numéros" 12
+sh input keyevent 4
+check "home now lists the latest calls" $UI has "Derniers appels inconnus" 8
+check "with their numbers" number_on_screen
+$UI tap "Mes listes" 8 >/dev/null
+check "my lists show only my own numbers" $UI has "04 78 12 34 56" 6
+check "the shipped numbers are counted, not listed" $UI has "fournis avec chut" 6
+shot lists-fr
+sh input keyevent 4
+$UI tap "Réglages" 6 >/dev/null
+$UI tap "Plus de réglages" 8 >/dev/null
+$UI tap "Afficher les numéros" 12 >/dev/null
+sh input keyevent 4
+check "numbers hidden again" no_number_on_screen
+
 section "Senior protection"
-$UI tap "Réglages" 0 >/dev/null
-check "turn on senior protection" $UI tap "Protéger une personne âgée" 10
+$UI tap "Réglages" 6 >/dev/null
+$UI tap "Plus de réglages" 8 >/dev/null
+check "turn on senior protection" $UI tap "Protéger une personne âgée" 12
 sh input keyevent 3
 sh am force-stop "$PKG"
 expect_call "an unknown mobile rings silently (06 98 76 54 32)" "+33698765432" 1 "SENIOR_UNKNOWN" 1
 check "with a notification" notified "06 98 76 54 32"
 open_app
-$UI tap "Réglages" 0 >/dev/null
-$UI tap "Protéger une personne âgée" 10 >/dev/null
+$UI tap "Réglages" 6 >/dev/null
+$UI tap "Plus de réglages" 8 >/dev/null
+$UI tap "Protéger une personne âgée" 12 >/dev/null
 sh input keyevent 3
 
 section "After a reboot"
@@ -230,6 +265,7 @@ expect_call "preset spam number is blocked after reboot (03 77 32 53 77)" "+3337
 expect_call "the model still silences its block after reboot (05 12 34 07 77)" "+33512340777" 1 "LEARNED" 1
 open_app
 check "French after reboot" $UI has "Protection active" 0
+shot home-after-reboot
 
 section "History"
 n="$(calls_logged)"

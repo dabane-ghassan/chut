@@ -254,43 +254,4 @@ public final class Ui {
         }
         return row;
     }
-
-    /** Big number with a caption below, for the stat tiles. */
-    public static LinearLayout tile(Context c, String value, String caption, int colorRes) {
-        LinearLayout t = column(c);
-        t.setBackground(round(color(c, R.color.card), dp(c, 18)));
-        t.setPadding(dp(c, 14), dp(c, 14), dp(c, 14), dp(c, 14));
-        t.addView(display(c, value, 34, colorRes));
-        TextView cap = muted(c, caption);
-        cap.setPadding(0, dp(c, 4), 0, 0);
-        t.addView(cap);
-        return t;
-    }
-
-    /** Lays tiles out in rows of {@code perRow}. */
-    public static LinearLayout grid(Context c, int perRow, View... tiles) {
-        LinearLayout col = column(c);
-        LinearLayout row = null;
-        for (int i = 0; i < tiles.length; i++) {
-            if (i % perRow == 0) {
-                row = row(c);
-                row.setGravity(Gravity.TOP);
-                LinearLayout.LayoutParams lp = matchWrap();
-                lp.bottomMargin = dp(c, 10);
-                col.addView(row, lp);
-            }
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1);
-            if (i % perRow != 0) lp.leftMargin = dp(c, 10);
-            row.addView(tiles[i], lp);
-        }
-        int rest = tiles.length % perRow;
-        if (rest != 0 && row != null) {
-            for (int i = rest; i < perRow; i++) {
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, 1, 1);
-                lp.leftMargin = dp(c, 10);
-                row.addView(new View(c), lp);
-            }
-        }
-        return col;
-    }
 }

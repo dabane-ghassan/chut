@@ -1,0 +1,3 @@
+• Plus simple : un seul écran, le nombre d’appels stoppés et un champ pour bloquer un numéro.
+• Aucun numéro affiché par défaut ; vos listes et l’historique deviennent une option (Plus de réglages › Afficher les numéros).
+• Statistiques et réglages allégés.

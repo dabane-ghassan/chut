@@ -1,0 +1,3 @@
+• Simpler: one screen, the number of calls stopped and a field to block a number.
+• No phone number shown by default; your lists and history are optional (More settings › Show numbers).
+• Lighter statistics and settings.

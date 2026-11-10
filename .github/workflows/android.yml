@@ -7,7 +7,7 @@
 #            test with real incoming calls (app never opened, force-stopped, killed, rebooted)
 #   publish  test build on the "latest-build" pre-release; a release when versionName is new
 #
-# The reports always go to the "test-report" pre-release (device-report.txt, build-log.txt).
+# The reports always go to the "test-report" pre-release (device-report.txt, build-log.txt, screenshots).
 name: Android APK
 
 on:
@@ -125,6 +125,7 @@ jobs:
           path: |
             device-report.txt
             connected.log
+            shots/*.png
           if-no-files-found: ignore
 
   report:
@@ -159,6 +160,7 @@ jobs:
             test-summary.txt
             device-report.txt
             build-log.txt
+            *.png
 
   publish:
     needs: [build, device]

@@ -49,7 +49,8 @@ import io.github.dabaneghassan.chut.ui.Ui;
 
 public class MainActivity extends Activity {
 
-    public static final int TAB_HOME = 0, TAB_STATS = 1, TAB_LISTS = 2, TAB_SETTINGS = 3;
+    /** One home page; the others open from it, and Back returns to it. */
+    public static final int PAGE_HOME = 0, PAGE_STATS = 1, PAGE_SETTINGS = 2, PAGE_LISTS = 3;
 
     private static final int REQ_ROLE = 1;
     private static final int REQ_NOTIFICATIONS = 2;
@@ -58,14 +59,16 @@ public class MainActivity extends Activity {
     private static final int REQ_CONTACTS = 5;
     private static final int REQ_CALL_LOG = 6;
 
-    private int tab = TAB_HOME;
+    private int page = PAGE_HOME;
     private FrameLayout content;
-    private LinearLayout nav;
-    private final TextView[] navItems = new TextView[4];
     /** Which list an import goes to. */
     private int importList = Store.BLOCKED;
     /** Set by the lists screen: which of its tabs is open. */
     public int listsTab = 0;
+    /** The lists page shows the numbers themselves only when asked. */
+    public boolean showNumbers = false;
+    /** Settings: the advanced section is folded by default. */
+    public boolean showAdvanced = false;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -86,7 +89,7 @@ public class MainActivity extends Activity {
         Notifier.createChannels(this);
         BackgroundJobs.schedule(this);
         if (saved != null) {
-            tab = saved.getInt("tab", TAB_HOME);
+            page = Math.min(saved.getInt("page", PAGE_HOME), PAGE_LISTS);
             listsTab = saved.getInt("listsTab", 0);
         }
 
@@ -94,8 +97,6 @@ public class MainActivity extends Activity {
         root.setBackgroundColor(getColor(R.color.bg));
         content = new FrameLayout(this);
         root.addView(content, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
-        nav = buildNav();
-        root.addView(nav, Ui.matchWrap());
         setContentView(root);
         edgeToEdge(root);
 
@@ -115,70 +116,52 @@ public class MainActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle out) {
         super.onSaveInstanceState(out);
-        out.putInt("tab", tab);
+        out.putInt("page", page);
         out.putInt("listsTab", listsTab);
     }
 
     @Override
     public void onBackPressed() {
-        if (tab != TAB_HOME) show(TAB_HOME);
+        if (page == PAGE_LISTS) show(PAGE_SETTINGS);
+        else if (page != PAGE_HOME) show(PAGE_HOME);
         else super.onBackPressed();
     }
 
     // ---- Navigation -------------------------------------------------------------------
 
-    public void show(int t) {
-        tab = t;
+    public void show(int p) {
+        if (p != PAGE_LISTS) showNumbers = false;
+        if (p == PAGE_HOME) showAdvanced = false;
+        page = p;
         refresh();
+    }
+
+    /** "‹ Back" link at the top of the pages that open from home. */
+    public View backLink(int to, int label) {
+        TextView back = Ui.text(this, "‹  " + getString(label), 15, R.color.muted, Ui.semibold());
+        back.setPadding(Ui.dp(this, 4), Ui.dp(this, 14), Ui.dp(this, 24), Ui.dp(this, 4));
+        back.setOnClickListener(v -> show(to));
+        back.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        return back;
     }
 
     /** Rebuilds the open screen from the current data. */
     public void refresh() {
         if (content == null) return;
         View v;
-        switch (tab) {
-            case TAB_STATS: v = StatsScreen.build(this); break;
-            case TAB_LISTS: v = ListsScreen.build(this); break;
-            case TAB_SETTINGS: v = SettingsScreen.build(this); break;
+        switch (page) {
+            case PAGE_STATS: v = StatsScreen.build(this); break;
+            case PAGE_LISTS: v = ListsScreen.build(this); break;
+            case PAGE_SETTINGS: v = SettingsScreen.build(this); break;
             default: v = HomeScreen.build(this); break;
         }
         content.removeAllViews();
         content.addView(v, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        for (int i = 0; i < navItems.length; i++) {
-            boolean on = i == tab;
-            navItems[i].setTextColor(getColor(on ? R.color.brand_ink : R.color.muted));
-            navItems[i].setBackground(on ? Ui.round(getColor(R.color.brand_soft), Ui.dp(this, 16)) : null);
-            navItems[i].getCompoundDrawables()[1].setTint(getColor(on ? R.color.brand_ink : R.color.muted));
-        }
-    }
-
-    private LinearLayout buildNav() {
-        LinearLayout bar = Ui.row(this);
-        bar.setBackgroundColor(getColor(R.color.card));
-        bar.setPadding(Ui.dp(this, 8), Ui.dp(this, 6), Ui.dp(this, 8), Ui.dp(this, 6));
-        int[] labels = {R.string.tab_home, R.string.tab_stats, R.string.tab_lists, R.string.tab_settings};
-        int[] icons = {R.drawable.ic_tab_home, R.drawable.ic_tab_stats, R.drawable.ic_tab_lists, R.drawable.ic_tab_settings};
-        for (int i = 0; i < 4; i++) {
-            final int index = i;
-            TextView t = Ui.text(this, getString(labels[i]), 12.5f, R.color.muted, Ui.semibold());
-            t.setGravity(Gravity.CENTER);
-            t.setCompoundDrawablesWithIntrinsicBounds(0, icons[i], 0, 0);
-            t.getCompoundDrawables()[1].mutate();
-            t.setCompoundDrawablePadding(Ui.dp(this, 2));
-            t.setPadding(0, Ui.dp(this, 6), 0, Ui.dp(this, 6));
-            t.setOnClickListener(v -> show(index));
-            LinearLayout.LayoutParams lp = Ui.weight(1);
-            lp.leftMargin = Ui.dp(this, 4);
-            lp.rightMargin = Ui.dp(this, 4);
-            bar.addView(t, lp);
-            navItems[i] = t;
-        }
-        return bar;
     }
 
     private void edgeToEdge(View root) {
         getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getWindow().setNavigationBarColor(getColor(R.color.card));
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
         boolean night = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
                 == Configuration.UI_MODE_NIGHT_YES;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -210,8 +193,7 @@ public class MainActivity extends Activity {
                 right = insets.getSystemWindowInsetRight();
             }
             v.setPadding(left, 0, right, 0);
-            content.setPadding(0, top, 0, 0);
-            nav.setPadding(Ui.dp(this, 8), Ui.dp(this, 6), Ui.dp(this, 8), Ui.dp(this, 6) + bottom);
+            content.setPadding(0, top, 0, bottom);
             return insets;
         });
     }
