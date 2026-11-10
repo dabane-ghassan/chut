@@ -1,14 +1,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 # Publishes the companion site in site/ to GitHub Pages: https://dabane-ghassan.github.io/chut/
-# The site also gets the current community list, for its number checker and counters.
+
 # One-time setup: repository Settings → Pages → Source: "GitHub Actions".
 name: Website
 
 on:
   push:
     branches: [main]
-    paths: ["site/**", "community/numbers.csv", ".github/workflows/pages.yml"]
+    paths: ["site/**", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
@@ -30,7 +30,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - run: cp community/numbers.csv site/community.csv
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

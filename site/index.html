@@ -5,9 +5,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>chut, bloqueur d'appels libre</title>
-<meta name="description" content="chut filtre le démarchage et les arnaques téléphoniques avant que votre téléphone Android sonne. Gratuit, open source, sans compte ni publicité. Toutes les fonctions et toutes les statistiques, pour tout le monde.">
+<meta name="description" content="chut filtre le démarchage avant que votre téléphone Android sonne, et apprend de vos blocages. Gratuit, open source, sans compte, sans publicité, sans accès à internet. Toutes les fonctions et toutes les statistiques, pour tout le monde.">
 <meta property="og:title" content="chut · le démarchage, en silence">
-<meta property="og:description" content="Bloqueur d'appels libre et gratuit pour Android : tranches ARCEP, liste communautaire, moteur intelligent sur le téléphone, statistiques complètes.">
+<meta property="og:description" content="Bloqueur d'appels libre et gratuit pour Android : vos listes, les tranches ARCEP et un modèle appris de vos blocages, sur le téléphone. Statistiques complètes.">
 <meta property="og:image" content="https://dabane-ghassan.github.io/chut/img/social.png">
 <meta property="og:url" content="https://dabane-ghassan.github.io/chut/">
 <meta name="twitter:card" content="summary_large_image">
@@ -157,6 +157,8 @@ section .intro{font-size:19px;color:var(--muted);max-width:40em;margin-bottom:36
 .samples{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .samples button{font:600 14px/1 var(--f-body);padding:9px 12px;border-radius:999px;border:0;background:var(--soft);color:var(--ink);cursor:pointer}
 .samples button:hover{background:var(--brand-soft)}
+#blocklist{width:100%;margin-top:8px;font:500 13.5px/1.45 ui-monospace,Menlo,Consolas,monospace;padding:12px;border-radius:14px;border:2px solid var(--line);background:var(--paper);color:var(--ink);resize:vertical}
+#blocklist:focus{outline:none;border-color:var(--brand)}
 .seg{display:flex;background:var(--soft);border-radius:14px;padding:4px;margin-top:18px}
 .seg button{flex:1;font:600 15px/1 var(--f-body);padding:10px 6px;border:0;border-radius:11px;background:none;color:var(--ink);cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--brand);color:#fff}
@@ -299,7 +301,7 @@ footer a{color:var(--muted)}
     <div>
       <p class="eyebrow">Bloqueur d'appels libre pour Android</p>
       <h1 id="h1">Le démarchage, <em>en&nbsp;silence.</em></h1>
-      <p class="lead">chut vérifie chaque appel inconnu <strong>avant que votre téléphone sonne</strong> et fait taire le démarchage et les arnaques. Gratuit, sans compte, sans pub, open source. Toutes les fonctions et toutes les statistiques, pour tout le monde.</p>
+      <p class="lead">chut vérifie chaque appel inconnu <strong>avant que votre téléphone sonne</strong>, même appli fermée, et fait taire le démarchage. Il <strong>apprend de vos blocages</strong> pour reconnaître les prochains numéros. Gratuit, sans compte, sans pub, open source, sans accès à internet.</p>
       <div class="ctas">
         <a class="btn btn-lips" href="https://github.com/dabane-ghassan/chut/releases/latest/download/chut.apk">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a1 1 0 0 1 1 1v9.6l3.3-3.3a1 1 0 1 1 1.4 1.4l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.4l3.3 3.3V4a1 1 0 0 1 1-1zM5 19h14a1 1 0 1 1 0 2H5a1 1 0 1 1 0-2z"/></svg>
@@ -308,25 +310,25 @@ footer a{color:var(--muted)}
         <a class="btn btn-ghost" href="#tester">Tester un numéro</a>
       </div>
       <ul class="facts">
-        <li>Android 10 et plus</li><li>Moins de 1&nbsp;Mo</li><li>Fonctionne hors ligne</li><li>Licence GPL-3.0</li>
+        <li>Android 10 et plus</li><li>Moins de 1&nbsp;Mo</li><li>Sans accès à internet</li><li>En français</li><li>Licence GPL-3.0</li>
       </ul>
     </div>
 
     <div class="phone" role="img" aria-label="Illustration de l'application chut : protection active, 3 appels stoppés aujourd'hui, et une notification d'appel mis en silencieux.">
       <div class="screen" aria-hidden="true">
         <div class="top"><img src="favicon.svg" alt=""><b>chut</b></div>
-        <div class="s-card s-ok">Protection active<small>Équilibrée · ARCEP · communauté · apprentissage</small></div>
+        <div class="s-card s-ok">Protection active<small>Équilibrée · 65 numéros bloqués · ARCEP · apprentissage</small></div>
         <div class="s-tiles"><div><b>3</b><span>aujourd'hui</span></div><div><b>17</b><span>cette semaine</span></div><div><b style="color:#3D35A8">412</b><span>au total</span></div></div>
         <div class="s-card"><b>14 derniers jours</b>
           <div class="s-bars"><i style="height:30%"></i><i style="height:55%"></i><i class="s" style="height:20%"></i><i style="height:70%"></i><i style="height:40%"></i><i style="height:15%"></i><i style="height:5%"></i><i style="height:60%"></i><i style="height:90%"></i><i class="s" style="height:35%"></i><i style="height:50%"></i><i style="height:25%"></i><i style="height:45%"></i><i style="height:65%"></i></div>
         </div>
         <div class="s-card">
           <div class="s-row"><i style="background:#E5484D"></i><div><b>01 62 43 41 66</b><span>Bloqué · Tranche 01 62, démarchage</span></div></div>
-          <div class="s-row"><i style="background:#E09100"></i><div><b>03 77 25 91 11</b><span>Silencieux · 3 voisins bloqués</span></div></div>
-          <div class="s-row"><i style="background:#E5484D"></i><div><b>09 48 26 25 99</b><span>Bloqué · Signalé par la communauté</span></div></div>
+          <div class="s-row"><i style="background:#E09100"></i><div><b>03 77 25 91 11</b><span>Silencieux · Ressemble à 87 % à vos blocages</span></div></div>
+          <div class="s-row"><i style="background:#E5484D"></i><div><b>09 48 26 25 99</b><span>Bloqué · Votre liste noire</span></div></div>
         </div>
       </div>
-      <div class="toast" aria-hidden="true"><b>Silencieux : 06 12 34 56 78</b>Score spam 60/100 · Numéro probablement usurpé<div class="acts"><span>BLOQUER</span><span>PAS DU SPAM</span></div></div>
+      <div class="toast" aria-hidden="true"><b>Silencieux : 05 12 34 02 22</b>Score spam 58/100 · Ressemble à vos numéros bloqués commençant par 05 12 34 0<div class="acts"><span>BLOQUER</span><span>PAS DU SPAM</span></div></div>
     </div>
   </div>
 </section>
@@ -335,9 +337,9 @@ footer a{color:var(--muted)}
   <div class="wrap">
     <ul>
       <li><b>0&nbsp;€</b><span>pour toujours, tout inclus</span></li>
-      <li><b>0</b><span>compte, publicité ou pisteur</span></li>
+      <li><b>0</b><span>compte, publicité, pisteur ou accès à internet</span></li>
       <li><b>12</b><span>tranches ARCEP de démarchage filtrées</span></li>
-      <li><b id="community-count">62</b><span>numéros dans la liste communautaire</span></li>
+      <li><b>94&nbsp;%</b><span>des spams jamais vus reconnus par le modèle</span></li>
       <li><b>&lt;&nbsp;1&nbsp;ms</b><span>pour décider, sur le téléphone</span></li>
     </ul>
   </div>
@@ -353,18 +355,18 @@ footer a{color:var(--muted)}
         <h3>Avant la sonnerie</h3><p>chut utilise le filtrage d'appels officiel d'Android : un appel bloqué ne sonne jamais, et reste dans votre historique.</p></article>
       <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 6h16M4 12h10M4 18h7"/><circle cx="18" cy="16" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
         <h3>Tranches ARCEP</h3><p>Les 12 tranches que l'ARCEP réserve au démarchage (01 62, 09 48…) sont reconnues d'office. Pas besoin de liste.</p></article>
-      <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M3 19c.6-3 2.6-4.6 5-4.6s4.4 1.6 5 4.6M14.5 15c2.4-.6 5 .6 5.8 4"/></svg></div>
-        <h3>Liste communautaire</h3><p>Les numéros signalés par deux personnes rejoignent une liste publique, vérifiée au grand jour, livrée avec l'appli.</p></article>
+      <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 19l5-6 4 3 7-9"/><circle cx="20" cy="7" r="1.6" fill="currentColor"/></svg></div>
+        <h3>Apprend de vous</h3><p>Chaque numéro bloqué entraîne un modèle sur le téléphone. Il reconnaît les blocs de numéros et les heures des démarcheurs.</p></article>
       <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v3M12 18v3M4.2 7l2.6 1.5M17.2 15.5 19.8 17M4.2 17l2.6-1.5M17.2 8.5 19.8 7"/><circle cx="12" cy="12" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
-        <h3>Moteur intelligent</h3><p>Un score de spam de 0 à 100, calculé sur le téléphone à partir d'indices expliqués. Il apprend de vos blocages.</p></article>
+        <h3>Même fermé</h3><p>Android consulte chut à chaque appel, même appli fermée, arrêtée ou après un redémarrage. Testé avant chaque version.</p></article>
       <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h9"/></svg></div>
-        <h3>Listes illimitées</h3><p>Liste noire, liste blanche, tranches entières (0162*). Importez l'export de votre téléphone ou votre journal d'appels.</p></article>
+        <h3>Listes illimitées</h3><p>62 numéros de démarchage déjà fournis, plus les vôtres, des tranches entières (0162*), une liste blanche. Import et export.</p></article>
       <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M5 20v-7M10 20V6M15 20v-9M20 20V9"/></svg></div>
         <h3>Toutes les stats</h3><p>Par jour, par semaine, par type, par région, par heure ; les numéros les plus insistants ; un bilan chaque semaine.</p></article>
       <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7.5-4.4-7.5-10.3A4.2 4.2 0 0 1 12 8a4.2 4.2 0 0 1 7.5 2.7C19.5 16.6 12 21 12 21z"/></svg></div>
         <h3>Protection senior</h3><p>Un réglage, et seuls les contacts sonnent normalement. Idéal sur le téléphone d'un parent, première cible des arnaqueurs.</p></article>
       <article class="feat"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M8 10V7.5a4 4 0 0 1 8 0V10"/></svg></div>
-        <h3>Privé par conception</h3><p>Aucun compte, aucun serveur. Vos listes et votre historique ne quittent jamais le téléphone.</p></article>
+        <h3>Rien ne sort</h3><p>chut n'a même pas la permission d'accéder à internet. Vos listes, votre historique et le modèle restent sur le téléphone.</p></article>
     </div>
   </div>
 </section>
@@ -373,21 +375,23 @@ footer a{color:var(--muted)}
   <div class="wrap">
     <p class="eyebrow">Essayez</p>
     <h2>Qu'en penserait chut&nbsp;?</h2>
-    <p class="intro">Tapez un numéro qui vous a appelé. Ce sont les mêmes règles que dans l'appli, avec la liste communautaire du jour. Rien n'est envoyé : tout se calcule dans votre navigateur.</p>
+    <p class="intro">Tapez un numéro qui vous a appelé. Ce sont les mêmes règles que dans l'appli, et le même modèle, entraîné ici sous vos yeux sur la liste fournie avec chut. Ajoutez des numéros à bloquer : le modèle réapprend. Rien n'est envoyé, tout se calcule dans votre navigateur.</p>
     <div class="checker">
       <div class="panel">
         <form class="check-form" id="check-form" autocomplete="off">
           <label class="sr" for="num">Numéro de téléphone</label>
-          <input id="num" type="tel" inputmode="tel" placeholder="01 62 43 41 66" value="01 62 43 41 66">
+          <input id="num" type="tel" inputmode="tel" placeholder="01 62 43 41 66" value="05 12 34 02 22">
           <button class="btn btn-brand" type="submit">Tester</button>
         </form>
         <div class="samples" aria-label="Exemples">
-          <button type="button" data-n="01 62 43 41 66">01 62… (ARCEP)</button>
-          <button type="button" data-n="03 77 25 91 11">Voisin de spams</button>
-          <button type="button" data-n="+225 07 12 34 56 78">+225</button>
-          <button type="button" data-n="08 99 12 34 56">08 99</button>
+                    <button type="button" data-n="04 24 03 60 62">Dans la liste</button>
+          <button type="button" data-n="01 62 99 99 99">Tranche ARCEP</button>
+          <button type="button" data-n="05 12 34 02 22">Voisin appris</button>
           <button type="button" data-n="06 12 34 56 78">Un mobile</button>
         </div>
+        <label class="eyebrow" for="blocklist" style="display:block;margin-top:20px">Votre liste noire (le modèle apprend d'elle)</label>
+        <textarea id="blocklist" rows="4" spellcheck="false"></textarea>
+        <div class="samples"><button type="button" id="teach">+ bloquer 3 numéros en 05 12 34 0x xx</button><span class="muted" id="model-info" style="font-size:14px;align-self:center"></span></div>
         <div class="seg" role="group" aria-label="Sensibilité">
           <button type="button" data-s="0" aria-pressed="false">Souple</button>
           <button type="button" data-s="1" aria-pressed="true">Équilibrée</button>
@@ -396,7 +400,7 @@ footer a{color:var(--muted)}
       </div>
       <div class="panel" aria-live="polite" id="result">
         <div class="verdict">
-          <span class="badge block" id="badge">Bloqué</span>
+          <span class="badge allow" id="badge">Sonne</span>
           <div class="score"><span class="muted">Score spam <b id="score">70</b>/100</span><div class="bar"><i id="scorebar" style="width:70%"></i></div></div>
         </div>
         <ul class="reasons" id="reasons"></ul>
@@ -423,37 +427,35 @@ footer a{color:var(--muted)}
   <div class="wrap">
     <p class="eyebrow">L'intelligence, sur votre téléphone</p>
     <h2>Un score, des raisons, aucun nuage.</h2>
-    <p class="intro">chut n'envoie vos appels à aucune IA distante. Son moteur tourne sur le téléphone, en une fraction de milliseconde, et explique chacune de ses décisions.</p>
+    <p class="intro">chut n'envoie vos appels à aucune IA distante. Il entraîne son propre modèle sur le téléphone, à partir de ce que vous bloquez, et explique chacune de ses décisions.</p>
     <div class="split" style="align-items:start">
       <div>
         <h3 class="display" style="font-size:30px;margin-bottom:10px">1. Les règles fermes d'abord</h3>
         <p class="muted">Vos contacts et votre liste blanche sonnent toujours. Votre liste noire ne sonne jamais. Ensuite seulement, chut cherche des indices.</p>
-        <h3 class="display" style="font-size:30px;margin:22px 0 10px">2. Des indices pondérés</h3>
+        <h3 class="display" style="font-size:30px;margin:22px 0 10px">2. Les tranches ARCEP</h3>
+        <p class="muted">Depuis 2023, les démarcheurs doivent appeler depuis 12 tranches connues (01 62, 01 63, 02 70… 09 49). Un appel qui en vient compte pour 70 points.</p>
+        <h3 class="display" style="font-size:30px;margin:22px 0 10px">3. Le modèle appris</h3>
+        <p class="muted">Une régression logistique, entraînée sur le téléphone. Chaque numéro est décrit par ses préfixes de 4 à 9 chiffres, son type de ligne et l'heure de l'appel. Elle compare vos numéros bloqués à ceux que vous laissez sonner et à 3 000 numéros français pris au hasard (apprentissage « positif / non étiqueté »).</p>
         <ul class="weights">
-          <li><span>Signalé comme arnaque par la communauté</span><b>85</b><span class="w"><i style="width:85%"></i></span></li>
-          <li><span>Signalé comme démarchage</span><b>75</b><span class="w"><i style="width:75%"></i></span></li>
-          <li><span>Tranche ARCEP de démarchage</span><b>70</b><span class="w"><i style="width:70%"></i></span></li>
-          <li><span>Numéro usurpé (contrôle opérateur échoué)</span><b>60</b><span class="w"><i style="width:60%"></i></span></li>
-          <li><span>Voisin de numéros bloqués (appris)</span><b>20–60</b><span class="w"><i style="width:60%"></i></span></li>
-          <li><span>Numéro surtaxé 089</span><b>50</b><span class="w"><i style="width:50%"></i></span></li>
-          <li><span>Indicatif à risque (arnaque au rappel)</span><b>45</b><span class="w"><i style="width:45%"></i></span></li>
-          <li><span>Numéro mal formé</span><b>40</b><span class="w"><i style="width:40%"></i></span></li>
-          <li><span>Inconnu pendant vos heures calmes</span><b>30</b><span class="w"><i style="width:30%"></i></span></li>
-          <li><span>Numéro étranger</span><b>10</b><span class="w"><i style="width:10%"></i></span></li>
+          <li><span>1 numéro bloqué dans un bloc de 1 000</span><b>35</b><span class="w"><i style="width:35%"></i></span></li>
+          <li><span>2 numéros bloqués dans le même bloc</span><b>41</b><span class="w"><i style="width:41%"></i></span></li>
+          <li><span>3 numéros bloqués dans le même bloc</span><b>58</b><span class="w"><i style="width:58%"></i></span></li>
+          <li><span>Le reste du bloc de 10 000</span><b>23</b><span class="w"><i style="width:23%"></i></span></li>
         </ul>
+        <p class="note">Probabilités du modèle pour un numéro jamais vu (sur 100). Sur les 62 numéros fournis, en validation croisée sur 5 plis, il reconnaît 94 % des numéros qu'on lui a cachés, pour 0,6 % de fausses alertes sur des numéros au hasard.</p>
       </div>
       <div>
-        <h3 class="display" style="font-size:30px;margin-bottom:10px">3. Un score qui combine</h3>
+        <h3 class="display" style="font-size:30px;margin-bottom:10px">4. Un score qui combine</h3>
         <p class="muted">Deux indices faibles en font un plus fort, sans jamais dépasser 100 :</p>
         <div class="formula">score = 1 − (1 − a)(1 − b)…</div>
-        <p class="muted">Une tranche ARCEP (70) dont trois voisins ont été bloqués (60) donne 88.</p>
-        <h3 class="display" style="font-size:30px;margin:22px 0 10px">4. Votre sensibilité décide</h3>
+        <p class="muted">Une tranche ARCEP (70) que le modèle juge suspecte à 60 donne 88. Le modèle seul plafonne à 95 : une ressemblance n'est jamais une certitude.</p>
+        <h3 class="display" style="font-size:30px;margin:22px 0 10px">5. Votre sensibilité décide</h3>
         <div class="thresholds">
           <div class="thr"><h3>Souple</h3><div class="track"><i style="width:60%;background:var(--allow)"></i><i style="width:30%;background:var(--silence)"></i><i style="width:10%;background:var(--block)"></i></div><p>Silencieux dès 60, bloqué dès 90.</p></div>
           <div class="thr"><h3>Équilibrée</h3><div class="track"><i style="width:40%;background:var(--allow)"></i><i style="width:30%;background:var(--silence)"></i><i style="width:30%;background:var(--block)"></i></div><p>Silencieux dès 40, bloqué dès 70.</p></div>
           <div class="thr"><h3>Stricte</h3><div class="track"><i style="width:25%;background:var(--allow)"></i><i style="width:25%;background:var(--silence)"></i><i style="width:50%;background:var(--block)"></i></div><p>Silencieux dès 25, bloqué dès 50.</p></div>
         </div>
-        <p class="note">Et si un numéro mis en silencieux rappelle dans les 5 minutes, il sonne : une vraie personne insiste, un robot passe au suivant.</p>
+        <p class="note">Un numéro mis en silencieux qui rappelle dans les 5 minutes sonne : une vraie personne insiste, un robot passe au suivant. Et chaque « Bloquer » ou « Pas du spam » réentraîne le modèle aussitôt.</p>
       </div>
     </div>
   </div>
@@ -479,7 +481,7 @@ footer a{color:var(--muted)}
       <div class="hbar"><span>Démarchage</span><b>301</b><span class="m"><i style="width:100%;background:var(--brand)"></i></span>
         <span>Votre liste noire</span><b>62</b><span class="m"><i style="width:21%;background:var(--brand)"></i></span>
         <span>Arnaque probable</span><b>31</b><span class="m"><i style="width:10%;background:var(--brand)"></i></span>
-        <span>Suspect (appris)</span><b>18</b><span class="m"><i style="width:6%;background:var(--brand)"></i></span></div>
+        <span>Appris de vos blocages</span><b>18</b><span class="m"><i style="width:6%;background:var(--brand)"></i></span></div>
       <b class="display" style="font-size:22px;display:block;margin-top:18px">Quand ils appellent</b>
       <div class="hours" aria-hidden="true"><i style="height:2%"></i><i style="height:1%"></i><i style="height:1%"></i><i style="height:1%"></i><i style="height:1%"></i><i style="height:1%"></i><i style="height:3%"></i><i style="height:8%"></i><i style="height:38%"></i><i style="height:72%"></i><i style="height:88%"></i><i style="height:76%"></i><i style="height:30%"></i><i style="height:46%"></i><i style="height:81%"></i><i style="height:100%"></i><i style="height:84%"></i><i style="height:62%"></i><i style="height:40%"></i><i style="height:12%"></i><i style="height:4%"></i><i style="height:2%"></i><i style="height:1%"></i><i style="height:1%"></i></div>
       <p class="note" style="margin-bottom:0">Illustration. Vos vraies statistiques se calculent sur votre téléphone : par jour, semaine, type, raison, région, heure et jour, plus les numéros les plus insistants et un bilan hebdomadaire.</p>
@@ -497,7 +499,7 @@ footer a{color:var(--muted)}
         <p class="eyebrow" style="color:#FFB4A9">Une seule formule</p>
         <div class="amount">0&nbsp;€<small>pour toujours</small></div>
         <ul>
-          <li>Blocage avant la sonnerie</li><li>Tranches ARCEP</li><li>Liste communautaire à jour</li><li>Moteur intelligent</li>
+          <li>Blocage avant la sonnerie</li><li>Tranches ARCEP</li><li>Modèle appris sur le téléphone</li><li>62 numéros fournis</li>
           <li>Numéros illimités</li><li>Tranches entières (0162*)</li><li>Import et export</li><li>Toutes les statistiques</li>
           <li>Bilan hebdomadaire</li><li>Protection senior</li><li>Autant de téléphones que voulu</li><li>Code source ouvert</li>
         </ul>
@@ -507,10 +509,10 @@ footer a{color:var(--muted)}
         <ul class="ticks">
           <li>Vous demander un compte, un e-mail ou votre numéro.</li>
           <li>Afficher une publicité ou intégrer un pisteur.</li>
-          <li>Envoyer vos appels ou vos contacts à un serveur.</li>
+          <li>Envoyer vos appels ou vos contacts où que ce soit : il n'a pas accès à internet.</li>
           <li>Verrouiller une fonction derrière un abonnement.</li>
         </ul>
-        <p class="note">chut vous rend service ? <a href="https://buymeacoffee.com/ghassandabane">Offrez un café</a>, <a href="https://github.com/dabane-ghassan/chut/issues/new?template=report.yml">signalez un numéro</a> ou <a href="https://github.com/dabane-ghassan/chut">contribuez au code</a>.</p>
+        <p class="note">chut vous rend service ? <a href="https://buymeacoffee.com/ghassandabane">Offrez un café</a> ou <a href="https://github.com/dabane-ghassan/chut">contribuez au code</a>.</p>
       </div>
     </div>
   </div>
@@ -529,7 +531,7 @@ footer a{color:var(--muted)}
           <tr><td>Contacts</td><td>Vérifier qu'un numéro est un contact, pour qu'il sonne toujours. chut ne lit jamais les noms.</td><td><span class="pill o">facultatif</span></td></tr>
           <tr><td>Journal d'appels</td><td>Vous proposer les numéros inconnus récents à bloquer, quand vous le demandez.</td><td><span class="pill o">facultatif</span></td></tr>
           <tr><td>Notifications</td><td>Les appels mis en silencieux et le bilan hebdomadaire. Sans aucun son.</td><td><span class="pill o">facultatif</span></td></tr>
-          <tr><td>Internet</td><td>Télécharger la liste communautaire publique, si vous activez la mise à jour quotidienne. Rien n'est envoyé.</td><td><span class="pill o">facultatif</span></td></tr>
+          <tr><td>Internet</td><td>Aucun. chut ne demande pas la permission d'accéder au réseau : rien ne peut quitter le téléphone.</td><td><span class="pill n">jamais</span></td></tr>
           <tr><td>Compte, publicité, pisteurs, analytics</td><td>Il n'y en a pas.</td><td><span class="pill n">jamais</span></td></tr>
         </tbody>
       </table>
@@ -561,13 +563,14 @@ footer a{color:var(--muted)}
     <h2>FAQ</h2>
     <div style="margin-top:28px">
       <details><summary>chut va-t-il bloquer des appels importants&nbsp;?</summary><p>Vos contacts sonnent toujours. Les appels douteux sonnent en silencieux plutôt que d'être bloqués, avec une notification. Un numéro mis en silencieux qui rappelle dans les 5 minutes sonne normalement. Et chaque appel filtré reste dans l'historique du téléphone et dans chut, avec la raison : un geste suffit pour le mettre en liste blanche.</p></details>
-      <details><summary>Est-ce que ça vide la batterie&nbsp;?</summary><p>Non. chut ne tourne pas en arrière-plan : Android le réveille le temps d'un appel, quelques millisecondes. Deux petites tâches planifiées s'ajoutent (le bilan hebdomadaire et, si vous l'activez, la mise à jour de la liste communautaire), lancées par Android au moment le plus économe.</p></details>
-      <details><summary>Faut-il internet&nbsp;?</summary><p>Non. Le moteur, vos listes et une copie de la liste communautaire sont sur le téléphone. Internet ne sert qu'à mettre à jour la liste communautaire, si vous le voulez.</p></details>
+      <details><summary>Est-ce que ça vide la batterie&nbsp;?</summary><p>Non. chut ne tourne pas en arrière-plan : Android le réveille le temps d'un appel, quelques millisecondes. Deux petites tâches hebdomadaires s'ajoutent (le bilan et le réentraînement du modèle), lancées par Android au moment le plus économe. L'entraînement prend moins d'une seconde.</p></details>
+      <details><summary>Faut-il internet&nbsp;?</summary><p>Non, et chut n'y a même pas accès. Le filtrage, vos listes, l'historique et l'entraînement du modèle se font sur le téléphone.</p></details>
+      <details><summary>Ça marche si l'appli est fermée&nbsp;?</summary><p>Oui. Android consulte chut à chaque appel entrant, que l'appli soit ouverte, fermée, arrêtée de force ou que le téléphone vienne de redémarrer. Avant chaque version, ces cas sont testés sur Android 14 avec de vrais appels : <a href="https://github.com/dabane-ghassan/chut/releases/tag/test-report">voir le dernier rapport de tests</a>.</p></details>
       <details><summary>Pourquoi pas sur le Play Store&nbsp;?</summary><p>chut se télécharge directement depuis GitHub, sans compte Google. Pour être prévenu des nouvelles versions, utilisez <a href="https://obtainium.imranr.dev/">Obtainium</a>. Une publication sur F-Droid est prévue.</p></details>
       <details><summary>Et sur iPhone&nbsp;?</summary><p>iOS ne permet de filtrer les appels qu'avec une appli distribuée par l'App Store. chut est pour l'instant réservé à Android 10 et plus.</p></details>
-      <details><summary>Comment fonctionne la liste communautaire&nbsp;?</summary><p>Chaque signalement ouvre un formulaire public sur GitHub. Un robot l'enregistre ; dès que deux personnes différentes ont signalé un numéro, il rejoint la liste. Un numéro qui reçoit autant d'avis « pas du spam » que de signalements en sort. Toute la liste et tout l'historique sont publics.</p></details>
+      <details><summary>Comment chut apprend-il&nbsp;?</summary><p>Quand vous bloquez un numéro, chut réentraîne un petit modèle sur le téléphone (une régression logistique). Il apprend quels blocs de numéros et quelles heures reviennent dans ce que vous bloquez, et ce qui distingue les appels que vous laissez sonner. Un seul blocage ne rend pas ses voisins suspects ; plusieurs dans le même bloc de 1 000 numéros, oui. Dans Réglages, l'appli affiche sa précision, mesurée par validation croisée.</p></details>
       <details><summary>Je viens d'une autre appli de blocage. Je garde mes numéros&nbsp;?</summary><p>Oui. Exportez vos numéros bloqués depuis l'appli Téléphone ou votre ancienne appli, puis « Listes › Importer un fichier » ou « Coller une liste ». chut lit les numéros séparés par des virgules ou des retours à la ligne, sous toutes les formes (01 62…, +33 1 62…, 0033…).</p></details>
-      <details><summary>Qui fait chut&nbsp;?</summary><p>Ghassan Dabane, sur son temps libre. Le code est sous licence GNU GPL v3 ou ultérieure, la liste communautaire sous ODbL. Les idées et les contributions sont bienvenues sur <a href="https://github.com/dabane-ghassan/chut">GitHub</a>.</p></details>
+      <details><summary>Qui fait chut&nbsp;?</summary><p>Ghassan Dabane, sur son temps libre. Le code est sous licence GNU GPL v3 ou ultérieure. Les idées et les contributions sont bienvenues sur <a href="https://github.com/dabane-ghassan/chut">GitHub</a>.</p></details>
     </div>
   </div>
 </section>
@@ -591,26 +594,27 @@ footer a{color:var(--muted)}
 <footer>
   <div class="wrap">
     <a class="brand" href="#"><img src="favicon.svg" alt="" width="28" height="28"><b>chut</b></a>
-    <span>Logiciel libre sous GPL-3.0 · liste communautaire sous ODbL</span>
+    <span>Logiciel libre sous GPL-3.0</span>
     <nav>
       <a href="https://github.com/dabane-ghassan/chut">GitHub</a>
-      <a href="https://github.com/dabane-ghassan/chut/issues/new?template=report.yml">Signaler un numéro</a>
-      <a href="https://github.com/dabane-ghassan/chut/blob/main/community/numbers.csv">La liste</a>
+      <a href="https://github.com/dabane-ghassan/chut/releases/tag/test-report">Rapport de tests</a>
       <a href="https://github.com/dabane-ghassan/chut/issues">Un bug, une idée</a>
     </nav>
   </div>
 </footer>
 
 <script>
-/* The number checker: a port of the app's engine (app/src/main/java/.../engine). Runs only here. */
+/* The number checker: a port of the app's engine and learned model
+   (app/src/main/java/.../engine/Engine.java and Learner.java). Runs only in this page. */
 (() => {
+  const PRESET = ["+33162009599","+33162148812","+33162149049","+33162215226","+33162216928","+33162308189","+33162308190","+33162345088","+33162346177","+33162434166","+33162525057","+33187686895","+33270236573","+33270239054","+33270239793","+33270258912","+33270298810","+33270298961","+33270311521","+33377115449","+33377259230","+33377259405","+33377259522","+33377274169","+33377278655","+33377318740","+33377325338","+33377325377","+33377421458","+33377466012","+33412112496","+33424036062","+33424036064","+33424112308","+33424114596","+33424230736","+33424235481","+33424287774","+33424288384","+33424288491","+33424322811","+33568006501","+33568302424","+33568305160","+33568305236","+33568437474","+33568510950","+33948044916","+33948204800","+33948256792","+33948256795","+33948261869","+33948262083","+33948262181","+33948262599","+33948490322","+33948490331","+33948490937","+33948499154","+33948499261","+33948499394","+33978808220"];
   const ARCEP = ["0162","0163","0270","0271","0377","0378","0424","0425","0568","0569","0948","0949"];
   const OVERSEAS = new Set(["262","269","508","590","594","596","681","687","689"]);
-  const HIGH_RISK = new Set(["222","223","224","225","231","232","235","242","243","247","252","261","373","675","676","677","678","679","682","683","686","688","690","691","692","870","881","882","883"]);
   const CC1 = new Set(["1","7"]);
   const CC2 = new Set("20 27 30 31 32 33 34 36 39 40 41 43 44 45 46 47 48 49 51 52 53 54 55 56 57 58 60 61 62 63 64 65 66 81 82 84 86 90 91 92 93 94 95 98".split(" "));
   const THRESH = [[90, 60], [70, 40], [50, 25]];
-  let community = new Map(), sensitivity = 1;
+  const DIM = 1 << 14, BACKGROUND = 3000, EPOCHS = 30, RATE = 0.25, L2 = 1.4e-4, MIN_PREFIX = 4, ML_THRESHOLD = 0.4;
+  let sensitivity = 1, model = null, blocked = new Set();
 
   const normalize = raw => {
     let s = "";
@@ -627,42 +631,76 @@ footer a{color:var(--muted)}
     if (CC1.has(d[0])) return d[0]; if (CC2.has(d.slice(0, 2))) return d.slice(0, 2); return d.slice(0, 3); };
   const pretty = n => { if (n.startsWith("+33")) { const r = n.slice(3); let o = "0" + r[0]; for (let i = 1; i < r.length; i += 2) o += " " + r.slice(i, i + 2); return o; }
     if (n.startsWith("+")) { const c = cc(n), r = n.slice(1 + c.length); let o = "+" + c; for (let i = 0; i < r.length; i += 2) o += " " + r.slice(i, i + 2); return o; } return n; };
+  const prettyPrefix = p => p.replace(/(\d\d)(?=\d)/g, "$1 ");
   const kind = n => {
-    if (!n) return "hidden";
-    if (!n.startsWith("+")) return n.length <= 6 ? "short" : "invalid";
-    const c = cc(n); if (c !== "33") return OVERSEAS.has(c) ? "overseas" : "foreign";
-    const nat = national(n); if (nat.length !== 10) return "invalid";
-    if (ARCEP.some(p => nat.startsWith(p))) return "telemarketing";
+    if (!n) return "HIDDEN";
+    if (!n.startsWith("+")) return n.length <= 6 ? "SHORT" : "INVALID";
+    const c = cc(n); if (c !== "33") return OVERSEAS.has(c) ? "OVERSEAS" : "FOREIGN";
+    const nat = national(n); if (nat.length !== 10) return "INVALID";
+    if (ARCEP.some(p => nat.startsWith(p))) return "TELEMARKETING";
     const d = nat[1];
-    if (d === "6" || d === "7") return "mobile"; if ("12345".includes(d)) return "landline"; if (d === "9") return "voip";
-    if (d === "8") return nat.startsWith("080") ? "tollfree" : nat.startsWith("089") ? "premium" : "special";
-    return "invalid";
+    if (d === "6" || d === "7") return "MOBILE"; if ("12345".includes(d)) return "LANDLINE"; if (d === "9") return "VOIP";
+    if (d === "8") return nat.startsWith("080") ? "TOLL_FREE" : nat.startsWith("089") ? "PREMIUM" : "SPECIAL";
+    return "INVALID";
   };
-  const KIND_FR = { mobile: "Mobile français", landline: "Fixe français", voip: "Fixe par box internet (09)", telemarketing: "Tranche ARCEP réservée au démarchage",
-    tollfree: "Numéro vert (080)", special: "Numéro spécial (08)", premium: "Numéro surtaxé (089)", overseas: "Outre-mer", foreign: "Numéro étranger",
-    short: "Numéro court", invalid: "Format invalide", hidden: "Numéro masqué" };
+  const KIND_FR = { MOBILE: "Mobile français", LANDLINE: "Fixe français", VOIP: "Fixe par box internet (09)", TELEMARKETING: "Tranche ARCEP réservée au démarchage",
+    TOLL_FREE: "Numéro vert (080)", SPECIAL: "Numéro spécial (08)", PREMIUM: "Numéro surtaxé (089)", OVERSEAS: "Outre-mer", FOREIGN: "Numéro étranger",
+    SHORT: "Numéro court", INVALID: "Format invalide", HIDDEN: "Numéro masqué" };
+
+  // ---- the learned model (same features and training as Learner.java) ----
+  const javaHash = str => { let h = 0; for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0; return h; };
+  const index = f => { let h = javaHash(f); h ^= h >>> 16; h = Math.imul(h, 0x85EBCA6B); h ^= h >>> 13; return h & (DIM - 1); };
+  const features = n => {
+    const d = n.startsWith("+33") ? national(n) : n, f = ["bias"];
+    for (let k = MIN_PREFIX; k <= Math.min(9, d.length - 1); k++) f.push("p" + k + ":" + d.slice(0, k));
+    f.push("k:" + kind(n));
+    return f;
+  };
+  const sigmoid = z => z > 30 ? 1 : z < -30 ? 0 : 1 / (1 + Math.exp(-z));
+  const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const randomFrench = r => { const x = Math.floor(r() * 100); const first = x < 50 ? (r() < .5 ? "6" : "7") : x < 85 ? String(1 + Math.floor(r() * 5)) : "9";
+    let s = "+33" + first; for (let i = 0; i < 8; i++) s += Math.floor(r() * 10); return s; };
+  function train(spam) {
+    if (spam.length < 5) return null;
+    const r = rng(42), data = spam.map(n => [n, 1]);
+    for (let i = 0; i < BACKGROUND; i++) { const x = randomFrench(r); if (!blocked.has(x)) data.push([x, 0]); }
+    const idx = data.map(([n]) => features(n).map(index)), v = new Float64Array(DIM);
+    const order = data.map((_, i) => i); let a = 1;
+    for (let e = 0; e < EPOCHS; e++) {
+      for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+      const rate = RATE / (1 + 0.1 * e);
+      for (const i of order) {
+        let z = 0; for (const k of idx[i]) z += v[k]; z *= a;
+        const g = sigmoid(z) - data[i][1];
+        a *= 1 - rate * L2; const step = rate * g / a;
+        for (const k of idx[i]) v[k] -= step;
+        if (a < 1e-6) { for (let k = 0; k < DIM; k++) v[k] *= a; a = 1; }
+      }
+    }
+    const w = new Float32Array(DIM); for (let k = 0; k < DIM; k++) w[k] = v[k] * a;
+    return {
+      predict: n => { let z = 0; for (const f of features(n)) z += w[index(f)]; return sigmoid(z); },
+      strongest: n => { const ps = features(n).filter(f => f[0] === "p"); const max = Math.max(0, ...ps.map(f => w[index(f)]));
+        if (max <= 0) return null; let best = null; for (const f of ps) if (w[index(f)] >= max / 2) best = f.slice(f.indexOf(":") + 1); return best; },
+      size: spam.length
+    };
+  }
 
   function evaluate(raw) {
     const n = normalize(raw), reasons = [];
     if (!n) return { n, action: "allow", score: 0, reasons: [[0, "Aucun numéro : un numéro masqué sonne, sauf si vous les bloquez."]] };
+    if (blocked.has(n)) return { n, k: kind(n), action: "block", score: 100, reasons: [[100, "Dans votre liste noire"]] };
     const k = kind(n);
-    if (k === "telemarketing") reasons.push([70, `Tranche ${national(n).slice(0, 2)} ${national(n).slice(2, 4)}, réservée par l'ARCEP au démarchage`]);
-    const cat = community.get(n);
-    if (cat === "scam") reasons.push([85, "Signalé comme arnaque par la communauté"]);
-    else if (cat) reasons.push([75, "Signalé comme démarchage par la communauté"]);
-    if (n.startsWith("+33") && n.length === 12) {
-      const block = n.slice(0, 9); let near = 0;
-      for (const m of community.keys()) if (m !== n && m.length === 12 && m.startsWith(block)) near++;
-      if (near >= 3) reasons.push([60, `${near} numéros signalés dans le même bloc de 1 000 (appris)`]);
-      else if (near === 2) reasons.push([45, "2 numéros signalés dans le même bloc de 1 000 (appris)"]);
-      else if (near === 1) reasons.push([20, "1 numéro signalé dans le même bloc de 1 000 (appris)"]);
+    if (k === "TELEMARKETING") reasons.push([70, `Tranche ${national(n).slice(0, 2)} ${national(n).slice(2, 4)}, réservée par l'ARCEP au démarchage`]);
+    if (model) {
+      const p = model.predict(n);
+      if (p >= ML_THRESHOLD) {
+        const pts = Math.min(95, Math.round(p * 100)), pre = model.strongest(n);
+        reasons.push([pts, pre ? `Ressemble à ${pts} % à vos numéros bloqués commençant par ${prettyPrefix(pre)}` : `Le modèle le juge suspect à ${pts} %`]);
+      }
     }
-    if (k === "premium") reasons.push([50, "Numéro surtaxé 089 : interdit comme numéro d'appelant depuis 2012"]);
-    if (k === "invalid") reasons.push([40, "Pas un numéro français valide : souvent falsifié"]);
-    if (k === "foreign") { const c = cc(n); reasons.push(HIGH_RISK.has(c) ? [45, `Indicatif +${c}, souvent utilisé pour les arnaques au rappel`] : [10, `Numéro étranger (+${c})`]); }
     let keep = 1; for (const [w] of reasons) keep *= 1 - w / 100;
-    const score = Math.round((1 - keep) * 100);
-    const [b, s] = THRESH[sensitivity];
+    const score = Math.round((1 - keep) * 100), [b, s] = THRESH[sensitivity];
     return { n, k, action: score >= b ? "block" : score >= s ? "silence" : "allow", score, reasons };
   }
 
@@ -675,26 +713,28 @@ footer a{color:var(--muted)}
     const ul = $("reasons"); ul.textContent = "";
     const rs = v.reasons.length ? v.reasons : [[0, "Rien de suspect sur ce numéro."]];
     for (const [w, text] of rs) { const li = document.createElement("li"); const bb = document.createElement("b"); bb.textContent = w ? "+" + w : "·"; li.append(bb, document.createTextNode(text)); ul.append(li); }
-    $("kind").textContent = v.n ? `${pretty(v.n)} · ${KIND_FR[v.k] || ""}. Dans l'appli, vos contacts et votre liste blanche sonnent toujours, et vos blocages enrichissent l'apprentissage.` : "";
+    $("kind").textContent = v.n ? `${pretty(v.n)} · ${KIND_FR[v.k] || ""}. Dans l'appli, vos contacts et votre liste blanche sonnent toujours.` : "";
   }
-  $("check-form").addEventListener("submit", e => { e.preventDefault(); show(); });
-  $("num").addEventListener("input", show);
-  document.querySelectorAll(".samples button").forEach(b => b.addEventListener("click", () => { $("num").value = b.dataset.n; show(); }));
-  document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
-    sensitivity = +b.dataset.s; document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x === b)); show(); }));
-
-  function load(text) {
-    const m = new Map();
-    for (const line of text.split(/\r?\n/)) { const t = line.trim(); if (!t || t[0] === "#" || t.startsWith("number")) continue;
-      const [num, cat] = t.split(","); const n = normalize(num); if (n) m.set(n, cat === "scam" ? "scam" : "telemarketing"); }
-    if (m.size) { community = m; $("community-count").textContent = m.size.toLocaleString("fr-FR"); }
+  let timer = null;
+  function relearn() {
+    blocked = new Set($("blocklist").value.split(/[,;\n]+/).map(normalize).filter(n => n.startsWith("+") && n.length >= 9));
+    const t0 = performance.now();
+    model = train([...blocked]);
+    $("model-info").textContent = model ? `Modèle entraîné sur ${blocked.size} numéros en ${Math.round(performance.now() - t0)} ms` : "Bloquez au moins 5 numéros pour activer le modèle";
     show();
   }
-  show();
-  fetch("https://raw.githubusercontent.com/dabane-ghassan/chut/main/community/numbers.csv")
-    .then(r => r.ok ? r.text() : Promise.reject())
-    .catch(() => fetch("community.csv").then(r => r.ok ? r.text() : ""))
-    .then(load).catch(() => {});
+  $("blocklist").value = PRESET.map(n => pretty(n)).join(", ");
+  $("blocklist").addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(relearn, 500); });
+  $("teach").addEventListener("click", () => {
+    $("blocklist").value = $("blocklist").value.trim() + ", 05 12 34 00 01, 05 12 34 04 57, 05 12 34 09 30";
+    $("teach").disabled = true; relearn();
+  });
+  $("check-form").addEventListener("submit", e => { e.preventDefault(); show(); });
+  $("num").addEventListener("input", show);
+  document.querySelectorAll(".samples button[data-n]").forEach(b => b.addEventListener("click", () => { $("num").value = b.dataset.n; show(); }));
+  document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
+    sensitivity = +b.dataset.s; document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x === b)); show(); }));
+  relearn();
 })();
 </script>
 </body>

@@ -2,8 +2,9 @@
 
 ## On GitHub (the usual way)
 
-[`.github/workflows/android.yml`](.github/workflows/android.yml) runs the unit tests and builds a
-release APK on every push to `main` that touches the app:
+[`.github/workflows/android.yml`](.github/workflows/android.yml) runs the unit tests, builds a release
+APK, tests it on an Android 14 emulator (instrumented tests, then real incoming calls with
+[`scripts/e2e.sh`](scripts/e2e.sh)), and publishes it only if everything passed:
 
 - every build goes to the **`latest-build`** pre-release as `chut-test-build.apk`;
 - when `versionName` in `app/build.gradle` has no `v…` tag yet, it also publishes a **release**
@@ -12,8 +13,8 @@ release APK on every push to `main` that touches the app:
 To release: bump `versionCode` and `versionName` in `app/build.gradle`, add
 `fastlane/metadata/android/{en-US,fr-FR}/changelogs/<versionCode>.txt`, push.
 
-If a build fails, its full log is pushed to the `ci-log` branch
-(`git fetch origin ci-log && git show origin/ci-log:build-log.txt`).
+Every run publishes its reports on the [`test-report`](https://github.com/dabane-ghassan/chut/releases/tag/test-report)
+pre-release: `test-summary.txt`, `device-report.txt` (each check of the device tests) and `build-log.txt`.
 
 ## Release signing
 
@@ -40,9 +41,10 @@ uninstall to update. Switching from the test key to your key also needs one unin
 Needs JDK 17 and the Android SDK (platform 35).
 
 ```sh
-./gradlew testDebugUnitTest      # engine tests
+./gradlew testDebugUnitTest      # engine and model tests
+./gradlew connectedDebugAndroidTest   # instrumented tests on a device or emulator
 ./gradlew assembleRelease        # app/build/outputs/apk/release/app-release.apk
-python3 community/build.py       # rebuild the community list
+scripts/e2e.sh chut.apk           # end-to-end test on a running emulator (adb root)
 ```
 
 ## The website

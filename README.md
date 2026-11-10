@@ -6,17 +6,18 @@
   <a href="LICENSE"><img alt="License: GPL v3 or later" src="https://img.shields.io/badge/license-GPL--3.0--or--later-3D35A8"></a>
   <a href="https://github.com/dabane-ghassan/chut/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/dabane-ghassan/chut?sort=semver&color=3D35A8&label=release"></a>
   <a href="https://github.com/dabane-ghassan/chut/actions/workflows/android.yml"><img alt="Android build" src="https://github.com/dabane-ghassan/chut/actions/workflows/android.yml/badge.svg"></a>
-  <a href="community/numbers.csv"><img alt="Community list" src="https://img.shields.io/badge/community_list-ODbL-FF6B57"></a>
+  <a href="https://github.com/dabane-ghassan/chut/releases/tag/test-report"><img alt="Tested on Android 14 with real calls" src="https://img.shields.io/badge/tested-Android_14_real_calls-FF6B57"></a>
 </p>
 
-# A free call blocker that tells you why.
+# A free call blocker that learns from what you block.
 
-**chut** (French for *shh!*) checks every unknown call **before your phone rings** and silences
-telemarketing and scams. No account, no ads, no trackers, no subscription: every feature and every
-statistic is free, for everyone. Built for France, works anywhere on Android 10+.
+**chut** (French for *shh!*) checks every unknown call **before your phone rings**, even when the
+app is closed, and silences telemarketing. It filters with your lists and with a model it trains on
+the phone from what you block. No account, no ads, no trackers, no internet access, no subscription:
+every feature and every statistic is free. In French by default, or English. Android 10+.
 
-🇫🇷 *chut filtre le démarchage et les arnaques avant que le téléphone sonne. Gratuit, libre, sans compte.*
-*Tout est expliqué en français sur le [site](https://dabane-ghassan.github.io/chut/).*
+🇫🇷 *chut filtre le démarchage avant que le téléphone sonne et apprend de vos blocages. Gratuit, libre,
+sans compte, sans internet. Tout est expliqué en français sur le [site](https://dabane-ghassan.github.io/chut/).*
 
 ## Installation
 
@@ -32,17 +33,19 @@ statistic is free, for everyone. Built for France, works anywhere on Android 10+
 
 ## What it does
 
-- **Blocks before the ring** with Android's own call-screening API. Blocked calls stay in your call history.
-- **ARCEP telemarketing ranges**: since 2023, French telemarketers must call from 01 62, 01 63, 02 70, 02 71,
-  03 77, 03 78, 04 24, 04 25, 05 68, 05 69, 09 48 or 09 49. chut knows them without any list.
-- **Community list**: numbers two people reported, in a [public list](community/) built from GitHub issues, with no server.
-- **An engine that explains itself** (see below), and **learns from your blocks**.
-- **Unlimited lists**: block list, allow list, whole ranges (`0162*`), import from your phone's
-  "Blocked numbers" export, a file, or your call log; export everything as CSV.
+- **Blocks before the ring** with Android's own call-screening API, whether chut is open, closed,
+  force-stopped or the phone just restarted. Blocked calls stay in your call history.
+- **Your lists**: an unlimited block list that already holds 62 known telemarketing numbers, whole
+  ranges (`0162*`), and an allow list. Import your phone's "Blocked numbers" export, a file, or pick
+  from your call log; export everything as CSV.
+- **ARCEP telemarketing ranges**: since 2023, French telemarketers must call from 01 62, 01 63, 02 70,
+  02 71, 03 77, 03 78, 04 24, 04 25, 05 68, 05 69, 09 48 or 09 49.
+- **A model learned from your blocks** (below), with its accuracy shown in the app.
 - **Every statistic**: per day and week, by type, reason, region, hour and weekday, the most
   insistent numbers, time saved, and a weekly report.
 - **Senior protection**: strict filtering, and only contacts ring normally. Made for a parent's phone.
-- **Private by design**: works offline. Lists and history never leave the phone. Every permission is optional.
+- **French by default**, with a Français / English switch in the settings.
+- **Private by design**: no internet permission at all. Lists, history and model never leave the phone.
 - **Light**: no background service, no dependencies, an APK under 1 MB.
 
 ## How chut decides
@@ -50,35 +53,40 @@ statistic is free, for everyone. Built for France, works anywhere on Android 10+
 Android asks chut about each incoming call. chut answers on the phone in a fraction of a millisecond
 ([`Engine.java`](app/src/main/java/io/github/dabaneghassan/chut/engine/Engine.java)):
 
-1. **Hard rules.** Contacts and your allow list always ring; your block list never does.
-2. **Signals**, each with a weight out of 100:
-
-   | Signal | Weight |
-   |---|---|
-   | Reported as a scam / as telemarketing by the community | 85 / 75 |
-   | ARCEP telemarketing range | 70 |
-   | Caller ID failed the operator's authentication check (spoofed) | 60 |
-   | Neighbours in the same block of 1,000 numbers that you or the community blocked (1 / 2 / 3+) | 20 / 45 / 60 |
-   | Premium rate (089) | 50 |
-   | High-risk country code (one-ring callback scams) | 45 |
-   | Malformed French number | 40 |
-   | Unknown number during your quiet hours | 30 |
-   | Foreign number | 10 |
-
-3. **Combine** as a noisy OR, `score = 1 − Π(1 − wᵢ)`: two weak signals make a stronger one, never above 100.
-4. **Decide** with your sensitivity: *relaxed* silences from 60 and blocks from 90, *balanced* 40 / 70, *strict* 25 / 50.
+1. **Your lists.** Contacts and your allow list always ring; your block list never does.
+2. **ARCEP ranges** count for 70 points.
+3. **The learned model** ([`Learner.java`](app/src/main/java/io/github/dabaneghassan/chut/engine/Learner.java))
+   gives up to 95 points. It is a logistic regression trained on the phone:
+   - *features*: every prefix of the number from 4 to 9 digits, the line type, the hour of the call,
+     hashed into 16,384 weights;
+   - *data*: your blocked numbers (and when they called) as spam; your allow list, the calls you let
+     ring and a background of 3,000 random French numbers as not spam (positive-unlabelled learning);
+   - *training*: SGD on the log-loss with L2 regularisation, seeded, in well under a second; retrained
+     after every list change, every Block / Not spam tap, and weekly;
+   - *behaviour*: one blocked number does not make its neighbours suspicious (0.35); two in the same
+     block of 1,000 numbers do (0.41), three more so (0.58); the rest of the 10,000-block stays low (0.23);
+   - *accuracy*, by 5-fold cross-validation on the 62 shipped numbers: **94 %** of hidden spam numbers
+     recognised, **0.6 %** false alarms on random numbers. The app shows these figures for your own list.
+4. **Combine** the points as a noisy OR, `score = 1 − Π(1 − pᵢ)`, and **decide** with your sensitivity:
+   *relaxed* silences from 60 and blocks from 90, *balanced* 40 / 70, *strict* 25 / 50.
    A silenced number that calls back within 5 minutes rings: a person insists, a robot moves on.
 
-Every verdict keeps its reasons; tap a call to see them. The **Block** and **Not spam** buttons on
-notifications feed your lists, and your lists feed the learning signal. You can try the same rules on the
-[website's number checker](https://dabane-ghassan.github.io/chut/#tester).
+Every verdict keeps its reasons; tap a call to see them. You can try the same rules, and train the same
+model, on the [website's number checker](https://dabane-ghassan.github.io/chut/#tester).
 
-## The community list
+## Tested on a real Android system
 
-Report a number from the app, or with the [report form](https://github.com/dabane-ghassan/chut/issues/new?template=report.yml).
-A [workflow](.github/workflows/community.yml) records it and answers; once two different people
-report a number, it joins [`community/numbers.csv`](community/numbers.csv). Apps can download it daily
-(opt-in), and every release ships the current copy. Details in [community/README.md](community/README.md).
+Every change is tested before it can be released ([`android.yml`](.github/workflows/android.yml)):
+
+- **JVM unit tests** of the engine, the statistics and the model (including the cross-validation above);
+- **instrumented tests** inside the app on an Android 14 emulator: database, preset list, import and
+  export, model training and persistence, language, notifications, background jobs;
+- **an end-to-end test** ([`scripts/e2e.sh`](scripts/e2e.sh)) that places real incoming calls to the
+  emulator and checks what Android did, what chut decided and why, and what it showed: with the app
+  never opened, force-stopped, killed, and after a reboot; the notification buttons; the model learning
+  from blocks; the weekly jobs; the screens in French and English; senior protection.
+
+The latest report is published on the [test-report](https://github.com/dabane-ghassan/chut/releases/tag/test-report) page.
 
 ## Privacy
 
@@ -88,26 +96,28 @@ report a number, it joins [`community/numbers.csv`](community/numbers.csv). Apps
 | Contacts | "Contacts always ring": checks if a number is a contact, never reads names | optional |
 | Call log | "Pick from your call log" when you ask for it | optional |
 | Notifications | silenced calls and the weekly report, silently | optional |
-| Internet | downloading the public community list, if you turn that on; nothing is uploaded | optional |
+| Internet | none: chut does not have the permission | never |
 
 No account, no analytics, no ads, no crash reporting. The history of unknown numbers is kept for 400 days on the phone;
 calls from contacts are never logged.
 
 ## Building
 
-The APK is built by [GitHub Actions](.github/workflows/android.yml) on every change: a test build on the
-`latest-build` pre-release, and a release whenever `versionName` in `app/build.gradle` changes. To build it
+The APK is built and tested by [GitHub Actions](.github/workflows/android.yml) on every change: a test
+build on the `latest-build` pre-release, and a release whenever `versionName` in `app/build.gradle` changes,
+both only after all tests pass. To build it
 yourself or set up release signing, see [BUILDING.md](BUILDING.md).
 
 The code is plain Java on the Android framework, with no third-party libraries:
 
 ```
 app/src/main/java/io/github/dabaneghassan/chut/
-  engine/   PhoneNumbers, Engine, Stats       pure Java, unit-tested on the JVM
-  data/     Store (SQLite), Prefs, Community, Phone (contacts, call log)
+  engine/   PhoneNumbers, Engine, Learner, Stats   pure Java, unit-tested on the JVM
+  data/     Store (SQLite), Learning (model on disk), Prefs, Lang, Phone (contacts, call log)
   ui/       the four screens, charts, labels
   ScreeningService, Notifier, ActionReceiver, BackgroundJobs, MainActivity
-community/  the community list and the scripts that build it
+app/src/androidTest/   instrumented tests
+scripts/    end-to-end test on an emulator (real incoming calls)
 site/       the companion website (GitHub Pages)
 brand/      the logo
 ```
@@ -115,10 +125,8 @@ brand/      the logo
 ## Support
 
 If chut gives you some peace, you can [buy me a coffee](https://buymeacoffee.com/ghassandabane) ☕,
-[report numbers](https://github.com/dabane-ghassan/chut/issues/new?template=report.yml), or open an issue or a pull request.
+or open an issue or a pull request.
 
 ## License
 
-chut is licensed under the [GNU GPL v3 or later](LICENSE). The community list is under the
-[Open Database License 1.0](https://opendatacommons.org/licenses/odbl/1-0/). The logo in `brand/` is
-CC BY-SA 4.0. The Barlow fonts are under the SIL Open Font License 1.1.
+chut is licensed under the [GNU GPL v3 or later](LICENSE). The logo in `brand/` is CC BY-SA 4.0. The Barlow fonts are under the SIL Open Font License 1.1.
