@@ -23,6 +23,8 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.deployment.outputs.page_url }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -35,3 +37,50 @@ jobs:
           path: site
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # Writes what happened (step results, the repository's Pages settings, the live page's
+  # status) to the "pages-log" branch, so a failed deploy can be diagnosed with plain git.
+  report:
+    needs: deploy
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: read
+    steps:
+      - name: Write the report
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESULT: ${{ needs.deploy.result }}
+          URL: ${{ needs.deploy.outputs.url }}
+        run: |
+          mkdir -p /tmp/log && cd /tmp/log
+          {
+            echo "deploy job: $RESULT"
+            echo "commit: $GITHUB_SHA"
+            echo "== Pages settings (GET /repos/$GITHUB_REPOSITORY/pages)"
+            gh api "repos/$GITHUB_REPOSITORY/pages" 2>&1 || true
+            echo
+            echo "== Latest Pages builds"
+            gh api "repos/$GITHUB_REPOSITORY/pages/builds?per_page=3" 2>&1 | head -60 || true
+            echo
+            echo "== Failed steps of this run"
+            gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs" \
+              --jq '.jobs[] | "\(.name): \(.conclusion) " + ([.steps[] | select(.conclusion=="failure") | .name] | join(", "))' 2>&1 || true
+            echo
+            echo "== Annotations (error messages)"
+            for id in $(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs" --jq '.jobs[].id' 2>/dev/null); do
+              gh api "repos/$GITHUB_REPOSITORY/check-runs/$id/annotations" --jq '.[] | "\(.annotation_level): \(.message)"' 2>&1 || true
+            done
+            echo
+            echo "== Live site"
+            curl -s -o /dev/null -w "https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/ -> HTTP %{http_code}\n" \
+              "https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/" || true
+          } > pages-log.txt 2>&1
+          cat pages-log.txt
+          git init -q -b pages-log
+          git config user.name "chut CI"
+          git config user.email "ci@users.noreply.github.com"
+          git add pages-log.txt
+          git commit -qm "Website deploy report for ${GITHUB_SHA::7}: $RESULT"
+          git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" pages-log
