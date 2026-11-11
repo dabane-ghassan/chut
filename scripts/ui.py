@@ -7,6 +7,7 @@ find a text, tap it, scroll to it.
     ui.py tap "Réglages"               tap the first element showing this text
     ui.py texts                        print every text on screen (for the test report)
     ui.py y "Plus de réglages"         print where a text is on screen now (no scrolling)
+    ui.py confirm                      tap the open dialog's confirm button
 """
 import re
 import subprocess
@@ -70,6 +71,14 @@ def main():
     if cmd == "texts":
         print(" | ".join(t for t in ((n.get("text") or "").strip() for n in nodes()) if t))
         return 0
+    if cmd == "confirm":   # the dialog's positive button, whatever its case on screen
+        for n in nodes():
+            if n.get("resource-id") == "android:id/button1":
+                x, y = center(n)
+                adb("shell", "input", "tap", str(x), str(y))
+                time.sleep(1.5)
+                return 0
+        return 1
     if cmd == "y":   # vertical position of a text on screen now, without scrolling
         n = find(args[0])
         if n is None:

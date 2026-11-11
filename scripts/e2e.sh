@@ -189,8 +189,7 @@ section "Turning protection off and on from the home screen"
 open_app
 $UI tap "Désactiver" 0 >/dev/null
 check "Turn off asks first" $UI has "Désactiver la protection ?" 0
-$UI tap "Désactiver" 0 >/dev/null
-sleep 1
+check "and is confirmed in the dialog" $UI confirm
 check "home says protection is paused" $UI has "Protection en pause" 0
 sh input keyevent 3
 call "+33163777888"
