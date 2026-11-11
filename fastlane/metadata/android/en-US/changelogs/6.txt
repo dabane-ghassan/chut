@@ -1,0 +1,1 @@
+• Settings without flicker: switches, sensitivity and "More settings" change in place, without redrawing the page

@@ -242,16 +242,31 @@ public final class Ui {
         row.setPadding(p, p, p, p);
         for (int i = 0; i < labels.length; i++) {
             final int index = i;
-            boolean on = i == selected;
-            TextView t = text(c, labels[i], 14, on ? R.color.on_brand : R.color.ink, semibold);
+            TextView t = text(c, labels[i], 14, R.color.ink, semibold);
             t.setGravity(Gravity.CENTER);
             t.setPadding(dp(c, 6), dp(c, 9), dp(c, 6), dp(c, 9));
             t.setMaxLines(1);
             t.setEllipsize(TextUtils.TruncateAt.END);
-            t.setBackground(on ? round(color(c, R.color.brand), dp(c, 11)) : pressable(c, 0x00000000, dp(c, 11)));
-            t.setOnClickListener(v -> onPick.accept(index));
+            t.setOnClickListener(v -> {
+                if (v.isSelected()) return;
+                select(row, index);
+                onPick.accept(index);
+            });
             row.addView(t, weight(1));
         }
+        select(row, selected);
         return row;
+    }
+
+    /** Marks one choice as selected, in place: the screen is not rebuilt. */
+    private static void select(LinearLayout row, int selected) {
+        Context c = row.getContext();
+        for (int i = 0; i < row.getChildCount(); i++) {
+            TextView t = (TextView) row.getChildAt(i);
+            boolean on = i == selected;
+            t.setSelected(on);
+            t.setTextColor(color(c, on ? R.color.on_brand : R.color.ink));
+            t.setBackground(on ? round(color(c, R.color.brand), dp(c, 11)) : pressable(c, 0x00000000, dp(c, 11)));
+        }
     }
 }

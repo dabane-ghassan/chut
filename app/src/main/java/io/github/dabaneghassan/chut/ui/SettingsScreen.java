@@ -48,30 +48,41 @@ public final class SettingsScreen {
 
         col.addView(StatsScreen.section(a, a.getString(R.string.sensitivity)));
         int level = p.number(Prefs.SENSITIVITY, 1);
-        col.addView(Ui.segmented(a, a.getResources().getStringArray(R.array.sensitivity), level, i -> {
-            p.setNumber(Prefs.SENSITIVITY, i);
-            a.refresh();
-        }));
         String[] explain = a.getResources().getStringArray(R.array.sensitivity_explain);
         TextView ex = Ui.muted(a, p.flag(Prefs.SENIOR) ? a.getString(R.string.senior_overrides) : explain[level]);
+        col.addView(Ui.segmented(a, a.getResources().getStringArray(R.array.sensitivity), level, i -> {
+            p.setNumber(Prefs.SENSITIVITY, i);
+            if (!p.flag(Prefs.SENIOR)) ex.setText(explain[i]);
+        }));
         ex.setPadding(0, Ui.dp(a, 10), 0, Ui.dp(a, 16));
         col.addView(ex);
 
         col.addView(flag(a, p, Prefs.ARCEP, R.string.set_arcep, R.string.set_arcep_sub));
         col.addView(flag(a, p, Prefs.LEARN, R.string.set_learn, R.string.set_learn_sub));
-        col.addView(Ui.switchRow(a, R.string.set_contacts, R.string.set_contacts_sub, p.flag(Prefs.CONTACTS), (b, on) -> {
+        LinearLayout contactsRow = Ui.switchRow(a, R.string.set_contacts, R.string.set_contacts_sub, p.flag(Prefs.CONTACTS), (b, on) -> {
             p.setFlag(Prefs.CONTACTS, on);
             if (on && !Phone.canReadContacts(a)) a.requestContacts();
-        }));
-        col.addView(flag(a, p, Prefs.NOTIFY_SILENCED, R.string.set_notify_silenced, R.string.set_notify_silenced_sub));
+        });
+        col.addView(contactsRow);
+        LinearLayout silencedRow = (LinearLayout) flag(a, p, Prefs.NOTIFY_SILENCED, R.string.set_notify_silenced, R.string.set_notify_silenced_sub);
+        col.addView(silencedRow);
 
+        // "More settings" opens and closes in place: the rows below are built once and only
+        // shown or hidden, so the page neither rebuilds nor moves.
         col.addView(Ui.space(a, 12));
         col.addView(Ui.divider(a));
-        col.addView(Ui.linkRow(a, a.getString(R.string.more_settings), a.showAdvanced ? "–" : "+", v -> {
+        LinearLayout moreRow = Ui.linkRow(a, a.getString(R.string.more_settings), a.showAdvanced ? "–" : "+", null);
+        TextView sign = (TextView) moreRow.getChildAt(moreRow.getChildCount() - 1);
+        col.addView(moreRow);
+        LinearLayout advanced = Ui.column(a);
+        advanced(a, p, advanced, ex, switchIn(contactsRow), switchIn(silencedRow));
+        advanced.setVisibility(a.showAdvanced ? View.VISIBLE : View.GONE);
+        col.addView(advanced);
+        moreRow.setOnClickListener(v -> {
             a.showAdvanced = !a.showAdvanced;
-            a.refresh();
-        }));
-        if (a.showAdvanced) advanced(a, p, col);
+            advanced.setVisibility(a.showAdvanced ? View.VISIBLE : View.GONE);
+            sign.setText(a.showAdvanced ? "–" : "+");
+        });
 
         // About
         col.addView(Ui.divider(a));
@@ -89,18 +100,26 @@ public final class SettingsScreen {
         return scroll;
     }
 
-    private static void advanced(MainActivity a, Prefs p, LinearLayout col) {
+    /** The switch at the end of a row made by Ui.switchRow. */
+    private static android.widget.Switch switchIn(LinearLayout row) {
+        return (android.widget.Switch) row.getChildAt(row.getChildCount() - 1);
+    }
+
+    private static void advanced(MainActivity a, Prefs p, LinearLayout col, TextView sensitivityText,
+                                 android.widget.Switch contacts, android.widget.Switch silenced) {
         col.addView(flag(a, p, Prefs.CALLBACKS, R.string.set_callbacks, R.string.set_callbacks_sub));
         col.addView(flag(a, p, Prefs.HIDDEN, R.string.set_hidden, R.string.set_hidden_sub));
         col.addView(flag(a, p, Prefs.FOREIGN, R.string.set_foreign, R.string.set_foreign_sub));
         col.addView(Ui.switchRow(a, R.string.set_senior, R.string.set_senior_sub, p.flag(Prefs.SENIOR), (b, on) -> {
             p.setFlag(Prefs.SENIOR, on);
+            String[] explain = a.getResources().getStringArray(R.array.sensitivity_explain);
+            sensitivityText.setText(on ? a.getString(R.string.senior_overrides) : explain[p.number(Prefs.SENSITIVITY, 1)]);
             if (on) {
-                p.setFlag(Prefs.CONTACTS, true);
-                p.setFlag(Prefs.NOTIFY_SILENCED, true);
-                if (!Phone.canReadContacts(a)) a.requestContacts();
+                // Shown on the switches above, without redrawing the page.
+                if (!silenced.isChecked()) silenced.setChecked(true);
+                if (!contacts.isChecked()) contacts.setChecked(true);
+                else if (!Phone.canReadContacts(a)) a.requestContacts();
             }
-            a.refresh();
         }));
         col.addView(flag(a, p, Prefs.NOTIFY_BLOCKED, R.string.set_notify_blocked, R.string.set_notify_blocked_sub));
         col.addView(Ui.switchRow(a, R.string.set_weekly, R.string.set_weekly_sub, p.flag(Prefs.WEEKLY), (b, on) -> {
@@ -108,8 +127,7 @@ public final class SettingsScreen {
             BackgroundJobs.schedule(a);
         }));
         col.addView(Ui.switchRow(a, R.string.set_show_numbers, R.string.set_show_numbers_sub, p.flag(Prefs.SHOW_NUMBERS), (b, on) -> {
-            p.setFlag(Prefs.SHOW_NUMBERS, on);
-            a.refresh();
+            p.setFlag(Prefs.SHOW_NUMBERS, on);     // only the home screen changes
         }));
         if (a.needsNotificationPermission()) {
             col.addView(Ui.linkRow(a, a.getString(R.string.allow_notifications), "›", v -> a.requestNotifications()));
@@ -118,8 +136,9 @@ public final class SettingsScreen {
         // The learned model
         col.addView(Ui.space(a, 16));
         col.addView(StatsScreen.section(a, a.getString(R.string.sec_model)));
-        Learner.Model m = Learning.model(a);
-        if (!m.ready()) {
+        // Built even while folded: read the saved model, never train on the screen's thread.
+        Learner.Model m = Learning.savedModel(a);
+        if (m == null || !m.ready()) {
             col.addView(Ui.muted(a, a.getString(R.string.model_not_ready, Learner.MIN_POSITIVES)));
         } else {
             String recall = m.recall < 0 ? "–" : Math.round(m.recall * 100) + " %";

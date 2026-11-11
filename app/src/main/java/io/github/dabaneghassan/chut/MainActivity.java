@@ -165,8 +165,16 @@ public class MainActivity extends Activity {
         content.removeAllViews();
         content.addView(v, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         if (keepY > 0) {
+            // Scroll back before the first frame is drawn, so the page never flashes at the top.
             final int y = keepY;
-            v.post(() -> v.scrollTo(0, y));
+            v.getViewTreeObserver().addOnPreDrawListener(new android.view.ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    v.getViewTreeObserver().removeOnPreDrawListener(this);
+                    v.scrollTo(0, y);
+                    return false;    // skip this frame; the next one is drawn already scrolled
+                }
+            });
         }
     }
 
