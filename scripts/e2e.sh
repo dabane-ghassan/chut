@@ -185,6 +185,24 @@ sleep 8
 after="$(sh stat -c %Y /data/data/$PKG/files/model.bin)"
 check "weekly retraining job rewrites the model ($before → $after)" newer "$before" "$after"
 
+section "Turning protection off and on from the home screen"
+open_app
+$UI tap "Désactiver" 0 >/dev/null
+check "Turn off asks first" $UI has "Désactiver la protection ?" 0
+$UI tap "Désactiver" 0 >/dev/null
+sleep 1
+check "home says protection is paused" $UI has "Protection en pause" 0
+sh input keyevent 3
+call "+33163777888"
+check "while paused, even a telemarketing range rings (01 63 77 78 88)" eq "$RANG" 1
+check "and chut does not screen it" eq "$(verdict +33163777888)" "none"
+open_app
+$UI tap "Réactiver la protection" 0 >/dev/null
+sleep 1
+check "Turn back on restores protection" $UI has "Protection active" 0
+sh input keyevent 3
+expect_call "and telemarketing is blocked again (01 63 77 78 89)" "+33163777889" 2 "ARCEP_RANGE" 0
+
 section "Screens, French by default"
 open_app
 check "home is in French" $UI has "Protection active" 0

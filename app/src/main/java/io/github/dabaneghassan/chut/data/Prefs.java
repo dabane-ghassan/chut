@@ -24,6 +24,8 @@ public final class Prefs {
     public static final String LANGUAGE = "language";
     /** Off by default: chut never displays phone numbers unless asked to. */
     public static final String SHOW_NUMBERS = "show_numbers";
+    /** Protection paused from the home screen: chut keeps its role but lets every call ring. */
+    public static final String PAUSED = "paused";
 
     private final SharedPreferences p;
 
@@ -75,7 +77,7 @@ public final class Prefs {
             case WEEKLY:
                 return true;
             default:
-                return false;   // hidden, foreign, senior, notify_blocked, show_numbers
+                return false;   // hidden, foreign, senior, notify_blocked, show_numbers, paused
         }
     }
 

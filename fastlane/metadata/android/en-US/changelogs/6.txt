@@ -1,1 +1,2 @@
 • Settings without flicker: switches, sensitivity and "More settings" change in place, without redrawing the page
+• Turn off button on home: every call rings until you turn protection back on

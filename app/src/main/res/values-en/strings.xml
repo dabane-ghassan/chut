@@ -183,4 +183,10 @@
     <string name="list_blocked">Blocked</string>
     <string name="list_allowed">Allowed</string>
     <string name="model_summary">Recognises %1$s of never-seen spam numbers, with %2$s false alarms.</string>
+    <string name="status_paused">Protection is paused</string>
+    <string name="status_paused_explain">Every call rings normally, telemarketing included, until you turn chut back on.</string>
+    <string name="deactivate">Turn off</string>
+    <string name="deactivate_title">Turn off protection?</string>
+    <string name="deactivate_confirm">Every call will ring, telemarketing included, until you turn it back on here. Your lists and settings are kept.</string>
+    <string name="reactivate">Turn protection back on</string>
 </resources>

@@ -27,6 +27,14 @@ public class ScreeningService extends CallScreeningService {
 
     @Override
     public void onScreenCall(Call.Details details) {
+        // Paused from the home screen: every call rings as if chut were not there.
+        try {
+            if (new Prefs(this).flag(Prefs.PAUSED)) {
+                respondToCall(details, new CallResponse.Builder().build());
+                return;
+            }
+        } catch (Throwable ignored) {
+        }
         CallResponse.Builder response = new CallResponse.Builder();
         Engine.Verdict verdict = null;
         String number = "";

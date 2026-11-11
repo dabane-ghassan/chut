@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Ghassan Dabane
 package io.github.dabaneghassan.chut.ui;
 
+import android.app.AlertDialog;
 import android.text.InputType;
 import android.text.format.DateUtils;
 import android.view.Gravity;
@@ -52,17 +53,41 @@ public final class HomeScreen {
         col.addView(head);
         col.addView(Ui.space(a, 40));
 
-        // Protection
+        // Protection: on, paused (every call rings), or off (chut is not the screening app).
         boolean on = a.isProtectionOn();
+        boolean paused = on && prefs.flag(Prefs.PAUSED);
         LinearLayout status = Ui.row(a);
-        status.addView(Ui.dot(a, on ? R.color.allow : R.color.block, 10));
-        status.addView(Ui.text(a, a.getString(on ? R.string.status_on : R.string.status_off), 17, R.color.ink, Ui.semibold()));
+        status.addView(Ui.dot(a, !on ? R.color.block : paused ? R.color.silence : R.color.allow, 10));
+        status.addView(Ui.text(a, a.getString(!on ? R.string.status_off : paused ? R.string.status_paused : R.string.status_on),
+                17, R.color.ink, Ui.semibold()), Ui.weight(1));
+        if (on && !paused) {
+            TextView off = Ui.text(a, a.getString(R.string.deactivate), 14.5f, R.color.brand_ink, Ui.semibold());
+            off.setPadding(Ui.dp(a, 12), Ui.dp(a, 8), 0, Ui.dp(a, 8));
+            off.setOnClickListener(v -> new AlertDialog.Builder(a)
+                    .setTitle(R.string.deactivate_title)
+                    .setMessage(R.string.deactivate_confirm)
+                    .setPositiveButton(R.string.deactivate, (d, w) -> {
+                        prefs.setFlag(Prefs.PAUSED, true);
+                        a.refresh();
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show());
+            status.addView(off);
+        }
         col.addView(status);
         if (!on) {
             TextView why = Ui.muted(a, a.getString(R.string.status_off_explain));
             why.setPadding(0, Ui.dp(a, 8), 0, Ui.dp(a, 14));
             col.addView(why);
             col.addView(Ui.button(a, a.getString(R.string.activate), true, v -> a.requestProtection()));
+        } else if (paused) {
+            TextView why = Ui.muted(a, a.getString(R.string.status_paused_explain));
+            why.setPadding(0, Ui.dp(a, 8), 0, Ui.dp(a, 14));
+            col.addView(why);
+            col.addView(Ui.button(a, a.getString(R.string.reactivate), true, v -> {
+                prefs.setFlag(Prefs.PAUSED, false);
+                a.refresh();
+            }));
         } else if (a.needsNotificationPermission() && prefs.flag(Prefs.NOTIFY_SILENCED)) {
             TextView n = Ui.text(a, a.getString(R.string.allow_notifications) + "  ›", 14.5f, R.color.brand_ink, Ui.semibold());
             n.setPadding(Ui.dp(a, 22), Ui.dp(a, 8), 0, 0);

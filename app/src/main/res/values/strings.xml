@@ -187,4 +187,10 @@
     <string name="list_blocked">Bloqués</string>
     <string name="list_allowed">Autorisés</string>
     <string name="model_summary">Reconnaît %1$s des numéros de spam jamais vus, pour %2$s de fausses alertes.</string>
+    <string name="status_paused">Protection en pause</string>
+    <string name="status_paused_explain">Tous les appels sonnent normalement, démarchage compris, jusqu’à ce que vous réactiviez chut.</string>
+    <string name="deactivate">Désactiver</string>
+    <string name="deactivate_title">Désactiver la protection ?</string>
+    <string name="deactivate_confirm">Tous les appels sonneront, démarchage compris, jusqu’à ce que vous la réactiviez ici. Vos listes et réglages sont conservés.</string>
+    <string name="reactivate">Réactiver la protection</string>
 </resources>
