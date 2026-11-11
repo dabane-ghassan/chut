@@ -128,9 +128,9 @@
     </string-array>
     <string name="senior_overrides">La protection senior est active : chut est strict, et les numéros inconnus sonnent en silencieux.</string>
     <string name="set_arcep">Tranches de démarchage</string>
-    <string name="set_arcep_sub">Depuis 2023, les démarcheurs doivent appeler depuis les 01 62, 01 63, 02 70, 02 71, 03 77, 03 78, 04 24, 04 25, 05 68, 05 69, 09 48 et 09 49.</string>
+    <string name="set_arcep_sub">Bloquées dès l’installation, sans apprentissage. La loi oblige les démarcheurs à appeler depuis les 01 62, 01 63, 02 70, 02 71, 03 77, 03 78, 04 24, 04 25, 05 68, 05 69, 09 48 et 09 49.</string>
     <string name="set_learn">Apprendre de vos blocages</string>
-    <string name="set_learn_sub">Un modèle entraîné sur le téléphone reconnaît les numéros qui ressemblent à ceux que vous bloquez : même bloc de numéros, mêmes heures.</string>
+    <string name="set_learn_sub">Pour les autres numéros. Dès que vous avez bloqué 5 numéros, chut s’entraîne tout seul sur le téléphone et reconnaît ceux qui leur ressemblent. Rien à faire.</string>
     <string name="set_callbacks">Laisser passer les insistants</string>
     <string name="set_callbacks_sub">Un numéro mis en silencieux qui rappelle dans les 5 minutes sonne. Jamais un numéro bloqué.</string>
     <string name="set_hidden">Bloquer les numéros masqués</string>
@@ -138,7 +138,7 @@
     <string name="set_foreign">Bloquer les numéros étrangers</string>
     <string name="set_foreign_sub">Tous les numéros hors de France et d’outre-mer. Vos contacts sonnent toujours.</string>
     <string name="sec_model">Modèle appris</string>
-    <string name="model_not_ready">Le modèle s’active dès que vous avez bloqué au moins %1$d numéros.</string>
+    <string name="model_not_ready">En attente : il s’entraînera tout seul dès que vous aurez bloqué %1$d numéros. Les tranches de démarchage sont bloquées en attendant.</string>
     <string name="model_line">Entraîné sur %1$d numéros bloqués et %2$d numéros fiables, %3$s. Mesuré par validation croisée : le modèle doit reconnaître des numéros bloqués qu’on lui a cachés.</string>
     <string name="model_retrain">Réentraîner maintenant</string>
     <string name="model_retrained">Modèle réentraîné</string>

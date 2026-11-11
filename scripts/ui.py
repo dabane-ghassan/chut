@@ -6,6 +6,7 @@ find a text, tap it, scroll to it.
     ui.py has "Protection active"      exit 0 if the text is on screen (scrolls down to look)
     ui.py tap "Réglages"               tap the first element showing this text
     ui.py texts                        print every text on screen (for the test report)
+    ui.py y "Plus de réglages"         print where a text is on screen now (no scrolling)
 """
 import re
 import subprocess
@@ -68,6 +69,12 @@ def main():
     cmd, args = sys.argv[1], sys.argv[2:]
     if cmd == "texts":
         print(" | ".join(t for t in ((n.get("text") or "").strip() for n in nodes()) if t))
+        return 0
+    if cmd == "y":   # vertical position of a text on screen now, without scrolling
+        n = find(args[0])
+        if n is None:
+            return 1
+        print(center(n)[1])
         return 0
     text = args[0]
     scrolls = int(args[1]) if len(args) > 1 else (6 if cmd == "has" else 6)

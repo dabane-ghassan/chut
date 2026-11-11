@@ -1,0 +1,3 @@
+• "More settings" no longer jumps to the top of the page.
+• Section headings no longer look like buttons.
+• Clearer settings: telemarketing ranges are blocked from install; the model trains itself once 5 numbers are blocked.

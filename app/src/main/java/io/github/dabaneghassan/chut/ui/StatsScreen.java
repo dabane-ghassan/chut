@@ -95,9 +95,13 @@ public final class StatsScreen {
         return h;
     }
 
+    /** A section heading: small and grey, so it never looks like something to tap. */
     static TextView section(MainActivity a, String title) {
-        TextView t = Ui.text(a, title, 15, R.color.ink, Ui.semibold());
-        t.setPadding(0, 0, 0, Ui.dp(a, 12));
+        TextView t = Ui.text(a, title, 13, R.color.muted, Ui.semibold());
+        t.setLetterSpacing(0.04f);
+        t.setPadding(0, Ui.dp(a, 8), 0, Ui.dp(a, 10));
+        t.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+        t.setAccessibilityHeading(true);
         return t;
     }
 

@@ -60,6 +60,7 @@ public class MainActivity extends Activity {
     private static final int REQ_CALL_LOG = 6;
 
     private int page = PAGE_HOME;
+    private int shownPage = -1;
     private FrameLayout content;
     /** Which list an import goes to. */
     private int importList = Store.BLOCKED;
@@ -148,6 +149,12 @@ public class MainActivity extends Activity {
     /** Rebuilds the open screen from the current data. */
     public void refresh() {
         if (content == null) return;
+        // Redrawing the same page (a switch, a fold) keeps it where it was scrolled.
+        int keepY = -1;
+        if (page == shownPage && content.getChildCount() > 0 && content.getChildAt(0) instanceof android.widget.ScrollView) {
+            keepY = content.getChildAt(0).getScrollY();
+        }
+        shownPage = page;
         View v;
         switch (page) {
             case PAGE_STATS: v = StatsScreen.build(this); break;
@@ -157,6 +164,10 @@ public class MainActivity extends Activity {
         }
         content.removeAllViews();
         content.addView(v, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        if (keepY > 0) {
+            final int y = keepY;
+            v.post(() -> v.scrollTo(0, y));
+        }
     }
 
     private void edgeToEdge(View root) {

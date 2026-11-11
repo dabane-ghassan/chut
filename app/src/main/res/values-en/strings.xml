@@ -125,9 +125,9 @@
     </string-array>
     <string name="senior_overrides">Senior protection is on: chut is strict, and unknown numbers ring silently.</string>
     <string name="set_arcep">Telemarketing ranges</string>
-    <string name="set_arcep_sub">Since 2023, telemarketers in France must call from 01 62, 01 63, 02 70, 02 71, 03 77, 03 78, 04 24, 04 25, 05 68, 05 69, 09 48 and 09 49.</string>
+    <string name="set_arcep_sub">Blocked from install, no learning needed. By law, telemarketers in France must call from 01 62, 01 63, 02 70, 02 71, 03 77, 03 78, 04 24, 04 25, 05 68, 05 69, 09 48 and 09 49.</string>
     <string name="set_learn">Learn from your blocks</string>
-    <string name="set_learn_sub">A model trained on the phone recognises numbers that look like the ones you block: same block of numbers, same hours.</string>
+    <string name="set_learn_sub">For all other numbers. Once you have blocked 5 numbers, chut trains itself on the phone and recognises numbers that look like them. Nothing to do.</string>
     <string name="set_callbacks">Let insistent callers through</string>
     <string name="set_callbacks_sub">A silenced number that calls back within 5 minutes rings. Blocked numbers never do.</string>
     <string name="set_hidden">Block hidden numbers</string>
@@ -135,7 +135,7 @@
     <string name="set_foreign">Block foreign numbers</string>
     <string name="set_foreign_sub">Every number outside France and overseas France. Contacts still ring.</string>
     <string name="sec_model">Learned model</string>
-    <string name="model_not_ready">The model starts once you have blocked at least %1$d numbers.</string>
+    <string name="model_not_ready">Waiting: it will train itself once you have blocked %1$d numbers. Telemarketing ranges are blocked in the meantime.</string>
     <string name="model_line">Trained on %1$d blocked and %2$d trusted numbers, %3$s. Measured by cross-validation: the model must recognise blocked numbers that were hidden from it.</string>
     <string name="model_retrain">Retrain now</string>
     <string name="model_retrained">Model retrained</string>

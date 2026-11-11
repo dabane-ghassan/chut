@@ -76,6 +76,8 @@ number_on_screen() { $UI texts | grep -qE '0[1-9]( [0-9]{2}){4}'; }
 not_on_screen() { ! $UI has "$1" 6; }
 mkdir -p shots
 shot() { adb exec-out screencap -p > "shots/$1.png" 2>/dev/null; }
+same_place() { [ -n "$1" ] && [ -n "$2" ] && [ $(( $1 > $2 ? $1 - $2 : $2 - $1 )) -le 20 ]; }
+file_picker_open() { sh dumpsys activity activities | grep -E "mResumedActivity|topResumedActivity" | grep -qi "documentsui"; }
 is_rejected() { [ "$1" = 5 ] || [ "$1" = 6 ]; }
 newer() { [ -n "$2" ] && [ "$2" -gt "$1" ] 2>/dev/null; }
 
@@ -205,9 +207,24 @@ $UI tap "Réglages" 0 >/dev/null
 check "settings show the language switch" $UI has "Langue · Language" 0
 check "advanced settings are folded" not_on_screen "Afficher les numéros"
 shot settings-fr
-$UI tap "Plus de réglages" 8 >/dev/null
-check "the learned model reports its cross-validated recall" $UI has "des numéros de spam jamais vus" 12
+$UI has "Plus de réglages" 8 >/dev/null
+y1="$($UI y "Plus de réglages")"
+$UI tap "Plus de réglages" 0 >/dev/null
+y2="$($UI y "Plus de réglages")"
+check "opening More settings keeps the page where it was ($y1 → $y2)" same_place "$y1" "$y2"
 shot settings-more-fr
+check "Your data is a heading, its actions are below it" $UI has "Choisir dans le journal d’appels" 8
+$UI tap "Choisir dans le journal d’appels" 0 >/dev/null
+check "Pick from your call log opens the list of unknown callers" $UI has "Numéros inconnus qui vous ont appelé" 0
+sh input keyevent 4
+sleep 1
+$UI tap "Exporter listes et historique" 4 >/dev/null
+sleep 2
+check "Export opens the system file picker" file_picker_open
+sh input keyevent 4
+sleep 2
+check "back in chut after the file picker" $UI has "Exporter listes et historique" 4
+check "the learned model reports its cross-validated recall" $UI has "des numéros de spam jamais vus" 12
 
 section "Language switch"
 sh input keyevent 4

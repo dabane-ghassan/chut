@@ -1,0 +1,3 @@
+• « Plus de réglages » ne renvoie plus en haut de la page.
+• Les titres de section ne ressemblent plus à des boutons.
+• Réglages plus clairs : les tranches de démarchage sont bloquées dès l’installation ; le modèle s’entraîne tout seul dès 5 numéros bloqués.
