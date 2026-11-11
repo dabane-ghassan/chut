@@ -5,7 +5,8 @@
 #   build    JVM unit tests (engine, statistics, learned model) and the release APK
 #   device   an Android 14 emulator: instrumented tests inside the app, then the end-to-end
 #            test with real incoming calls (app never opened, force-stopped, killed, rebooted)
-#   publish  test build on the "latest-build" pre-release; a release when versionName is new
+#   publish  test build on the "latest-build" pre-release; a release when versionName is new,
+#            only if the APK is signed with the chut release key (so updates never break)
 #
 # The reports always go to the "test-report" pre-release (device-report.txt, build-log.txt, screenshots).
 name: Android APK
@@ -35,7 +36,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    outputs:
+      release_signed: ${{ steps.cert.outputs.release_signed }}
     env:
+      # The chut release certificate. Obtainium and Android only accept updates signed with it.
+      RELEASE_CERT_SHA256: 9b1d2f11b7f27be50c80684aaf930f303d80f61ec14a7dc70ff54dcdabd28e27
       HAS_KEY: ${{ secrets.CHUT_KEYSTORE_BASE64 != '' && secrets.CHUT_KEYSTORE_PASSWORD != '' }}
     steps:
       - uses: actions/checkout@v4
@@ -71,6 +76,20 @@ jobs:
             --ks-pass env:KS_PASS --key-pass env:KS_PASS \
             --out chut.apk app/build/outputs/apk/release/app-release.apk
           "$BT/apksigner" verify chut.apk
+
+      - name: Which key signed it?
+        id: cert
+        shell: bash
+        run: |
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)
+          got=$("$BT/apksigner" verify --print-certs chut.apk | sed -nE 's/.*certificate SHA-256 digest: ([0-9a-f]+).*/\1/p' | head -1)
+          echo "signer: $got"
+          if [ "$got" = "$RELEASE_CERT_SHA256" ]; then
+            echo "release_signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "release_signed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Signed with the test key, not the chut release key: no release will be published (see BUILDING.md)."
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
@@ -164,6 +183,8 @@ jobs:
 
   publish:
     needs: [build, device]
+    env:
+      RELEASE_CERT_SHA256: 9b1d2f11b7f27be50c80684aaf930f303d80f61ec14a7dc70ff54dcdabd28e27
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
@@ -201,13 +222,12 @@ jobs:
           fi
 
       - name: Write release notes
-        if: steps.rel.outputs.tag != ''
+        if: steps.rel.outputs.tag != '' && needs.build.outputs.release_signed == 'true'
         shell: bash
         env:
           TAG: ${{ steps.rel.outputs.tag }}
         run: |
           code=$(sed -nE 's/^\s*versionCode = ([0-9]+).*/\1/p' app/build.gradle)
-          cp chut.apk "chut-${TAG}.apk"
           {
             echo "## Nouveautés · What's new"
             echo
@@ -221,20 +241,23 @@ jobs:
             echo
             echo "Download **chut.apk** below on your Android phone (Android 10+), open it and allow the install. Then in chut: **Turn on protection**."
             echo
+            echo "**Obtainium** : ajoutez \`https://github.com/${GITHUB_REPOSITORY}\` pour recevoir les mises à jour automatiquement · add it to get updates automatically."
+            echo
+            echo "Certificat de signature · Signing certificate (SHA-256): \`${RELEASE_CERT_SHA256}\`"
+            echo
             echo "Tested on an Android 14 emulator with real incoming calls before release: see the [test report](https://github.com/${GITHUB_REPOSITORY}/releases/tag/test-report)."
           } > release-notes.md
           cat release-notes.md
 
       - name: Publish release
-        if: steps.rel.outputs.tag != ''
+        if: steps.rel.outputs.tag != '' && needs.build.outputs.release_signed == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.rel.outputs.tag }}
           target_commitish: ${{ github.sha }}
           name: chut ${{ steps.rel.outputs.tag }}
           body_path: release-notes.md
-          files: |
-            chut-${{ steps.rel.outputs.tag }}.apk
-            chut.apk
+          # One APK per release, so Obtainium never has to ask which one to install.
+          files: chut.apk
           prerelease: false
           make_latest: true

@@ -1,0 +1,3 @@
+• Signée avec la clé de chut : les mises à jour s'installent par-dessus
+• Mises à jour automatiques avec Obtainium
+• Si vous aviez une version précédente : exportez vos listes, désinstallez une fois, réinstallez

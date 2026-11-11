@@ -23,11 +23,13 @@ sans compte, sans internet. Tout est expliqué en français sur le [site](https:
 
 <p>
   <a href="https://github.com/dabane-ghassan/chut/releases/latest/download/chut.apk"><img alt="Download the latest APK" src="https://img.shields.io/badge/Download-APK-3D35A8?style=for-the-badge&logo=android&logoColor=white"></a>
-  <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22io.github.dabaneghassan.chut%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fdabane-ghassan%2Fchut%22%2C%22author%22%3A%22Ghassan%20Dabane%22%2C%22name%22%3A%22chut%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Echut-v.%2B%5C%5C%5C%5C.apk%24%5C%22%7D%22%7D"><img alt="Get it on Obtainium" src="https://img.shields.io/badge/Obtainium-updates-FF6B57?style=for-the-badge"></a>
+  <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22io.github.dabaneghassan.chut%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fdabane-ghassan%2Fchut%22%2C%22author%22%3A%22Ghassan%20Dabane%22%2C%22name%22%3A%22chut%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Echut%5C%5C%5C%5C.apk%24%5C%22%7D%22%7D"><img alt="Get it on Obtainium" src="https://img.shields.io/badge/Obtainium-updates-FF6B57?style=for-the-badge"></a>
   <img alt="F-Droid: coming soon" src="https://img.shields.io/badge/F--Droid-coming_soon-lightgrey?style=for-the-badge&logo=fdroid&logoColor=white">
 </p>
 
 1. Download `chut.apk` on your phone and open it (allow your browser to install apps if asked).
+   Or, for automatic updates, add chut to [Obtainium](https://github.com/ImranR98/Obtainium) with the
+   badge above (or paste `https://github.com/dabane-ghassan/chut` in Obtainium).
 2. In chut, tap **Turn on protection** and pick chut as your **Caller ID & spam app**.
 3. That's it. Telemarketing stops ringing; doubtful calls ring silently with a notification.
 

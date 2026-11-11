@@ -1,0 +1,3 @@
+• Signed with the chut release key: updates install over each other
+• Automatic updates with Obtainium
+• Coming from an earlier version: export your lists, uninstall once, reinstall

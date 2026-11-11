@@ -18,23 +18,37 @@ pre-release: `test-summary.txt`, `device-report.txt` (each check of the device t
 
 ## Release signing
 
-Without secrets, builds are signed with the committed **test key** (`app/test-signing.jks`): fine for
-trying chut, but anyone could sign an APK with it. For real releases, create your own key once:
+Releases are signed with the chut release key, whose certificate is pinned in
+`.github/workflows/android.yml` (`RELEASE_CERT_SHA256`):
 
-```sh
-keytool -genkeypair -keystore chut-release.jks -alias chut -keyalg RSA -keysize 4096 -validity 10000
-base64 -w0 chut-release.jks   # copy the output
+```
+9b1d2f11b7f27be50c80684aaf930f303d80f61ec14a7dc70ff54dcdabd28e27
 ```
 
-and add two repository secrets (Settings → Secrets and variables → Actions):
+CI reads the key from two repository secrets (Settings → Secrets and variables → Actions):
 
 | Secret | Value |
 |---|---|
-| `CHUT_KEYSTORE_BASE64` | the base64 output |
-| `CHUT_KEYSTORE_PASSWORD` | the keystore password (use the same for the key) |
+| `CHUT_KEYSTORE_BASE64` | `base64 -w0 chut-release.jks` |
+| `CHUT_KEYSTORE_PASSWORD` | the keystore password (the key uses the same one) |
 
-Keep `chut-release.jks` and its password safe and out of the repository: losing them means users must
-uninstall to update. Switching from the test key to your key also needs one uninstall.
+CI only publishes a release when the APK is signed with that certificate. Without the secrets, builds
+are signed with the committed **test key** (`app/test-signing.jks`) and only reach the `latest-build`
+pre-release, so a release can never switch keys by accident and break updates (Android and Obtainium
+refuse an update signed with another key).
+
+Keep `chut-release.jks` and its password safe and out of the repository: losing them means every user
+must uninstall to update. To verify a downloaded APK:
+
+```sh
+apksigner verify --print-certs chut.apk   # SHA-256 digest must match the one above
+```
+
+### Obtainium
+
+Each release carries a single `chut.apk` and is tagged `vX.Y.Z` with the app's `versionName`, so
+Obtainium detects new versions from the GitHub releases (pre-releases `latest-build` and `test-report`
+are ignored).
 
 ## Locally
 
